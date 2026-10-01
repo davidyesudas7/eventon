@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/>
+<title>All Services - EventoNgo</title>
+<!-- Tailwind CSS CDN with plugins -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>tailwind.config = {theme: {extend: {colors: {"teal-brand": "#127b73", "tile-bg": "#e7f5f2", "tile-icon": "#167e74", "nav-active": "#117c72", "nav-inactive": "#5f6f75", "surface-variant": "#263836", "on-secondary": "#003738", "surface-container-high": "#1b2d2b", "surface-container": "#102321", "secondary-container": "#005f61", "on-primary": "#003733", "tertiary-fixed": "#ffdcc1", surface: "#041614", "surface-container-highest": "#263836", "on-primary-fixed-variant": "#00504a", "on-secondary-container": "#8dd6d8", "on-tertiary-fixed": "#2d1601", "on-secondary-fixed-variant": "#004f51", "on-background": "#d2e7e3", "surface-container-low": "#0c1f1d", "on-primary-fixed": "#00201d", "on-tertiary-fixed-variant": "#5f4025", "on-surface-variant": "#bbc9c7", "outline-variant": "#3c4947", "surface-bright": "#2a3d3a", "on-error-container": "#ffdad6", error: "#ffb4ab", "on-error": "#690005", outline: "#869491", "on-tertiary": "#452a11", "tertiary-container": "#e1b592", "error-container": "#93000a", background: "#041614", "on-primary-container": "#005750", tertiary: "#ffd1ac", "surface-container-lowest": "#01110f", "surface-dim": "#041614", "primary-fixed-dim": "#59dacd", "primary-fixed": "#78f7ea", "secondary-fixed": "#a6eff1", "surface-tint": "#59dacd", "on-secondary-fixed": "#002021", "on-surface": "#d2e7e3", "primary-container": "#4ed1c5", secondary: "#8ad3d5", "tertiary-fixed-dim": "#eabe9a", primary: "#6feee1", "inverse-on-surface": "#213431", "secondary-fixed-dim": "#8ad3d5", "inverse-primary": "#006a63", "inverse-surface": "#d2e7e3", "on-tertiary-container": "#65462a"}, fontFamily: {sans: ["-apple-system", "BlinkMacSystemFont", "\"Segoe UI\"", "Roboto", "Helvetica", "Arial", "sans-serif"], headline: ["DM Sans"], display: ["DM Sans"], body: ["DM Sans"], label: ["DM Sans"]}, fontSize: {}, borderRadius: {DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", full: "9999px"}}}};</script>
+<style data-purpose="custom-scroll-and-resets">
+    /* Remove tap highlight & customize scrollbar */
+    * {
+      -webkit-tap-highlight-color: transparent;
+      box-sizing: border-box;
+    }
+    body {
+      background-color: #ffffff;
+      color: #1a1e21;
+      user-select: none;
+      -webkit-font-smoothing: antialiased;
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-white flex justify-center min-h-screen">
+<!-- Mobile Screen Shell Container -->
+<div class="w-full max-w-[440px] bg-white min-h-screen flex flex-col justify-between relative shadow-sm">
+<!-- BEGIN: Header -->
+<header class="sticky top-0 z-30 bg-white/95 backdrop-blur-sm px-4 pt-4 pb-3 flex items-center gap-4" data-purpose="top-navigation-header">
+<!-- Back Button Circular Icon -->
+<button aria-label="Go back" class="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center active:bg-gray-100 transition-colors" type="button">
+<svg class="w-5 h-5 text-gray-800" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24">
+<path d="M19 12H5M12 19l-7-7 7-7"></path>
+</svg>
+</button>
+<!-- Page Title -->
+<h1 class="text-[22px] font-bold text-gray-900 tracking-tight">All services</h1>
+</header>
+<!-- END: Header -->
+<!-- BEGIN: MainContent -->
+<main class="flex-1 px-4 pt-3 pb-24 overflow-y-auto" data-purpose="categories-grid-section">
+<!-- 4 Columns Grid matching reference layout -->
+<div class="grid grid-cols-4 gap-x-3 gap-y-5">
+<!-- 1. Bridal makeup & styling -->
+<a class="flex flex-col items-center group focus:outline-none" data-purpose="service-item" href="#">
+<div class="w-16 h-16 sm:w-[72px] sm:h-[72px] bg-tile-bg rounded-[22px] flex items-center justify-center transition-transform active:scale-95">
+<!-- Lipstick / Makeup Icon -->
+<svg class="w-8 h-8 text-tile-icon" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24">
+<path d="M9 11l4-4"></path>
+<path d="M10 7l1.5-1.5a1.414 1.414 0 0 1 2 0l1 1a1.414 1.414 0 0 1 0 2L13 10"></path>
+<rect height="10" rx="1" width="5" x="8" y="11"></rect>
+<line x1="5.5" x2="6.5" y1="8" y2="8"></line>
+<line x1="6" x2="6" y1="7.5" y2="8.5"></line>
+</svg>
+</div>
+<span class="mt-2 text-[11.5px] leading-[14px] text-center font-medium text-gray-800">Bridal makeup &amp; styling</span>
+</a>
+<!-- 2. Bridal wear & costumes -->
+<a class="flex flex-col items-center group focus:outline-none" data-purpose="service-item" href="#">
+<div class="w-16 h-16 sm:w-[72px] sm:h-[72px] bg-tile-bg rounded-[22px] flex items-center justify-center transition-transform active:scale-95">
+<!-- Dress / Costume Icon -->
+<svg class="w-8 h-8 text-tile-icon" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24">
+<path d="M9 3v2a3 3 0 0 0 6 0V3"></path>
+<path d="M9 5l-2 5l3 2l-2 9h8l-2-9l3-2l-2-5"></path>
+<line stroke-dasharray="1 2" x1="12" x2="12" y1="12" y2="19"></line>
+</svg>
+</div>
+<span class="mt-2 text-[11.5px] leading-[14px] text-center font-medium text-gray-800">Bridal wear &amp; costumes</span>
+</a>
+<!-- 3. Cakes & desserts -->
+<a class="flex flex-col items-center group focus:outline-none" data-purpose="service-item" href="#">
+<div class="w-16 h-16 sm:w-[72px] sm:h-[72px] bg-tile-bg rounded-[22px] flex items-center justify-center transition-transform active:scale-95">
+<!-- Cake Icon -->
+<svg class="w-8 h-8 text-tile-icon" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24">
+<path d="M12 4v3"></path>
+<circle cx="12" cy="3" fill="currentColor" r="0.7"></circle>
+<rect height="4" rx="1.5" width="10" x="7" y="7"></rect>
+<path d="M5 14h14a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-4a1 1 0 0 1 1-1z"></path>
+<path d="M5 14a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2"></path>
+</svg>
+</div>
+<span class="mt-2 text-[11.5px] leading-[14px] text-center font-medium text-gray-800">Cakes &amp; desserts</span>
+</a>
+<!-- 4. Catering -->
+<a class="flex flex-col items-center group focus:outline-none" data-purpose="service-item" href="#">
+<div class="w-16 h-16 sm:w-[72px] sm:h-[72px] bg-tile-bg rounded-[22px] flex items-center justify-center transition-transform active:scale-95">
+<!-- Covered Platter / Cloche Icon -->
+<svg class="w-8 h-8 text-tile-icon" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24">
+<path d="M12 7a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"></path>
+<path d="M4 16h16"></path>
+<path d="M5 16c0-4.418 3.134-8 7-8s7 3.582 7 8"></path>
+<path d="M3 19h18"></path>
+</svg>
+</div>
+<span class="mt-2 text-[11.5px] leading-[14px] text-center font-medium text-gray-800">Catering</span>
+</a>
+<!-- 5. DJ & entertainment -->
+<a class="flex flex-col items-center group focus:outline-none" data-purpose="service-item" href="#">
+<div class="w-16 h-16 sm:w-[72px] sm:h-[72px] bg-tile-bg rounded-[22px] flex items-center justify-center transition-transform active:scale-95">
+<!-- Headphones Icon -->
+<svg class="w-8 h-8 text-tile-icon" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24">
+<path d="M4 13a8 8 0 0 1 16 0"></path>
+<rect height="6" rx="2" width="4" x="3" y="13"></rect>
+<rect height="6" rx="2" width="4" x="17" y="13"></rect>
+<path d="M7 16a2 2 0 0 1 2-2"></path>
+</svg>
+</div>
+<span class="mt-2 text-[11.5px] leading-[14px] text-center font-medium text-gray-800">DJ &amp; entertainment</span>
+</a>
+<!-- 6. Decoration & stage -->
+<a class="flex flex-col items-center group focus:outline-none" data-purpose="service-item" href="#">
+<div class="w-16 h-16 sm:w-[72px] sm:h-[72px] bg-tile-bg rounded-[22px] flex items-center justify-center transition-transform active:scale-95">
+<!-- Flower / Stage Decor Icon -->
+<svg class="w-8 h-8 text-tile-icon" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24">
+<circle cx="12" cy="8" r="2.5"></circle>
+<path d="M12 5.5a2.5 2.5 0 0 0-2.5 2.5c0 1.5 1.5 3 2.5 4c1-1 2.5-2.5 2.5-4a2.5 2.5 0 0 0-2.5-2.5z"></path>
+<path d="M7.5 8a2.5 2.5 0 0 0 2.5 2.5"></path>
+<path d="M16.5 8a2.5 2.5 0 0 1-2.5 2.5"></path>
+<line x1="12" x2="12" y1="12" y2="20"></line>
+<path d="M12 16c-1.5 0-3-1-3-2"></path>
+<path d="M12 14c1.5 0 3-1 3-2"></path>
+</svg>
+</div>
+<span class="mt-2 text-[11.5px] leading-[14px] text-center font-medium text-gray-800">Decoration &amp; stage</span>
+</a>
+<!-- 7. Event & wedding... -->
+<a class="flex flex-col items-center group focus:outline-none" data-purpose="service-item" href="#">
+<div class="w-16 h-16 sm:w-[72px] sm:h-[72px] bg-tile-bg rounded-[22px] flex items-center justify-center transition-transform active:scale-95">
+<!-- Clipboard Check Icon -->
+<svg class="w-8 h-8 text-tile-icon" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24">
+<path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+<rect height="4" rx="1" width="8" x="8" y="2"></rect>
+<path d="M9 11l2 2l4-4"></path>
+<path d="M9 16h6"></path>
+</svg>
+</div>
+<span class="mt-2 text-[11.5px] leading-[14px] text-center font-medium text-gray-800 truncate w-full">Event &amp; wedding...</span>
+</a>
+<!-- 8. Invitations & printing -->
+<a class="flex flex-col items-center group focus:outline-none" data-purpose="service-item" href="#">
+<div class="w-16 h-16 sm:w-[72px] sm:h-[72px] bg-tile-bg rounded-[22px] flex items-center justify-center transition-transform active:scale-95">
+<!-- Envelope with Heart/Card Icon -->
+<svg class="w-8 h-8 text-tile-icon" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24">
+<rect height="14" rx="2" width="18" x="3" y="6"></rect>
+<path d="M3 8l9 6l9-6"></path>
+<circle cx="12" cy="7" fill="#f59e0b" r="1" stroke="#f59e0b"></circle>
+</svg>
+</div>
+<span class="mt-2 text-[11.5px] leading-[14px] text-center font-medium text-gray-800">Invitations &amp; printing</span>
+</a>
+<!-- 9. Kids' party entertainment -->
+<a class="flex flex-col items-center group focus:outline-none" data-purpose="service-item" href="#">
+<div class="w-16 h-16 sm:w-[72px] sm:h-[72px] bg-tile-bg rounded-[22px] flex items-center justify-center transition-transform active:scale-95">
+<!-- Balloons Icon -->
+<svg class="w-8 h-8 text-tile-icon" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24">
+<circle cx="9" cy="8" r="4"></circle>
+<path d="M9 12l-1 2"></path>
+<circle cx="15" cy="11" r="3.5"></circle>
+<path d="M15 14.5l1 2"></path>
+<path d="M8 14c0 3 2 5 2 6"></path>
+<path d="M16 16.5c0 2-1 3-1 3.5"></path>
+</svg>
+</div>
+<span class="mt-2 text-[11.5px] leading-[14px] text-center font-medium text-gray-800">Kids' party entertainment</span>
+</a>
+<!-- 10. Mehendi artists -->
+<a class="flex flex-col items-center group focus:outline-none" data-purpose="service-item" href="#">
+<div class="w-16 h-16 sm:w-[72px] sm:h-[72px] bg-tile-bg rounded-[22px] flex items-center justify-center transition-transform active:scale-95">
+<!-- Palm / Hamsa Hand Icon -->
+<svg class="w-8 h-8 text-tile-icon" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24">
+<path d="M10 11V6a1.5 1.5 0 0 1 3 0v5"></path>
+<path d="M7 11V8a1.5 1.5 0 0 1 3 0"></path>
+<path d="M13 11V8a1.5 1.5 0 0 1 3 0v3"></path>
+<path d="M16 11.5V10a1.5 1.5 0 0 1 3 0v4c0 4-3 6.5-6.5 6.5s-6-2-6.5-5l-.5-3.5a1.5 1.5 0 0 1 3-1V11"></path>
+<circle cx="12" cy="15" fill="currentColor" r="1"></circle>
+</svg>
+</div>
+<span class="mt-2 text-[11.5px] leading-[14px] text-center font-medium text-gray-800">Mehendi artists</span>
+</a>
+<!-- 11. Pandal, tent & furniture -->
+<a class="flex flex-col items-center group focus:outline-none" data-purpose="service-item" href="#">
+<div class="w-16 h-16 sm:w-[72px] sm:h-[72px] bg-tile-bg rounded-[22px] flex items-center justify-center transition-transform active:scale-95">
+<!-- Tent / Canopy Icon -->
+<svg class="w-8 h-8 text-tile-icon" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24">
+<path d="M12 4L3 19h18L12 4z"></path>
+<path d="M12 4v15"></path>
+<path d="M9 19l3-7l3 7"></path>
+</svg>
+</div>
+<span class="mt-2 text-[11.5px] leading-[14px] text-center font-medium text-gray-800">Pandal, tent &amp; furniture</span>
+</a>
+<!-- 12. Photography & videography -->
+<a class="flex flex-col items-center group focus:outline-none" data-purpose="service-item" href="#">
+<div class="w-16 h-16 sm:w-[72px] sm:h-[72px] bg-tile-bg rounded-[22px] flex items-center justify-center transition-transform active:scale-95">
+<!-- Camera Icon -->
+<svg class="w-8 h-8 text-tile-icon" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24">
+<path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+<circle cx="12" cy="13" r="3.5"></circle>
+</svg>
+</div>
+<span class="mt-2 text-[11.5px] leading-[14px] text-center font-medium text-gray-800">Photography &amp; videography</span>
+</a>
+<!-- 13. Return gifts & favours -->
+<a class="flex flex-col items-center group focus:outline-none" data-purpose="service-item" href="#">
+<div class="w-16 h-16 sm:w-[72px] sm:h-[72px] bg-tile-bg rounded-[22px] flex items-center justify-center transition-transform active:scale-95">
+<!-- Gift Box Icon -->
+<svg class="w-8 h-8 text-tile-icon" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24">
+<polyline points="20 12 20 21 4 21 4 12"></polyline>
+<rect height="5" rx="1" width="20" x="2" y="7"></rect>
+<line x1="12" x2="12" y1="7" y2="21"></line>
+<path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path>
+<path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path>
+</svg>
+</div>
+<span class="mt-2 text-[11.5px] leading-[14px] text-center font-medium text-gray-800">Return gifts &amp; favours</span>
+</a>
+<!-- 14. Sound, light & stage -->
+<a class="flex flex-col items-center group focus:outline-none" data-purpose="service-item" href="#">
+<div class="w-16 h-16 sm:w-[72px] sm:h-[72px] bg-tile-bg rounded-[22px] flex items-center justify-center transition-transform active:scale-95">
+<!-- Speaker Cabinet Icon -->
+<svg class="w-8 h-8 text-tile-icon" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24">
+<rect height="18" rx="2" width="12" x="6" y="3"></rect>
+<circle cx="12" cy="8" r="1.5"></circle>
+<circle cx="12" cy="15" r="2.5"></circle>
+<line x1="12" x2="12" y1="15" y2="15.01"></line>
+</svg>
+</div>
+<span class="mt-2 text-[11.5px] leading-[14px] text-center font-medium text-gray-800">Sound, light &amp; stage</span>
+</a>
+<!-- 15. Traditional performers -->
+<a class="flex flex-col items-center group focus:outline-none" data-purpose="service-item" href="#">
+<div class="w-16 h-16 sm:w-[72px] sm:h-[72px] bg-tile-bg rounded-[22px] flex items-center justify-center transition-transform active:scale-95">
+<!-- Traditional Performer / Pot / Mask Icon -->
+<svg class="w-8 h-8 text-tile-icon" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24">
+<path d="M5 8c0 4 2 8 7 8s7-4 7-8"></path>
+<path d="M4 8h16"></path>
+<path d="M12 3v3"></path>
+<path d="M8 5l2 3"></path>
+<path d="M16 5l-2 3"></path>
+<path d="M8 12c1 1.5 3 2 4 2s3-.5 4-2"></path>
+</svg>
+</div>
+<span class="mt-2 text-[11.5px] leading-[14px] text-center font-medium text-gray-800">Traditional performers</span>
+</a>
+<!-- 16. Vehicle rental -->
+<a class="flex flex-col items-center group focus:outline-none" data-purpose="service-item" href="#">
+<div class="w-16 h-16 sm:w-[72px] sm:h-[72px] bg-tile-bg rounded-[22px] flex items-center justify-center transition-transform active:scale-95">
+<!-- Car / Vehicle Icon -->
+<svg class="w-8 h-8 text-tile-icon" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24">
+<path d="M5 11l2-4h10l2 4"></path>
+<rect height="6" rx="2" width="18" x="3" y="11"></rect>
+<circle cx="7" cy="17" r="1.5"></circle>
+<circle cx="17" cy="17" r="1.5"></circle>
+</svg>
+</div>
+<span class="mt-2 text-[11.5px] leading-[14px] text-center font-medium text-gray-800">Vehicle rental</span>
+</a>
+<!-- 17. Venues -->
+<a class="flex flex-col items-center group focus:outline-none" data-purpose="service-item" href="#">
+<div class="w-16 h-16 sm:w-[72px] sm:h-[72px] bg-tile-bg rounded-[22px] flex items-center justify-center transition-transform active:scale-95">
+<!-- Classic Venue / Pillar Building Icon -->
+<svg class="w-8 h-8 text-tile-icon" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24">
+<path d="M3 9l9-5l9 5"></path>
+<line x1="4" x2="20" y1="9" y2="9"></line>
+<line x1="6" x2="6" y1="9" y2="18"></line>
+<line x1="10" x2="10" y1="9" y2="18"></line>
+<line x1="14" x2="14" y1="9" y2="18"></line>
+<line x1="18" x2="18" y1="9" y2="18"></line>
+<line x1="3" x2="21" y1="18" y2="18"></line>
+</svg>
+</div>
+<span class="mt-2 text-[11.5px] leading-[14px] text-center font-medium text-gray-800">Venues</span>
+</a>
+</div>
+</main>
+<!-- END: MainContent -->
+<!-- BEGIN: BottomNav -->
+<nav class="fixed bottom-0 left-0 right-0 max-w-[440px] mx-auto bg-white border-t border-gray-100 flex items-center justify-around py-2.5 z-40" data-purpose="main-bottom-navigation">
+<!-- Home (Active) -->
+<a aria-current="page" class="flex flex-col items-center gap-1 text-nav-active focus:outline-none" data-purpose="nav-item" href="#">
+<svg class="w-6 h-6 stroke-[2]" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" viewbox="0 0 24 24">
+<path d="M3 10.5L12 3l9 7.5V20a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1v-4a1 1 0 0 0-1-1h-2a1 1 0 0 0-1 1v4a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-9.5z"></path>
+</svg>
+<span class="text-[11px] font-semibold">Home</span>
+</a>
+<!-- Explore -->
+<a class="flex flex-col items-center gap-1 text-nav-inactive hover:text-nav-active focus:outline-none" data-purpose="nav-item" href="#">
+<svg class="w-6 h-6 stroke-[1.8]" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" viewbox="0 0 24 24">
+<circle cx="11" cy="11" r="7"></circle>
+<line x1="21" x2="16.65" y1="21" y2="16.65"></line>
+</svg>
+<span class="text-[11px] font-medium">Explore</span>
+</a>
+<!-- Bookings -->
+<a class="flex flex-col items-center gap-1 text-nav-inactive hover:text-nav-active focus:outline-none" data-purpose="nav-item" href="#">
+<svg class="w-6 h-6 stroke-[1.8]" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" viewbox="0 0 24 24">
+<rect height="17" rx="2" width="18" x="3" y="4"></rect>
+<line x1="16" x2="16" y1="2" y2="6"></line>
+<line x1="8" x2="8" y1="2" y2="6"></line>
+<line x1="3" x2="21" y1="10" y2="10"></line>
+<circle cx="8" cy="14" fill="currentColor" r="0.75"></circle>
+<circle cx="12" cy="14" fill="currentColor" r="0.75"></circle>
+<circle cx="16" cy="14" fill="currentColor" r="0.75"></circle>
+</svg>
+<span class="text-[11px] font-medium">Bookings</span>
+</a>
+<!-- Chats -->
+<a class="flex flex-col items-center gap-1 text-nav-inactive hover:text-nav-active focus:outline-none" data-purpose="nav-item" href="#">
+<svg class="w-6 h-6 stroke-[1.8]" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" viewbox="0 0 24 24">
+<path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+</svg>
+<span class="text-[11px] font-medium">Chats</span>
+</a>
+<!-- Profile -->
+<a class="flex flex-col items-center gap-1 text-nav-inactive hover:text-nav-active focus:outline-none" data-purpose="nav-item" href="#">
+<svg class="w-6 h-6 stroke-[1.8]" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" viewbox="0 0 24 24">
+<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+<circle cx="12" cy="7" r="4"></circle>
+</svg>
+<span class="text-[11px] font-medium">Profile</span>
+</a>
+</nav>
+<!-- END: BottomNav -->
+</div>
+</body></html>

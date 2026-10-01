@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>EventOn - Search Vendors</title>
+<!-- Tailwind CSS v3 CDN with plugins -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>tailwind.config = {theme: {extend: {colors: {brand: {teal: "#0e766e", darkteal: "#115e59", lightteal: "#f0fdfa"}, "surface-variant": "#263836", "on-secondary": "#003738", "surface-container-high": "#1b2d2b", "surface-container": "#102321", "secondary-container": "#005f61", "on-primary": "#003733", "tertiary-fixed": "#ffdcc1", surface: "#041614", "surface-container-highest": "#263836", "on-primary-fixed-variant": "#00504a", "on-secondary-container": "#8dd6d8", "on-tertiary-fixed": "#2d1601", "on-secondary-fixed-variant": "#004f51", "on-background": "#d2e7e3", "surface-container-low": "#0c1f1d", "on-primary-fixed": "#00201d", "on-tertiary-fixed-variant": "#5f4025", "on-surface-variant": "#bbc9c7", "outline-variant": "#3c4947", "surface-bright": "#2a3d3a", "on-error-container": "#ffdad6", error: "#ffb4ab", "on-error": "#690005", outline: "#869491", "on-tertiary": "#452a11", "tertiary-container": "#e1b592", "error-container": "#93000a", background: "#041614", "on-primary-container": "#005750", tertiary: "#ffd1ac", "surface-container-lowest": "#01110f", "surface-dim": "#041614", "primary-fixed-dim": "#59dacd", "primary-fixed": "#78f7ea", "secondary-fixed": "#a6eff1", "surface-tint": "#59dacd", "on-secondary-fixed": "#002021", "on-surface": "#d2e7e3", "primary-container": "#4ed1c5", secondary: "#8ad3d5", "tertiary-fixed-dim": "#eabe9a", primary: "#6feee1", "inverse-on-surface": "#213431", "secondary-fixed-dim": "#8ad3d5", "inverse-primary": "#006a63", "inverse-surface": "#d2e7e3", "on-tertiary-container": "#65462a"}, fontFamily: {headline: ["DM Sans"], display: ["DM Sans"], body: ["DM Sans"], label: ["DM Sans"]}, fontSize: {}, borderRadius: {DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", full: "9999px"}}}};</script>
+<style data-purpose="custom-scroll-and-tap">
+    /* Remove default tap highlights on mobile */
+    * {
+      -webkit-tap-highlight-color: transparent;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+    /* Hide scrollbars for clean app look */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-gray-100 flex justify-center items-start min-h-screen text-slate-800 antialiased selection:bg-teal-100">
+<!-- BEGIN: AppContainer -->
+<!-- Constrained mobile layout shell (iOS / Android Mobile viewport simulation) -->
+<div class="w-full max-w-md min-h-screen bg-white shadow-xl relative flex flex-col pb-24 overflow-x-hidden">
+<!-- BEGIN: TopHeader -->
+<header class="sticky top-0 z-40 bg-white px-4 py-3 flex items-center gap-3 border-b border-gray-100">
+<button aria-label="Go back" class="p-1 -ml-1 text-slate-700 hover:text-slate-900 transition-colors">
+<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2.2" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M10 19l-7-7m0 0l7-7m-7 7h18" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</button>
+<div class="flex items-center text-2xl font-bold tracking-tight text-slate-900">
+<span>Event</span><span class="text-teal-700">On</span>
+</div>
+</header>
+<!-- END: TopHeader -->
+<!-- BEGIN: SearchAndFiltersSection -->
+<section class="px-4 pt-3 pb-2 space-y-3">
+<!-- Search Input & Filter Button Row -->
+<div class="flex items-center gap-2.5">
+<!-- Search Field -->
+<div class="relative flex-1">
+<div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
+<svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</div>
+<input class="w-full pl-10 pr-3 py-2.5 bg-white border border-gray-300 rounded-xl text-[14.5px] text-slate-800 placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-teal-700 focus:border-teal-700" placeholder="Search 'pandal, tent &amp; furniture'" type="text"/>
+</div>
+<!-- Filter Icon Box -->
+<button aria-label="Filter" class="w-11 h-11 flex-shrink-0 flex items-center justify-center border border-gray-300 rounded-xl bg-white text-slate-600 hover:bg-gray-50 active:scale-95 transition-all">
+<svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M3 4h18M6 10h12M9 16h6" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</button>
+</div>
+<!-- Location Selector Pill -->
+<div class="flex">
+<button class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-gray-300 text-[13.5px] font-medium text-slate-800 bg-white hover:bg-gray-50 active:bg-gray-100 transition-colors shadow-2xs">
+<!-- Pin Icon -->
+<svg class="h-3.5 w-3.5 text-slate-600" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" stroke-linecap="round" stroke-linejoin="round"></path>
+<path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+<span>Alappuzha · 50 km</span>
+<!-- Chevron Down Icon -->
+<svg class="h-3.5 w-3.5 text-slate-600 ml-0.5" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</button>
+</div>
+</section>
+<!-- END: SearchAndFiltersSection -->
+<!-- BEGIN: VendorFeed -->
+<main class="px-4 py-2 space-y-4 flex-1">
+<!-- Vendor Card 1: Royal Wedding Cars -->
+<article class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden flex flex-col" data-purpose="vendor-card">
+<!-- Card Image & Badge -->
+<div class="relative w-full h-56 bg-slate-100">
+<img alt="Red vintage classic Ford Mustang car" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAbPT2bwRSiFk6dudQ57nkrkeEx9xampafAVXoyrFAfj6tOlTO9h55QmmZUfAL10XgIpfkhD1ezFKi6dJ8ITR1g5Fg7NCQNbA1wp3Gyi9UB4TT8iXAqrtOQHWGZXOgXHjX3zwskE17lmVpocrWu-IO1QEqluPaRGiBvUqj1VZ-VN2k8HOLlyn9Fz5Mo7YQPWXI1aVL5oZR-HE7r0A1ygA38ZKuUnO12DKkXj7_JSdlN_5GOgJRFG9-J"/>
+<!-- 'Added' Status Badge -->
+<div class="absolute top-3 right-3 bg-teal-800/90 backdrop-blur-xs text-white text-[12px] font-medium px-2.5 py-1 rounded-full flex items-center gap-1 shadow-sm">
+<svg class="h-3.5 w-3.5" fill="currentColor" viewbox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+<path clip-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" fill-rule="evenodd"></path>
+</svg>
+<span>Added</span>
+</div>
+</div>
+<!-- Card Content Body -->
+<div class="p-3.5 flex flex-col space-y-1">
+<h2 class="text-base font-bold text-slate-900 tracking-tight">Royal Wedding Cars</h2>
+<p class="text-[13px] text-slate-600 leading-snug line-clamp-2">
+            Chauffeur-driven sedans and vintage cars for weddings and photoshoots across the city.
+          </p>
+<!-- Price and Distance Meta -->
+<div class="pt-2 flex items-center justify-between text-[13px]">
+<span class="font-medium text-teal-800">From ₹6,500</span>
+<span class="text-slate-500 font-normal">40 km away</span>
+</div>
+</div>
+</article>
+<!-- Vendor Card 2: DJ & Entertainment (Partially visible) -->
+<article class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden flex flex-col" data-purpose="vendor-card">
+<!-- DJ Image with Quote button -->
+<div class="relative w-full h-44 bg-slate-800">
+<img alt="DJ mixing console" class="w-full h-full object-cover opacity-90" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCQfXKLlE1lRBGr1BcK754za_BeHpK2jHv8ILGci4K2yYXUgYm3TEYwH-Go2XcaW1x-YX2RCdLrH5LXbjUtAKzPxVMOTGnuRMAyprpyrc6ETQBMGzocwT71_41rvfo6ryWFAsQDvMI7Z8xNhF0WbWc4IPLsgwfqZ7UF4bBfXLk9vzdsJTcMW6zd09F0tQodY4iYMhdoMTb70Gp0FXvuAHs3Sk_mvEwlhjts93RVTmjwTykqOd3aTv34"/>
+<!-- '+ Quote' Button -->
+<button class="absolute top-3 right-3 bg-white/95 text-slate-900 text-xs font-semibold px-3 py-1 rounded-full shadow hover:bg-white active:scale-95 transition-transform flex items-center gap-1">
+<span class="text-sm leading-none">+</span>
+<span>Quote</span>
+</button>
+</div>
+<!-- Card Body -->
+<div class="p-3.5">
+<h2 class="text-base font-bold text-slate-900">Elite Beat DJs &amp; Sound</h2>
+<p class="text-[13px] text-slate-600">Premium sound systems and lighting setups for live celebrations.</p>
+</div>
+</article>
+</main>
+<!-- END: VendorFeed -->
+<!-- BEGIN: FloatingActionBar -->
+<!-- Request Quotes Floating Banner Bar -->
+<div class="fixed bottom-16 inset-x-0 mx-auto max-w-[calc(100%-2rem)] w-full sm:max-w-[390px] z-50 pointer-events-auto">
+<div class="bg-slate-900 text-white rounded-xl py-3 px-4 flex items-center justify-between shadow-xl">
+<span class="text-[14px] font-medium tracking-tight text-gray-200">
+          1 business picked
+        </span>
+<button class="inline-flex items-center gap-1.5 text-[14px] font-semibold text-white hover:text-gray-200 active:opacity-90">
+<span>Request quotes</span>
+<svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.5" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M14 5l7 7m0 0l-7 7m7-7H3" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</button>
+</div>
+</div>
+<!-- END: FloatingActionBar -->
+<!-- BEGIN: BottomNavigation -->
+<!-- Mobile App standard 5-tab bar -->
+<nav class="fixed bottom-0 inset-x-0 mx-auto max-w-md bg-white border-t border-gray-200 z-40 px-2 py-1.5">
+<ul class="flex items-center justify-around">
+<!-- Tab: Home -->
+<li class="flex-1">
+<a class="flex flex-col items-center justify-center py-1 text-slate-600 hover:text-teal-700" href="#">
+<svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+<span class="text-[11px] mt-0.5 font-normal">Home</span>
+</a>
+</li>
+<!-- Tab: Explore (Active) -->
+<li class="flex-1">
+<a class="flex flex-col items-center justify-center py-1 text-teal-700" href="#">
+<svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2.2" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+<span class="text-[11px] mt-0.5 font-bold">Explore</span>
+</a>
+</li>
+<!-- Tab: Bookings -->
+<li class="flex-1">
+<a class="flex flex-col items-center justify-center py-1 text-slate-600 hover:text-teal-700" href="#">
+<svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+<span class="text-[11px] mt-0.5 font-normal">Bookings</span>
+</a>
+</li>
+<!-- Tab: Chats -->
+<li class="flex-1">
+<a class="flex flex-col items-center justify-center py-1 text-slate-600 hover:text-teal-700" href="#">
+<svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+<span class="text-[11px] mt-0.5 font-normal">Chats</span>
+</a>
+</li>
+<!-- Tab: Profile -->
+<li class="flex-1">
+<a class="flex flex-col items-center justify-center py-1 text-slate-600 hover:text-teal-700" href="#">
+<svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+<span class="text-[11px] mt-0.5 font-normal">Profile</span>
+</a>
+</li>
+</ul>
+</nav>
+<!-- END: BottomNavigation -->
+</div>
+<!-- END: AppContainer -->
+</body></html>

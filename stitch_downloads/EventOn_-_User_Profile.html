@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>EventOn - Profile</title>
+<!-- Tailwind CSS CDN with plugins -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>tailwind.config = {theme: {extend: {colors: {teal: {brand: "#165e56", brandLight: "#189285", navActive: "#128073"}, surface: "#041614", "surface-variant": "#263836", "on-secondary": "#003738", "surface-container-high": "#1b2d2b", "surface-container": "#102321", "secondary-container": "#005f61", "on-primary": "#003733", "tertiary-fixed": "#ffdcc1", "surface-container-highest": "#263836", "on-primary-fixed-variant": "#00504a", "on-secondary-container": "#8dd6d8", "on-tertiary-fixed": "#2d1601", "on-secondary-fixed-variant": "#004f51", "on-background": "#d2e7e3", "surface-container-low": "#0c1f1d", "on-primary-fixed": "#00201d", "on-tertiary-fixed-variant": "#5f4025", "on-surface-variant": "#bbc9c7", "outline-variant": "#3c4947", "surface-bright": "#2a3d3a", "on-error-container": "#ffdad6", error: "#ffb4ab", "on-error": "#690005", outline: "#869491", "on-tertiary": "#452a11", "tertiary-container": "#e1b592", "error-container": "#93000a", background: "#041614", "on-primary-container": "#005750", tertiary: "#ffd1ac", "surface-container-lowest": "#01110f", "surface-dim": "#041614", "primary-fixed-dim": "#59dacd", "primary-fixed": "#78f7ea", "secondary-fixed": "#a6eff1", "surface-tint": "#59dacd", "on-secondary-fixed": "#002021", "on-surface": "#d2e7e3", "primary-container": "#4ed1c5", secondary: "#8ad3d5", "tertiary-fixed-dim": "#eabe9a", primary: "#6feee1", "inverse-on-surface": "#213431", "secondary-fixed-dim": "#8ad3d5", "inverse-primary": "#006a63", "inverse-surface": "#d2e7e3", "on-tertiary-container": "#65462a"}, fontFamily: {headline: ["DM Sans"], display: ["DM Sans"], body: ["DM Sans"], label: ["DM Sans"]}, fontSize: {}, borderRadius: {DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", full: "9999px"}}}};</script>
+<!-- Custom Style Tag for Global Font and Mobile Enhancements -->
+<style data-purpose="base-styling">
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+      background-color: #ffffff;
+    }
+    input::placeholder {
+      color: #94a3b8;
+      font-size: 1.05rem;
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-white text-surface-textMain flex justify-center min-h-screen">
+<!-- Mobile Viewport Container -->
+<div class="w-full max-w-md bg-white min-h-screen flex flex-col justify-between relative shadow-sm">
+<!-- BEGIN: TopHeader -->
+<header class="w-full px-5 pt-4 pb-3 flex items-center border-b border-gray-100 sticky top-0 bg-white/95 backdrop-blur-xs z-10">
+<!-- Back Arrow Icon Button -->
+<button aria-label="Go back" class="p-1 -ml-1 text-gray-800 hover:text-black" type="button">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24">
+<path d="M19 12H5M12 19l-7-7 7-7"></path>
+</svg>
+</button>
+<!-- Brand Logo / Title -->
+<div class="ml-5 flex items-center text-[1.4rem] font-bold tracking-tight">
+<span class="text-[#13222a]">Event</span><span class="text-[#0d8478]">On</span>
+</div>
+</header>
+<!-- END: TopHeader -->
+<!-- BEGIN: MainContent -->
+<main class="flex-1 px-5 pt-6 pb-24 overflow-y-auto">
+<!-- Page Title -->
+<h1 class="text-[1.8rem] font-bold text-[#1a202c] mb-6 tracking-tight">Profile</h1>
+<!-- BEGIN: UserDetailsCard -->
+<section class="w-full rounded-2xl border border-gray-200/90 p-5 mb-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)]" data-purpose="user-info-card">
+<h2 class="text-[1.18rem] font-semibold text-gray-900 leading-snug">David Yesudas</h2>
+<p class="text-[0.98rem] text-[#6b7280] font-normal mt-0.5">david@gmail.com</p>
+</section>
+<!-- END: UserDetailsCard -->
+<!-- BEGIN: HomeLocationSection -->
+<section class="w-full rounded-2xl border border-gray-200/90 p-5 mb-4 shadow-[0_1px_3px_rgba(0,0,0,0.02)]" data-purpose="location-settings">
+<h2 class="text-[1.2rem] font-semibold text-gray-900 mb-2 tracking-tight">Home location</h2>
+<!-- Explanation Note -->
+<p class="text-[0.95rem] text-[#64748b] leading-[1.42] mb-5">
+          Where you live — this can decide which franchise territory a booking's commission goes to.
+        </p>
+<form action="#" class="space-y-4" method="POST" onsubmit="event.preventDefault();">
+<!-- Pincode Input Field -->
+<div data-purpose="input-group">
+<label class="block text-[1.02rem] font-normal text-[#475569] mb-1.5" for="pincode">Pincode</label>
+<input class="w-full h-13 px-4 py-3 rounded-xl border border-gray-300 text-gray-800 text-[1.05rem] focus:ring-1 focus:ring-teal-brand focus:border-teal-brand focus:outline-none transition duration-150" id="pincode" name="pincode" placeholder="e.g. 641004" type="text"/>
+</div>
+<!-- Panchayat/Municipality/Corporation Input Field -->
+<div class="pt-1" data-purpose="input-group">
+<label class="block text-[1.02rem] font-normal text-[#475569] mb-1.5 leading-snug" for="local-body">
+              Panchayat, municipality or corporation (Kerala only)
+            </label>
+<input class="w-full h-13 px-4 py-3 rounded-xl border border-gray-300 text-gray-800 text-[1.05rem] focus:ring-1 focus:ring-teal-brand focus:border-teal-brand focus:outline-none transition duration-150" id="local-body" name="local-body" placeholder="Start typing your panchayat's name..." type="text"/>
+</div>
+<!-- Submit Button -->
+<div class="pt-2">
+<button class="w-full h-[52px] bg-[#1a5b54] hover:bg-[#154c46] active:bg-[#12423d] text-white font-medium text-[1.05rem] rounded-xl flex items-center justify-center transition shadow-sm tracking-wide" type="submit">
+              Save home location
+            </button>
+</div>
+</form>
+</section>
+<!-- END: HomeLocationSection -->
+<!-- BEGIN: ActionButtonsList -->
+<section class="space-y-3 pt-1" data-purpose="action-list">
+<!-- My Bookings Button -->
+<a class="flex items-center w-full px-5 py-3.5 rounded-2xl border border-gray-200/90 text-gray-900 text-[1.06rem] font-medium hover:bg-gray-50 active:bg-gray-100 transition shadow-[0_1px_3px_rgba(0,0,0,0.02)]" href="#">
+          My bookings
+        </a>
+<!-- Log Out Button -->
+<button class="flex items-center w-full px-5 py-3.5 rounded-2xl border border-gray-200/90 text-[#b93822] text-[1.06rem] font-medium hover:bg-red-50/40 active:bg-red-50 transition shadow-[0_1px_3px_rgba(0,0,0,0.02)] text-left" type="button">
+          Log out
+        </button>
+</section>
+<!-- END: ActionButtonsList -->
+</main>
+<!-- END: MainContent -->
+<!-- BEGIN: BottomNavigation -->
+<nav class="w-full bg-white border-t border-gray-200 fixed bottom-0 max-w-md z-20 py-2 px-3 flex justify-between items-center text-xs">
+<!-- Home Tab -->
+<a class="flex flex-col items-center justify-center flex-1 py-1 text-gray-600 hover:text-gray-900" href="#">
+<svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewbox="0 0 24 24">
+<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+<polyline points="9 22 9 12 15 12 15 22"></polyline>
+</svg>
+<span class="text-[0.72rem] tracking-tight">Home</span>
+</a>
+<!-- Explore Tab -->
+<a class="flex flex-col items-center justify-center flex-1 py-1 text-gray-600 hover:text-gray-900" href="#">
+<svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewbox="0 0 24 24">
+<circle cx="11" cy="11" r="8"></circle>
+<line x1="21" x2="16.65" y1="21" y2="16.65"></line>
+</svg>
+<span class="text-[0.72rem] tracking-tight">Explore</span>
+</a>
+<!-- Bookings Tab -->
+<a class="flex flex-col items-center justify-center flex-1 py-1 text-gray-600 hover:text-gray-900" href="#">
+<svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewbox="0 0 24 24">
+<rect height="18" rx="2" ry="2" width="18" x="3" y="4"></rect>
+<line x1="16" x2="16" y1="2" y2="6"></line>
+<line x1="8" x2="8" y1="2" y2="6"></line>
+<line x1="3" x2="21" y1="10" y2="10"></line>
+<!-- Calendar detail marks -->
+<circle cx="8" cy="14" fill="currentColor" r="0.8"></circle>
+<circle cx="12" cy="14" fill="currentColor" r="0.8"></circle>
+<circle cx="16" cy="14" fill="currentColor" r="0.8"></circle>
+<circle cx="8" cy="18" fill="currentColor" r="0.8"></circle>
+<circle cx="12" cy="18" fill="currentColor" r="0.8"></circle>
+</svg>
+<span class="text-[0.72rem] tracking-tight">Bookings</span>
+</a>
+<!-- Chats Tab -->
+<a class="flex flex-col items-center justify-center flex-1 py-1 text-gray-600 hover:text-gray-900" href="#">
+<svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewbox="0 0 24 24">
+<path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+</svg>
+<span class="text-[0.72rem] tracking-tight">Chats</span>
+</a>
+<!-- Profile Tab (Active) -->
+<a aria-current="page" class="flex flex-col items-center justify-center flex-1 py-1 text-[#15796e] font-medium" href="#">
+<svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" viewbox="0 0 24 24">
+<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+<circle cx="12" cy="7" r="4"></circle>
+</svg>
+<span class="text-[0.72rem] font-semibold tracking-tight">Profile</span>
+</a>
+</nav>
+<!-- END: BottomNavigation -->
+</div>
+</body></html>

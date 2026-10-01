@@ -1,0 +1,372 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+<title>EventOn - Event Planning &amp; Vendors</title>
+<!-- Google Fonts: Inter -->
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<!-- Tailwind CSS CDN -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              dark: '#081a18',
+              accent: '#52d1af',
+              mint: '#47bda1',
+              cardMint: '#e3f3ee',
+              iconMint: '#1b7d68',
+              goldBtn: '#df9c39',
+              goldBg: '#fef3dc',
+            }
+          }
+        }
+      }
+    }
+  </script>
+<style data-purpose="custom-scrollbars-and-reset">
+    /* Hide scrollbar for clean horizontal card scrolling */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    body {
+      -webkit-tap-highlight-color: transparent;
+    }
+  </style>
+</head>
+<body class="bg-gray-100 font-sans antialiased text-gray-800 flex justify-center min-h-screen">
+<!-- BEGIN: MobileDeviceFrame -->
+<main class="w-full max-w-[430px] bg-white min-h-screen relative pb-24 shadow-2xl flex flex-col overflow-x-hidden">
+<!-- BEGIN: DarkTopHeroSection -->
+<section class="bg-[#081b19] pt-12 px-5 text-white relative z-0 pb-10">
+<!-- Top Bar: Location Selector -->
+<div class="flex items-center gap-2 mb-6" data-purpose="location-picker">
+<svg class="w-5 h-5 text-emerald-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+<path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" stroke-linecap="round" stroke-linejoin="round"></path>
+<circle cx="12" cy="11" r="2.5"></circle>
+</svg>
+<div class="flex flex-col">
+<div class="flex items-center gap-1.5 leading-tight font-bold text-sm tracking-wide text-white">
+<span class="">Set your location</span>
+<svg class="w-3.5 h-3.5 text-gray-300" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+<path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</div>
+<span class="text-[11px] text-gray-400 font-normal">See businesses near you</span>
+</div>
+</div>
+<!-- Hero Greeting -->
+<div class="mb-5 leading-tight" data-purpose="hero-title">
+<h1 class="text-2xl font-bold tracking-tight text-white">Hi there,</h1>
+<h2 class="text-2xl font-bold tracking-tight text-[#47c9a9]">what are we celebrating?</h2>
+</div>
+<!-- Search Bar -->
+<div class="relative mb-6" data-purpose="search-bar">
+<div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+<path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</div>
+<input class="w-full bg-white text-gray-800 placeholder-gray-400 text-sm font-medium rounded-full py-3.5 pl-11 pr-4 shadow-sm border-0 focus:ring-2 focus:ring-[#47c9a9] outline-none" placeholder="Search 'br'" type="text">
+</div>
+<!-- Plan By Occasion Header -->
+<div class="mb-3.5">
+<h3 class="text-base font-bold text-white tracking-wide">Plan by occasion</h3>
+</div>
+<!-- Occasion Horizontal Carousel -->
+<div class="flex gap-3 overflow-x-auto no-scrollbar -mx-5 px-5 pb-2 pt-1" data-purpose="occasion-carousel">
+<!-- Occasion Card 1: Wedding -->
+<div class="relative flex-none w-[145px] h-[195px] rounded-2xl overflow-hidden shadow-lg group">
+<img alt="Wedding" class="w-full h-full object-cover object-center transform group-hover:scale-105 transition-transform duration-300" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDQtllC6wYXqeQJKHfU_cmPO4YQXyg2Ewo_3qzO0NRlwwgjJqmhP3FUfCggjNfQgwcEnjRbs73Oi1V87jZlVSHEbZjdQC7Xs2sYHSOFGmkfDPtP4MAyzAoW_sTXECBotv7XCdNhNjMgNgc7S14d5KZVcOdBjeTBxlnd0Rb5v30rqP8KHp25up0CBOPUuFaquwsp7_4kp1y6CfqDGU64Me4SRO5Cd4dNQH-Qo9vd8hTdALOPBVPoLJ94">
+<div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent"></div>
+<div class="absolute bottom-3 left-3 right-2 text-white">
+<h4 class="font-bold text-base leading-tight">Wedding</h4>
+<p class="text-[11px] text-gray-300 font-medium">16 services</p>
+</div>
+</div>
+<!-- Occasion Card 2: Engagement -->
+<div class="relative flex-none w-[145px] h-[195px] rounded-2xl overflow-hidden shadow-lg group">
+<img alt="Engagement" class="w-full h-full object-cover object-center transform group-hover:scale-105 transition-transform duration-300" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDq7nonQGY0WokfigZ67UGaUEr4zrWaoma-ZnRukhhwVOQSrVJqW_5gl9oEPBFNGy-56b-p02pGePt8qIIa4u2N1-sZgOMzhFNGN4qI3UBtdNuVT5swweGhMvB6vfFnG9E_npz4zTpLYzvTgRQFzlrY1RFb90pMDuh8WDgC-ZjUqfN1XfVH7YnO7dYHOlNe2OdBXPMU_8ooF4yB6I1vYdM23N7_dh9VisR-CioyfuteLswq4hsCe1DB">
+<div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent"></div>
+<div class="absolute bottom-3 left-3 right-2 text-white">
+<h4 class="font-bold text-base leading-tight">Engagement</h4>
+<p class="text-[11px] text-gray-300 font-medium">14 services</p>
+</div>
+</div>
+<!-- Occasion Card 3: Birthday -->
+<div class="relative flex-none w-[145px] h-[195px] rounded-2xl overflow-hidden shadow-lg group">
+<img alt="Birthday" class="w-full h-full object-cover object-center transform group-hover:scale-105 transition-transform duration-300" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAU4SrxJCR3BdSGEqTgdUR7N6cofqiHeFVtLfueWBbfKDOJKnHyK7E4xNj_eOMJ8deHWhSTSDaypGVKfkespPEcvYH4Mjs48NVuL1yUxPs-aDhHxesHJnQWVEXjFsRC1obB21Ci6ZLXN8euqtvttKVPiQMM8-ix1K6bMq_LgcroWWL-SxWt-LIafmeaQSgJbPtZfbdhskELhEh15bqu_8GMChqZIF5kYvUUCjiJsxRfDzjyVbxI8xMo">
+<div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent"></div>
+<div class="absolute bottom-3 left-3 right-2 text-white">
+<h4 class="font-bold text-base leading-tight">Birthday</h4>
+<p class="text-[11px] text-gray-300 font-medium">11 services</p>
+</div>
+</div>
+</div>
+</section>
+<!-- END: DarkTopHeroSection -->
+<!-- BEGIN: MainContentArea -->
+<div class="px-4 space-y-6 rounded-t-[36px] -mt-6 relative z-10 bg-white shadow-[0_-8px_30px_rgba(0,0,0,0.12)] pt-6 pb-5">
+<!-- BEGIN: BrowseByServiceSection -->
+<section class="bg-white rounded-3xl" data-purpose="services-grid-container">
+<!-- Section Header -->
+<div class="flex items-center justify-between mb-4 px-1">
+<h3 class="text-lg font-bold text-gray-900 tracking-tight">Browse by service</h3>
+<a class="text-xs font-semibold text-[#0a6650] hover:underline" href="#">See all</a>
+</div>
+<!-- 4x2 Services Grid -->
+<div class="grid grid-cols-4 gap-y-4 gap-x-2">
+<!-- Service 1: Venues -->
+<div class="flex flex-col items-center text-center">
+<div class="w-14 h-14 rounded-2xl bg-[#e5f4ef] flex items-center justify-center text-[#116e58] shadow-sm mb-1.5 transition-transform active:scale-95">
+<svg class="w-6 h-6 stroke-[1.75]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M3 21h18M3 10h18M5 6l7-3 7 3M4 10v11m4-11v11m4-11v11m4-11v11m4-11v11" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</div>
+<span class="text-[11px] font-bold text-gray-800 leading-tight">Venues</span>
+</div>
+<!-- Service 2: Catering -->
+<div class="flex flex-col items-center text-center">
+<div class="w-14 h-14 rounded-2xl bg-[#e5f4ef] flex items-center justify-center text-[#116e58] shadow-sm mb-1.5 transition-transform active:scale-95">
+<svg class="w-6 h-6 stroke-[1.75]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M12 4v2m0 0a8 8 0 00-8 8v1h16v-1a8 8 0 00-8-8zm-9 11h18" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</div>
+<span class="text-[11px] font-bold text-gray-800 leading-tight">Catering</span>
+</div>
+<!-- Service 3: Photography -->
+<div class="flex flex-col items-center text-center">
+<div class="w-14 h-14 rounded-2xl bg-[#e5f4ef] flex items-center justify-center text-[#116e58] shadow-sm mb-1.5 transition-transform active:scale-95">
+<svg class="w-6 h-6 stroke-[1.75]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" stroke-linecap="round" stroke-linejoin="round"></path>
+<circle cx="12" cy="13" r="3.5"></circle>
+</svg>
+</div>
+<span class="text-[11px] font-bold text-gray-800 leading-tight">Photography<br>&amp;...</span>
+</div>
+<!-- Service 4: Decoration & stage -->
+<div class="flex flex-col items-center text-center">
+<div class="w-14 h-14 rounded-2xl bg-[#e5f4ef] flex items-center justify-center text-[#116e58] shadow-sm mb-1.5 transition-transform active:scale-95">
+<svg class="w-6 h-6 stroke-[1.75]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M12 21v-8m0 0a4 4 0 10-4-4 4 4 0 004 4zm0 0a4 4 0 114-4 4 4 0 01-4 4z" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</div>
+<span class="text-[11px] font-bold text-gray-800 leading-tight">Decoration &amp;<br>stage</span>
+</div>
+<!-- Service 5: Bridal makeup -->
+<div class="flex flex-col items-center text-center">
+<div class="w-14 h-14 rounded-2xl bg-[#e5f4ef] flex items-center justify-center text-[#116e58] shadow-sm mb-1.5 transition-transform active:scale-95">
+<svg class="w-6 h-6 stroke-[1.75]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm11-13l3 3m0 0l-4 4m4-4H13" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</div>
+<span class="text-[11px] font-bold text-gray-800 leading-tight">Bridal<br>makeup &amp;...</span>
+</div>
+<!-- Service 6: Mehendi artists -->
+<div class="flex flex-col items-center text-center">
+<div class="w-14 h-14 rounded-2xl bg-[#e5f4ef] flex items-center justify-center text-[#116e58] shadow-sm mb-1.5 transition-transform active:scale-95">
+<svg class="w-6 h-6 stroke-[1.75]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M7 11.5V14m0-2.5v-6a1.5 1.5 0 113 0m-3 6a1.5 1.5 0 00-3 0v2a7.5 7.5 0 0015 0v-5a1.5 1.5 0 00-3 0m-6-3V4a1.5 1.5 0 013 0v3.5m0 0V4a1.5 1.5 0 013 0v7.5" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</div>
+<span class="text-[11px] font-bold text-gray-800 leading-tight">Mehendi<br>artists</span>
+</div>
+<!-- Service 7: Traditional performers -->
+<div class="flex flex-col items-center text-center">
+<div class="w-14 h-14 rounded-2xl bg-[#e5f4ef] flex items-center justify-center text-[#116e58] shadow-sm mb-1.5 transition-transform active:scale-95">
+<svg class="w-6 h-6 stroke-[1.75]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</div>
+<span class="text-[11px] font-bold text-gray-800 leading-tight">Traditional<br>performers</span>
+</div>
+<!-- Service 8: Cakes & desserts -->
+<div class="flex flex-col items-center text-center">
+<div class="w-14 h-14 rounded-2xl bg-[#e5f4ef] flex items-center justify-center text-[#116e58] shadow-sm mb-1.5 transition-transform active:scale-95">
+<svg class="w-6 h-6 stroke-[1.75]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M21 15.5a3.5 3.5 0 01-7 0 3.5 3.5 0 01-7 0V19a2 2 0 002 2h10a2 2 0 002-2v-3.5zM12 4v3m0 0a2 2 0 100 4 2 2 0 000-4z" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</div>
+<span class="text-[11px] font-bold text-gray-800 leading-tight">Cakes &amp;<br>desserts</span>
+</div>
+</div>
+<!-- Planning A Wedding Card -->
+<div class="mt-6 bg-[#fcf2df] rounded-2xl p-4 flex items-center justify-between shadow-sm border border-amber-100" data-purpose="promo-banner">
+<div>
+<h5 class="text-[11px] font-extrabold uppercase tracking-wider text-[#b87616]">PLANNING A WEDDING?</h5>
+<p class="text-xs font-semibold text-gray-800 mt-0.5">Explore curated vendors</p>
+</div>
+<button class="bg-[#d9822b] hover:bg-[#c27020] text-white text-xs font-bold px-4 py-2 rounded-xl shadow-sm transition active:scale-95">
+            Explore
+          </button>
+</div>
+</section>
+<!-- END: BrowseByServiceSection -->
+<!-- BEGIN: PopularNearYouSection -->
+<section data-purpose="popular-vendors">
+<!-- Section Header -->
+<div class="flex items-center justify-between mb-3 px-1">
+<h3 class="text-lg font-bold text-gray-900 tracking-tight">Popular near you</h3>
+<a class="text-xs font-semibold text-[#0a6650] hover:underline" href="#">See all</a>
+</div>
+<!-- Filter Chips -->
+<div class="flex items-center gap-2 overflow-x-auto no-scrollbar pb-3">
+<button class="bg-[#122824] text-white text-xs font-medium px-4 py-2 rounded-full whitespace-nowrap shadow-sm">
+            All
+          </button>
+<button class="bg-white text-gray-700 border border-gray-200 text-xs font-medium px-4 py-2 rounded-full whitespace-nowrap hover:bg-gray-50 shadow-sm">
+            Top rated
+          </button>
+<button class="bg-white text-gray-700 border border-gray-200 text-xs font-medium px-4 py-2 rounded-full whitespace-nowrap hover:bg-gray-50 shadow-sm">
+            Under ₹25k
+          </button>
+<button class="bg-white text-gray-700 border border-gray-200 text-xs font-medium px-4 py-2 rounded-full whitespace-nowrap hover:bg-gray-50 shadow-sm">
+            New
+          </button>
+</div>
+<!-- Vendor Cards Horizontal Scroll/Grid -->
+<div class="flex gap-4 overflow-x-auto no-scrollbar -mx-4 px-4 pt-1 pb-2">
+<!-- Vendor 1: Royal Wedding Cars -->
+<div class="flex-none w-[275px] bg-white rounded-3xl overflow-hidden border border-gray-100 shadow-md">
+<div class="relative h-44 w-full">
+<img alt="Vintage Red Mustang Car" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCySM4uLhvwlsUMZv-gD_4LAUHcJaHmHmfYFDuCz4yGEtRRdkcA3EvWkZ7rvVA_bCnCgg9_8XjjaPRPed-AmGOB6vuqacfZpV4eHfRasd7Ly_0dsFeaIv-zd61VDb6S2XYOwtKGrB7iYk9hYPFkxfFr_ZpKQKUBV73-FKwqpqiD8L6jfyfdtMi2zZKtNoro2KP8Sx53rmra5Z3yU7DfEgk8lpugdw27anPur1pIT-yAPLTAELxrZFC_">
+<!-- Verified Badge -->
+<span class="absolute top-3 left-3 bg-white/95 backdrop-blur-sm text-gray-800 text-[11px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1 shadow-sm">
+<svg class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+<path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+                Verified
+              </span>
+</div>
+<div class="p-3.5">
+<h4 class="font-bold text-gray-900 text-base leading-snug">Royal Wedding Cars</h4>
+<p class="text-xs text-gray-500 font-medium mt-0.5">Vehicle rental</p>
+<div class="mt-2 text-[#0c6b55] font-extrabold text-sm">
+                From ₹6,500
+              </div>
+</div>
+</div>
+<!-- Vendor 2: Spice Route Catering -->
+<div class="flex-none w-[275px] bg-white rounded-3xl overflow-hidden border border-gray-100 shadow-md">
+<div class="relative h-44 w-full">
+<img alt="Banquet Dinner" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDsRkgU_OreOyRyB4iByNm5LK0SqvtZN5uXoxQX25WxlPvOnD8tHdvEHoMaITZJDsLfFgOow-CbJn9wR-eWUAx3Xvyua_sAy0-U_imIe1rlRiAzbpQ7wa__9A4oh6B8-JdI-Vf0RVWoC_DYsRxT2ijsAn07Yf1FF8b7ylOwHKOjIwWHcXrPYmQirQQ_vyG2CcDWKVgQJBwLRWwRoaNpq3uq62AgzNMfgfvC016FPMJv5A7Ozb21QPeX">
+<!-- Verified Badge -->
+<span class="absolute top-3 left-3 bg-white/95 backdrop-blur-sm text-gray-800 text-[11px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1 shadow-sm">
+<svg class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+<path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+                Verified
+              </span>
+</div>
+<div class="p-3.5">
+<h4 class="font-bold text-gray-900 text-base leading-snug">Spice Route Catering</h4>
+<p class="text-xs text-gray-500 font-medium mt-0.5">Catering</p>
+<div class="mt-2 text-[#0c6b55] font-extrabold text-sm">
+                From ₹650
+              </div>
+</div>
+</div>
+</div>
+</section>
+<!-- END: PopularNearYouSection -->
+<!-- BEGIN: TrustAndHighlightsSection -->
+<section class="bg-[#f0f8f5] rounded-3xl p-5" data-purpose="trust-badges">
+<div class="grid grid-cols-2 divide-x divide-gray-200/80">
+<!-- Badge 1: Verified businesses -->
+<div class="flex flex-col items-center text-center px-2">
+<div class="w-10 h-10 rounded-full bg-white flex items-center justify-center text-emerald-700 shadow-sm mb-2.5">
+<svg class="w-5 h-5 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</div>
+<h5 class="text-xs font-extrabold text-gray-900">Verified businesses</h5>
+<p class="text-[10px] text-gray-500 font-medium mt-1">Every business checked</p>
+</div>
+<!-- Badge 2: Help next door -->
+<div class="flex flex-col items-center text-center px-2">
+<div class="w-10 h-10 rounded-full bg-white flex items-center justify-center text-emerald-700 shadow-sm mb-2.5">
+<svg class="w-5 h-5 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" stroke-linecap="round" stroke-linejoin="round"></path>
+<circle cx="12" cy="11" r="2"></circle>
+</svg>
+</div>
+<h5 class="text-xs font-extrabold text-gray-900">Help next door</h5>
+<p class="text-[10px] text-gray-500 font-medium mt-1">A local partner near you</p>
+</div>
+</div>
+</section>
+<!-- END: TrustAndHighlightsSection -->
+<!-- BEGIN: PartnerCTASection -->
+<section class="bg-[#091f1c] text-white rounded-3xl p-4 flex items-center justify-between shadow-lg" data-purpose="vendor-onboarding-cta">
+<div class="flex items-center gap-3 pr-2">
+<div class="w-11 h-11 rounded-2xl bg-white/10 flex items-center justify-center shrink-0">
+<svg class="w-6 h-6 text-emerald-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+<path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</div>
+<div>
+<h4 class="text-sm font-bold text-white tracking-tight">Run an event business?</h4>
+<p class="text-[11px] text-gray-300 font-normal leading-tight mt-0.5">List it on EventOn — it's free to join</p>
+</div>
+</div>
+<button class="bg-[#78ddbe] hover:bg-[#64ccad] text-[#052922] font-bold text-xs px-4 py-2.5 rounded-xl shadow shrink-0 transition active:scale-95">
+          Join
+        </button>
+</section>
+<!-- END: PartnerCTASection -->
+</div>
+<!-- END: MainContentArea -->
+<!-- BEGIN: FixedBottomNavigationBar -->
+<nav class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] bg-white border-t border-gray-100 px-6 py-2 flex items-center justify-between z-50 shadow-lg" data-purpose="bottom-nav">
+<!-- Nav Item: Home (Active) -->
+<a class="flex flex-col items-center gap-1 text-[#157962]" href="#">
+<svg class="w-6 h-6 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+<span class="text-[10px] font-bold">Home</span>
+</a>
+<!-- Nav Item: Explore -->
+<a class="flex flex-col items-center gap-1 text-gray-500 hover:text-gray-800" href="#">
+<svg class="w-6 h-6 stroke-[1.8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+<span class="text-[10px] font-medium">Explore</span>
+</a>
+<!-- Nav Item: Bookings -->
+<a class="flex flex-col items-center gap-1 text-gray-500 hover:text-gray-800" href="#">
+<svg class="w-6 h-6 stroke-[1.8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+<span class="text-[10px] font-medium">Bookings</span>
+</a>
+<!-- Nav Item: Chats -->
+<a class="flex flex-col items-center gap-1 text-gray-500 hover:text-gray-800" href="#">
+<svg class="w-6 h-6 stroke-[1.8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+<span class="text-[10px] font-medium">Chats</span>
+</a>
+<!-- Nav Item: Profile -->
+<a class="flex flex-col items-center gap-1 text-gray-500 hover:text-gray-800" href="#">
+<svg class="w-6 h-6 stroke-[1.8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+<span class="text-[10px] font-medium">Profile</span>
+</a>
+</nav>
+<!-- END: FixedBottomNavigationBar -->
+</main>
+<!-- END: MobileDeviceFrame -->
+
+
+</body></html>

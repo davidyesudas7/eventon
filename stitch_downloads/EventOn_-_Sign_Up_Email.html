@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Sign Up with Email - EventOn</title>
+<!-- Tailwind CSS v3 CDN with forms and container queries plugins -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Configuration -->
+<script data-purpose="tailwind-config">tailwind.config = {theme: {extend: {colors: {brand: {teal: "#088a85", dark: "#16242c", border: "#dce1e6", subtext: "#64748b", muted: "#94a3b8"}, "surface-variant": "#263836", "on-secondary": "#003738", "surface-container-high": "#1b2d2b", "surface-container": "#102321", "secondary-container": "#005f61", "on-primary": "#003733", "tertiary-fixed": "#ffdcc1", surface: "#041614", "surface-container-highest": "#263836", "on-primary-fixed-variant": "#00504a", "on-secondary-container": "#8dd6d8", "on-tertiary-fixed": "#2d1601", "on-secondary-fixed-variant": "#004f51", "on-background": "#d2e7e3", "surface-container-low": "#0c1f1d", "on-primary-fixed": "#00201d", "on-tertiary-fixed-variant": "#5f4025", "on-surface-variant": "#bbc9c7", "outline-variant": "#3c4947", "surface-bright": "#2a3d3a", "on-error-container": "#ffdad6", error: "#ffb4ab", "on-error": "#690005", outline: "#869491", "on-tertiary": "#452a11", "tertiary-container": "#e1b592", "error-container": "#93000a", background: "#041614", "on-primary-container": "#005750", tertiary: "#ffd1ac", "surface-container-lowest": "#01110f", "surface-dim": "#041614", "primary-fixed-dim": "#59dacd", "primary-fixed": "#78f7ea", "secondary-fixed": "#a6eff1", "surface-tint": "#59dacd", "on-secondary-fixed": "#002021", "on-surface": "#d2e7e3", "primary-container": "#4ed1c5", secondary: "#8ad3d5", "tertiary-fixed-dim": "#eabe9a", primary: "#6feee1", "inverse-on-surface": "#213431", "secondary-fixed-dim": "#8ad3d5", "inverse-primary": "#006a63", "inverse-surface": "#d2e7e3", "on-tertiary-container": "#65462a"}, fontFamily: {sans: ["-apple-system", "BlinkMacSystemFont", "\"Segoe UI\"", "Roboto", "Helvetica", "Arial", "sans-serif"], headline: ["DM Sans"], display: ["DM Sans"], body: ["DM Sans"], label: ["DM Sans"]}, fontSize: {}, borderRadius: {DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", full: "9999px"}}}};</script>
+<!-- Custom Typography & Micro-adjustments -->
+<style data-purpose="typography">
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+  </style>
+<style data-purpose="form-styles">
+    /* Remove default focus ring and replace with clean outline matching input shape */
+    .custom-input:focus {
+      outline: none;
+      border-color: #088a85;
+      box-shadow: 0 0 0 1px #088a85;
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-white text-gray-900 min-h-screen flex flex-col justify-between antialiased selection:bg-teal-100">
+<!-- BEGIN: MainContentWrapper -->
+<div class="w-full max-w-md mx-auto px-6 pt-5 pb-8 flex-1 flex flex-col justify-between">
+<!-- BEGIN: HeaderSection -->
+<header class="w-full">
+<!-- Brand Logo / Name -->
+<div class="pt-1 pb-14" data-purpose="brand-logo">
+<h1 class="text-[26px] font-bold tracking-tight text-gray-900 select-none">
+          Event<span class="text-[#0ea5a0]">On</span>
+</h1>
+</div>
+<!-- Back Navigation Button -->
+<div class="mb-8" data-purpose="back-navigation">
+<a aria-label="Go back" class="inline-flex items-center text-gray-700 hover:text-gray-900 transition-colors p-1 -ml-1 rounded-full focus:outline-none focus:ring-2 focus:ring-gray-300" href="javascript:history.back()">
+<svg class="w-6 h-6 stroke-[2.2]" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</a>
+</div>
+<!-- Page Headings -->
+<div class="space-y-2 mb-8" data-purpose="screen-title">
+<h2 class="text-[30px] font-bold tracking-tight text-gray-950 leading-tight">
+          Sign up with email
+        </h2>
+<p class="text-[17px] text-[#6b7280] font-normal leading-normal">
+          Or <a class="text-[#4b5563] hover:underline focus:outline-none focus:underline" href="#">go back and use your phone</a>.
+        </p>
+</div>
+</header>
+<!-- END: HeaderSection -->
+<!-- BEGIN: RegistrationForm -->
+<main class="w-full flex-1" data-purpose="signup-form-container">
+<form action="#" class="space-y-6" method="POST" onsubmit="event.preventDefault();">
+<!-- Field 1: Full Name -->
+<div class="space-y-2" data-purpose="input-group-name">
+<label class="block text-[17px] font-medium text-gray-600" for="full-name">
+            Full name
+          </label>
+<input autocomplete="name" class="custom-input block w-full rounded-2xl border border-[#d8dee4] px-4 py-3.5 text-gray-900 placeholder-gray-400 text-[16px] transition duration-150 ease-in-out focus:ring-0" id="full-name" name="fullName" required="" type="text"/>
+</div>
+<!-- Field 2: Email -->
+<div class="space-y-2" data-purpose="input-group-email">
+<label class="block text-[17px] font-medium text-gray-600" for="email">
+            Email
+          </label>
+<input autocomplete="email" class="custom-input block w-full rounded-2xl border border-[#d8dee4] px-4 py-3.5 text-gray-900 placeholder-gray-400 text-[16px] transition duration-150 ease-in-out focus:ring-0" id="email" name="email" required="" type="email"/>
+</div>
+<!-- Field 3: Password -->
+<div class="space-y-2" data-purpose="input-group-password">
+<label class="block text-[17px] font-medium text-gray-600" for="password">
+            Password
+          </label>
+<div class="relative rounded-2xl border border-[#d8dee4] focus-within:border-[#088a85] focus-within:ring-1 focus-within:ring-[#088a85] transition duration-150 ease-in-out bg-white">
+<!-- Left Lock Icon -->
+<div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-600">
+<svg class="h-5 w-5 stroke-[1.8]" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</div>
+<input autocomplete="new-password" class="block w-full rounded-2xl border-0 py-3.5 pl-12 pr-12 text-gray-900 placeholder-gray-400 text-[16px] focus:ring-0 bg-transparent" id="password" name="password" required="" type="password"/>
+<!-- Right Toggle Visibility Icon -->
+<button aria-label="Toggle password visibility" class="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-600 hover:text-gray-800 focus:outline-none" id="toggle-password-btn" type="button">
+<svg class="h-5 w-5 stroke-[1.8]" fill="none" id="eye-icon" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" stroke-linecap="round" stroke-linejoin="round"></path>
+<path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</button>
+</div>
+</div>
+<!-- Submit Button CTA -->
+<div class="pt-4" data-purpose="submit-button-container">
+<button class="w-full bg-[#18252d] hover:bg-[#111a20] active:scale-[0.99] text-white font-semibold text-[17px] py-4 px-6 rounded-2xl shadow-sm transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#18252d]" type="submit">
+            Create account
+          </button>
+</div>
+</form>
+</main>
+<!-- END: RegistrationForm -->
+<!-- BEGIN: FooterLinks -->
+<footer class="mt-20 mb-3 text-center space-y-3.5" data-purpose="footer-links">
+<!-- Existing Account / Sign In -->
+<p class="text-[16px] text-gray-600">
+        Already have an account? 
+        <a class="font-medium text-gray-950 hover:underline" href="#">
+          Sign in
+        </a>
+</p>
+<!-- Business Registration Link -->
+<div>
+<a class="inline-block text-[16px] font-medium text-gray-900 hover:text-black hover:underline transition-colors" href="#">
+          List your business
+        </a>
+</div>
+</footer>
+<!-- END: FooterLinks -->
+</div>
+<!-- END: MainContentWrapper -->
+<!-- JavaScript for Password Toggle Interaction -->
+<script data-purpose="password-visibility-toggle">
+    document.addEventListener('DOMContentLoaded', () => {
+      const toggleButton = document.getElementById('toggle-password-btn');
+      const passwordInput = document.getElementById('password');
+
+      if (toggleButton && passwordInput) {
+        toggleButton.addEventListener('click', () => {
+          const isPassword = passwordInput.getAttribute('type') === 'password';
+          passwordInput.setAttribute('type', isPassword ? 'text' : 'password');
+        });
+      }
+    });
+  </script>
+</body></html>
