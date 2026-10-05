@@ -115,7 +115,6 @@ class HomeScreen extends StatelessWidget {
       child: Stack(
         fit: StackFit.expand,
         children: [
-          // Image placeholder, using a solid color for now since images might not be loaded in pubspec
           ClipRRect(
             borderRadius: BorderRadius.circular(16),
             child: Container(color: Colors.grey[700]), // TODO: Use Image.asset(imagePath) when assets are configured
@@ -202,9 +201,9 @@ class HomeScreen extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 24),
-          _buildPlanningWeddingBanner(),
+          _buildPlanningWeddingBanner(context),
           const SizedBox(height: 32),
-          _buildPopularNearYou(),
+          _buildPopularNearYou(context),
           const SizedBox(height: 32),
           _buildTrustBadges(),
           const SizedBox(height: 32),
@@ -214,7 +213,7 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildPlanningWeddingBanner() {
+  Widget _buildPlanningWeddingBanner(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -244,7 +243,7 @@ class HomeScreen extends StatelessWidget {
             ],
           ),
           ElevatedButton(
-            onPressed: () {},
+            onPressed: () => context.push('/home/occasion/wedding'),
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFFD9822B),
               foregroundColor: Colors.white,
@@ -259,7 +258,7 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildPopularNearYou() {
+  Widget _buildPopularNearYou(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -296,9 +295,9 @@ class HomeScreen extends StatelessWidget {
           scrollDirection: Axis.horizontal,
           child: Row(
             children: [
-              _buildVendorCard('Royal Wedding Cars', 'Vehicle rental', 'From ₹6,500'),
+              _buildVendorCard(context, 'l_001', 'Royal Wedding Cars', 'Vehicle rental', 'From ₹6,500'),
               const SizedBox(width: 16),
-              _buildVendorCard('Spice Route Catering', 'Catering', 'From ₹650'),
+              _buildVendorCard(context, 'l_002', 'Spice Route Catering', 'Catering', 'From ₹650'),
             ],
           ),
         ),
@@ -323,63 +322,66 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildVendorCard(String title, String category, String price) {
-    return Container(
-      width: 275,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: AppColors.borderSubtle),
-        boxShadow: const [
-          BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2)),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            height: 176,
-            decoration: const BoxDecoration(
-              color: Colors.grey,
-              borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-            ),
-            child: Stack(
-              children: [
-                Positioned(
-                  top: 12,
-                  left: 12,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.95),
-                      borderRadius: BorderRadius.circular(9999),
-                    ),
-                    child: Row(
-                      children: [
-                        const Icon(Icons.verified, color: AppColors.success, size: 14),
-                        const SizedBox(width: 4),
-                        Text('Verified', style: AppTextStyles.labelSm.copyWith(color: AppColors.textPrimary)),
-                      ],
+  Widget _buildVendorCard(BuildContext context, String id, String title, String category, String price) {
+    return GestureDetector(
+      onTap: () => context.push('/home/listing/$id'),
+      child: Container(
+        width: 275,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: AppColors.borderSubtle),
+          boxShadow: const [
+            BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2)),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              height: 176,
+              decoration: const BoxDecoration(
+                color: Colors.grey,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+              ),
+              child: Stack(
+                children: [
+                  Positioned(
+                    top: 12,
+                    left: 12,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.95),
+                        borderRadius: BorderRadius.circular(9999),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.verified, color: AppColors.success, size: 14),
+                          const SizedBox(width: 4),
+                          Text('Verified', style: AppTextStyles.labelSm.copyWith(color: AppColors.textPrimary)),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(14.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(title, style: AppTextStyles.headlineSm),
-                const SizedBox(height: 2),
-                Text(category, style: AppTextStyles.labelMd.copyWith(color: AppColors.textSecondary)),
-                const SizedBox(height: 8),
-                Text(price, style: AppTextStyles.labelLg.copyWith(color: const Color(0xFF0C6B55), fontWeight: FontWeight.w800)),
-              ],
+            Padding(
+              padding: const EdgeInsets.all(14.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title, style: AppTextStyles.headlineSm),
+                  const SizedBox(height: 2),
+                  Text(category, style: AppTextStyles.labelMd.copyWith(color: AppColors.textSecondary)),
+                  const SizedBox(height: 8),
+                  Text(price, style: AppTextStyles.labelLg.copyWith(color: const Color(0xFF0C6B55), fontWeight: FontWeight.w800)),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

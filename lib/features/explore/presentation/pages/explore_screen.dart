@@ -1,9 +1,36 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 
-class ExploreScreen extends StatelessWidget {
+class ExploreScreen extends StatefulWidget {
   const ExploreScreen({super.key});
+
+  @override
+  State<ExploreScreen> createState() => _ExploreScreenState();
+}
+
+class _ExploreScreenState extends State<ExploreScreen> {
+  final TextEditingController _searchController = TextEditingController();
+  bool _openingSearch = false;
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  /// Opens the search sub-screen as soon as the user starts typing.
+  Future<void> _onSearchChanged(String value) async {
+    if (value.isEmpty || _openingSearch) return;
+    _openingSearch = true;
+    FocusScope.of(context).unfocus();
+    final result = await context.push<String>('/explore/search', extra: value);
+    _openingSearch = false;
+    if (!mounted) return;
+    // Clearing in the search screen returns null -> back to an empty bar.
+    _searchController.text = result ?? '';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -53,6 +80,8 @@ class ExploreScreen extends StatelessWidget {
                                 const SizedBox(width: 8),
                                 Expanded(
                                   child: TextField(
+                                    controller: _searchController,
+                                    onChanged: _onSearchChanged,
                                     decoration: InputDecoration(
                                       hintText: 'Search \'pandal, tent & furniture\'',
                                       hintStyle: AppTextStyles.bodyMd.copyWith(color: AppColors.textSecondary),
@@ -119,6 +148,8 @@ class ExploreScreen extends StatelessWidget {
                   padding: const EdgeInsets.all(16),
                   children: [
                     _buildVendorCard(
+                      context: context,
+                      id: 'l_001',
                       title: 'Royal Wedding Cars',
                       description: 'Chauffeur-driven sedans and vintage cars for weddings and photoshoots across the city.',
                       price: 'From ₹6,500',
@@ -127,6 +158,8 @@ class ExploreScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 16),
                     _buildVendorCard(
+                      context: context,
+                      id: 'l_003',
                       title: 'Elite Beat DJs & Sound',
                       description: 'Premium sound systems and lighting setups for live celebrations.',
                       hasQuoteButton: true,
@@ -180,6 +213,8 @@ class ExploreScreen extends StatelessWidget {
   }
 
   Widget _buildVendorCard({
+    required BuildContext context,
+    required String id,
     required String title,
     required String description,
     String? price,
@@ -187,94 +222,97 @@ class ExploreScreen extends StatelessWidget {
     bool hasAddedBadge = false,
     bool hasQuoteButton = false,
   }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.borderSubtle),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            height: 180,
-            decoration: const BoxDecoration(
-              color: Colors.grey,
-              borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-            ),
-            child: Stack(
-              children: [
-                if (hasAddedBadge)
-                  Positioned(
-                    top: 12,
-                    right: 12,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF0C6B55).withOpacity(0.9),
-                        borderRadius: BorderRadius.circular(999),
-                      ),
-                      child: Row(
-                        children: [
-                          const Icon(Icons.check, color: Colors.white, size: 14),
-                          const SizedBox(width: 4),
-                          Text('Added', style: AppTextStyles.labelSm.copyWith(color: Colors.white)),
-                        ],
-                      ),
-                    ),
-                  ),
-                if (hasQuoteButton)
-                  Positioned(
-                    top: 12,
-                    right: 12,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.95),
-                        borderRadius: BorderRadius.circular(999),
-                        boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 4)],
-                      ),
-                      child: Row(
-                        children: [
-                          const Text('+', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
-                          const SizedBox(width: 4),
-                          Text('Quote', style: AppTextStyles.labelSm.copyWith(fontWeight: FontWeight.bold)),
-                        ],
+    return GestureDetector(
+      onTap: () => context.push('/explore/listing/$id'),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: AppColors.borderSubtle),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              height: 180,
+              decoration: const BoxDecoration(
+                color: Colors.grey,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+              ),
+              child: Stack(
+                children: [
+                  if (hasAddedBadge)
+                    Positioned(
+                      top: 12,
+                      right: 12,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF0C6B55).withOpacity(0.9),
+                          borderRadius: BorderRadius.circular(999),
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.check, color: Colors.white, size: 14),
+                            const SizedBox(width: 4),
+                            Text('Added', style: AppTextStyles.labelSm.copyWith(color: Colors.white)),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-              ],
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(title, style: AppTextStyles.headlineSm.copyWith(fontSize: 18)),
-                const SizedBox(height: 6),
-                Text(
-                  description,
-                  style: AppTextStyles.bodyMd.copyWith(color: AppColors.textSecondary),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                if (price != null || distance != null) ...[
-                  const SizedBox(height: 12),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      if (price != null)
-                        Text(price, style: AppTextStyles.labelMd.copyWith(color: const Color(0xFF0C6B55), fontWeight: FontWeight.w700)),
-                      if (distance != null)
-                        Text(distance, style: AppTextStyles.bodySm.copyWith(color: AppColors.textSecondary)),
-                    ],
-                  ),
+                  if (hasQuoteButton)
+                    Positioned(
+                      top: 12,
+                      right: 12,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.95),
+                          borderRadius: BorderRadius.circular(999),
+                          boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 4)],
+                        ),
+                        child: Row(
+                          children: [
+                            const Text('+', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+                            const SizedBox(width: 4),
+                            Text('Quote', style: AppTextStyles.labelSm.copyWith(fontWeight: FontWeight.bold)),
+                          ],
+                        ),
+                      ),
+                    ),
                 ],
-              ],
+              ),
             ),
-          ),
-        ],
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title, style: AppTextStyles.headlineSm.copyWith(fontSize: 18)),
+                  const SizedBox(height: 6),
+                  Text(
+                    description,
+                    style: AppTextStyles.bodyMd.copyWith(color: AppColors.textSecondary),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  if (price != null || distance != null) ...[
+                    const SizedBox(height: 12),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        if (price != null)
+                          Text(price, style: AppTextStyles.labelMd.copyWith(color: const Color(0xFF0C6B55), fontWeight: FontWeight.w700)),
+                        if (distance != null)
+                          Text(distance, style: AppTextStyles.bodySm.copyWith(color: AppColors.textSecondary)),
+                      ],
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
