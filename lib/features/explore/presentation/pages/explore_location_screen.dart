@@ -50,6 +50,12 @@ class _ExploreLocationScreenState extends ConsumerState<ExploreLocationScreen> {
         clearRadius: radius == null,
       );
       ref.read(exploreLocationProvider.notifier).setLocation(updatedLocation);
+      
+      // Save it locally to recent list
+      ref.read(locationSearchControllerProvider.notifier).selectRecent(
+        updatedLocation, 
+        radiusKm: radius,
+      );
     }
   }
 

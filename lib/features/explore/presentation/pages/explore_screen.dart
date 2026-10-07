@@ -103,7 +103,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
       queries['lat'] = location.latitude;
       queries['lng'] = location.longitude;
       if (location.radiusKm != null) {
-        queries['radius'] = location.radiusKm;
+        queries['radiusKm'] = location.radiusKm;
       }
     }
 
@@ -234,7 +234,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                         GestureDetector(
                           onTap: () => context.push('/explore/location'),
                           child: LocationChip(
-                            label: location != null 
+                            label: location != null
                                 ? '${location.name}${location.radiusKm != null ? ' · ${location.radiusKm} km' : ''}'
                                 : 'Anywhere',
                           ),
@@ -247,7 +247,10 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
 
               if (location == null)
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
                   child: Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
@@ -257,7 +260,10 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                     ),
                     child: Row(
                       children: [
-                        const Icon(Icons.location_on_outlined, color: AppColors.textPrimary),
+                        const Icon(
+                          Icons.location_on_outlined,
+                          color: AppColors.textPrimary,
+                        ),
                         const SizedBox(width: 12),
                         Expanded(
                           child: Column(
@@ -265,11 +271,15 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                             children: [
                               Text(
                                 'See businesses near you',
-                                style: AppTextStyles.labelMd.copyWith(color: AppColors.textPrimary),
+                                style: AppTextStyles.labelMd.copyWith(
+                                  color: AppColors.textPrimary,
+                                ),
                               ),
                               Text(
                                 'Or pick the place your event is at.',
-                                style: AppTextStyles.labelSm.copyWith(color: AppColors.textSecondary),
+                                style: AppTextStyles.labelSm.copyWith(
+                                  color: AppColors.textSecondary,
+                                ),
                               ),
                             ],
                           ),
@@ -285,10 +295,16 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8),
                             ),
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 8,
+                            ),
                             minimumSize: Size.zero,
                           ),
-                          child: const Text('Use my location', style: TextStyle(fontWeight: FontWeight.w600)),
+                          child: const Text(
+                            'Use my location',
+                            style: TextStyle(fontWeight: FontWeight.w600),
+                          ),
                         ),
                       ],
                     ),

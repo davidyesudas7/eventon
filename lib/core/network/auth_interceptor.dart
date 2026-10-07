@@ -19,7 +19,7 @@ class AuthInterceptor extends QueuedInterceptor {
     RequestOptions options,
     RequestInterceptorHandler handler,
   ) async {
-    log("the api url is ${options.path}");
+    log("the api url is ${options.uri}");
     final accessToken = await tokenStorage.getAccessToken();
     if (accessToken != null && accessToken.isNotEmpty) {
       options.headers['Authorization'] = 'Bearer $accessToken';
@@ -41,7 +41,7 @@ class AuthInterceptor extends QueuedInterceptor {
         path.contains('/auth/register') ||
         path.contains('/auth/firebase') ||
         path.contains('/auth/refresh');
-
+    log("the api response is ${response?.data}");
     if (response?.statusCode == 401 && !isAuthPath) {
       final refreshToken = await tokenStorage.getRefreshToken();
       if (refreshToken != null && refreshToken.isNotEmpty) {
