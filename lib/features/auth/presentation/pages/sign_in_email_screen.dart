@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
+import '../../../profile/presentation/providers/home_location_provider.dart';
 import '../providers/auth_providers.dart';
 
 class SignInEmailScreen extends ConsumerStatefulWidget {
@@ -46,6 +47,12 @@ class _SignInEmailScreenState extends ConsumerState<SignInEmailScreen> {
     setState(() => _isLoading = false);
 
     if (success) {
+      final authState = ref.read(authControllerProvider);
+      if (authState is AuthStateAuthenticated) {
+        final user = authState.user;
+        await ref.read(homeLocationStateProvider.notifier).saveFromLogin(user.basePincode, user.lsgId);
+      }
+
       if (context.canPop()) {
         context.pop();
       } else {

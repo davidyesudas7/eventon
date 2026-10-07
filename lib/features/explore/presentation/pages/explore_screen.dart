@@ -16,6 +16,7 @@ import '../../../categories/domain/entities/category.dart';
 import '../../../categories/domain/entities/ui_hint.dart';
 import '../../../listings/presentation/widgets/listing_card.dart';
 import '../providers/explore_providers.dart';
+import '../providers/location_search_provider.dart';
 
 class ExploreScreen extends ConsumerStatefulWidget {
   final String? initialCategoryId;
@@ -87,6 +88,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
   @override
   Widget build(BuildContext context) {
     final categoriesAsync = ref.watch(categoriesProvider);
+    final location = ref.watch(exploreLocationProvider);
 
     final Map<String, dynamic> queries = {};
     if (_searchController.text.isNotEmpty) {
@@ -96,6 +98,14 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
       queries['categoryId'] = _appliedCategoryId;
     }
     queries.addAll(_appliedAttributes);
+
+    if (location != null) {
+      queries['lat'] = location.latitude;
+      queries['lng'] = location.longitude;
+      if (location.radiusKm != null) {
+        queries['radius'] = location.radiusKm;
+      }
+    }
 
     final searchAsync = ref.watch(searchProvider(jsonEncode(queries)));
 
@@ -221,12 +231,69 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                     const SizedBox(height: 12),
                     Row(
                       children: [
-                        const LocationChip(label: 'Alappuzha · 50 km'),
+                        GestureDetector(
+                          onTap: () => context.push('/explore/location'),
+                          child: LocationChip(
+                            label: location != null 
+                                ? '${location.name}${location.radiusKm != null ? ' · ${location.radiusKm} km' : ''}'
+                                : 'Anywhere',
+                          ),
+                        ),
                       ],
                     ),
                   ],
                 ),
               ),
+
+              if (location == null)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: AppColors.borderStrong),
+                      borderRadius: BorderRadius.circular(12),
+                      color: Colors.white,
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.location_on_outlined, color: AppColors.textPrimary),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'See businesses near you',
+                                style: AppTextStyles.labelMd.copyWith(color: AppColors.textPrimary),
+                              ),
+                              Text(
+                                'Or pick the place your event is at.',
+                                style: AppTextStyles.labelSm.copyWith(color: AppColors.textSecondary),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        ElevatedButton(
+                          onPressed: () {
+                            // TODO: Handle Use my location
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF15272A),
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                            minimumSize: Size.zero,
+                          ),
+                          child: const Text('Use my location', style: TextStyle(fontWeight: FontWeight.w600)),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
 
               // Vendor Feed
               Expanded(
@@ -306,7 +373,14 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
               left: 16,
               right: 16,
               child: GestureDetector(
-                onTap: () => context.push('/request-quotes'),
+                onTap: () {
+                  final authState = ref.read(authControllerProvider);
+                  if (authState is! AuthStateAuthenticated) {
+                    context.push('/sign-in-mobile');
+                    return;
+                  }
+                  context.push('/request-quotes');
+                },
                 child: Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 20,

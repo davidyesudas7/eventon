@@ -16,6 +16,7 @@ import '../../features/bookings/presentation/pages/bookings_screen.dart';
 import '../../features/chats/presentation/pages/chats_screen.dart';
 import '../../features/explore/presentation/pages/explore_screen.dart';
 import '../../features/explore/presentation/pages/explore_search_screen.dart';
+import '../../features/explore/presentation/pages/explore_location_screen.dart';
 import '../../features/home/presentation/pages/home_screen.dart';
 import '../../features/listings/presentation/pages/listing_details_screen.dart';
 import '../../features/main/presentation/pages/main_screen.dart';
@@ -57,7 +58,7 @@ GoRouter goRouter(Ref ref) {
       final isAuthenticated = authStateListener.value is AuthStateAuthenticated;
       final location = state.uri.toString();
 
-      final protectedRoutes = ['/profile', '/bookings', '/chats'];
+      final protectedRoutes = ['/profile', '/bookings', '/chats', '/request-quotes'];
 
       final isProtectedRoute = protectedRoutes.any(
         (route) => location == route || location.startsWith('$route/'),
@@ -169,6 +170,10 @@ GoRouter goRouter(Ref ref) {
                           ? state.extra as String
                           : '',
                     ),
+                  ),
+                  GoRoute(
+                    path: 'location',
+                    builder: (context, state) => const ExploreLocationScreen(),
                   ),
                   GoRoute(
                     path: 'listing/:id',

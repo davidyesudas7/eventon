@@ -17,7 +17,7 @@ class CategoriesRepositoryImpl implements CategoriesRepository {
   Future<Either<Failure, List<Category>>> getCategories() async {
     try {
       final models = await _apiClient.getCategories();
-      log("categories ${models[0].toJson()}", name: "CategoriesRepositoryImpl");
+
       return Right(models.map((model) => model.toEntity()).toList());
     } catch (e) {
       return Left(ServerFailure(e.toString()));

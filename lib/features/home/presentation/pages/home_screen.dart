@@ -13,6 +13,7 @@ import '../../../categories/domain/entities/occasion.dart';
 import '../../../categories/presentation/widgets/category_grid.dart';
 import '../../../../core/widgets/app_filter_chip.dart';
 import '../../../listings/presentation/widgets/listing_card.dart';
+import '../../../profile/presentation/providers/home_location_provider.dart';
 import '../widgets/home_search_bar.dart';
 
 class HomeScreen extends ConsumerWidget {
@@ -30,7 +31,7 @@ class HomeScreen extends ConsumerWidget {
             pinned: true,
             expandedHeight: 240, // Increased to show greeting text fully
             flexibleSpace: FlexibleSpaceBar(
-              background: _buildTopHeroContent(context),
+              background: _buildTopHeroContent(context, ref),
             ),
             bottom: const PreferredSize(
               preferredSize: Size.fromHeight(72),
@@ -50,7 +51,33 @@ class HomeScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildTopHeroContent(BuildContext context) {
+  Widget _buildTopHeroContent(BuildContext context, WidgetRef ref) {
+    final authState = ref.watch(authControllerProvider);
+    final locationState = ref.watch(homeLocationStateProvider);
+
+    String greeting = 'Hi there,';
+    String? initial;
+    if (authState is AuthStateAuthenticated) {
+      greeting = 'Hi ${authState.user.fullName},';
+      if (authState.user.fullName.isNotEmpty) {
+        initial = authState.user.fullName[0].toUpperCase();
+      }
+    }
+
+    String locationTitle = 'Set your location';
+    String locationSubtitle = 'See businesses near you';
+
+    if (locationState.value != null) {
+      final loc = locationState.value!;
+      if (loc.lsgDetails != null && loc.lsgDetails!.name.isNotEmpty) {
+        locationTitle = loc.lsgDetails!.name;
+        locationSubtitle = loc.lsgDetails!.district;
+      } else {
+        locationTitle = loc.pincodeDetails.officeName;
+        locationSubtitle = loc.pincodeDetails.district;
+      }
+    }
+
     return SafeArea(
       bottom: false,
       child: Padding(
@@ -58,48 +85,64 @@ class HomeScreen extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Location Picker
+            // Location Picker and Avatar
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Icon(
-                  Icons.location_on,
-                  color: AppColors.success,
-                  size: 20,
-                ),
-                const SizedBox(width: 8),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                Row(
                   children: [
-                    Row(
+                    const Icon(
+                      Icons.location_on,
+                      color: AppColors.success,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 8),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          'Set your location',
-                          style: AppTextStyles.labelMd.copyWith(
-                            color: Colors.white,
-                          ),
+                        Row(
+                          children: [
+                            Text(
+                              locationTitle,
+                              style: AppTextStyles.labelMd.copyWith(
+                                color: Colors.white,
+                              ),
+                            ),
+                            const SizedBox(width: 4),
+                            const Icon(
+                              Icons.keyboard_arrow_down,
+                              color: Colors.white70,
+                              size: 16,
+                            ),
+                          ],
                         ),
-                        const SizedBox(width: 4),
-                        const Icon(
-                          Icons.keyboard_arrow_down,
-                          color: Colors.white70,
-                          size: 16,
+                        Text(
+                          locationSubtitle,
+                          style: AppTextStyles.labelSm.copyWith(
+                            color: Colors.white54,
+                          ),
                         ),
                       ],
                     ),
-                    Text(
-                      'See businesses near you',
-                      style: AppTextStyles.labelSm.copyWith(
-                        color: Colors.white54,
-                      ),
-                    ),
                   ],
                 ),
+                if (initial != null)
+                  CircleAvatar(
+                    radius: 20,
+                    backgroundColor: AppColors.success,
+                    child: Text(
+                      initial,
+                      style: AppTextStyles.labelLg.copyWith(
+                        color: const Color(0xFF0D2226),
+                      ),
+                    ),
+                  ),
               ],
             ),
             const SizedBox(height: 24),
             // Greeting
             Text(
-              'Hi there,',
+              greeting,
               style: AppTextStyles.headlineLg.copyWith(color: Colors.white),
             ),
             Text(
