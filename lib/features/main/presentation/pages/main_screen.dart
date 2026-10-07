@@ -21,7 +21,10 @@ class MainScreen extends StatelessWidget {
         destinations: const [
           NavigationDestination(icon: Icon(Icons.home), label: 'Home'),
           NavigationDestination(icon: Icon(Icons.explore), label: 'Explore'),
-          NavigationDestination(icon: Icon(Icons.calendar_month), label: 'Bookings'),
+          NavigationDestination(
+            icon: Icon(Icons.calendar_month),
+            label: 'Bookings',
+          ),
           NavigationDestination(icon: Icon(Icons.chat), label: 'Chats'),
           NavigationDestination(icon: Icon(Icons.person), label: 'Profile'),
         ],

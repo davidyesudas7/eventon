@@ -14,7 +14,7 @@ class AppColors {
   static const Color surfaceMintPill = Color(0xFFE6FFFA);
 
   // Typography & Neutrals
-  static const Color textPrimary = Color(0xFF0F172A); // Deep ink slate
+  static const Color textPrimary = Color(0xFF16262B); // Deep ink slate
   static const Color textSecondary = Color(0xFF475569); // Neutral slate
   static const Color textMuted = Color(0xFF94A3B8);
   static const Color borderSubtle = Color(0xFFE2E8F0);
@@ -25,4 +25,10 @@ class AppColors {
   static const Color error = Color(0xFFBA1A1A);
   static const Color errorContainer = Color(0xFFFFDAD6);
   static const Color onErrorContainer = Color(0xFF93000A);
+
+  // Custom added for deduplication
+  static const Color ink = Color(0xFF142328);
+  static const Color price = Color(0xFF0C6B55);
+  static const Color brandDeep = Color(0xFF155E56);
+  static const Color heroDark = Color(0xFF081B19);
 }

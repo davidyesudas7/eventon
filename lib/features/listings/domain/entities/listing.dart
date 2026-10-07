@@ -45,7 +45,8 @@ const List<Listing> mockListings = [
     category: 'Vehicle rental',
     providerName: 'Demo Provider',
     startingPrice: 6500,
-    about: 'Chauffeur-driven sedans and vintage cars for weddings and photoshoots across the city.',
+    about:
+        'Chauffeur-driven sedans and vintage cars for weddings and photoshoots across the city.',
     isNew: true,
     details: {
       'Vehicle type': 'vintage',
@@ -70,7 +71,8 @@ const List<Listing> mockListings = [
     category: 'Catering',
     providerName: 'Spice Route',
     startingPrice: 650,
-    about: 'Authentic traditional sadhya and multi-cuisine buffet for weddings and corporate events.',
+    about:
+        'Authentic traditional sadhya and multi-cuisine buffet for weddings and corporate events.',
     isNew: false,
     details: {
       'Cuisine types': 'Kerala, North Indian, Chinese',
@@ -91,7 +93,8 @@ const List<Listing> mockListings = [
     category: 'DJ & entertainment',
     providerName: 'Elite Productions',
     startingPrice: 15000,
-    about: 'Premium sound systems, lighting setups and DJ services for live celebrations.',
+    about:
+        'Premium sound systems, lighting setups and DJ services for live celebrations.',
     isNew: false,
     details: {
       'Genre': 'Bollywood, EDM, Commercial',

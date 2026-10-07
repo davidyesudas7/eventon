@@ -1,5 +1,9 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../categories/presentation/providers/categories_providers.dart';
+import '../providers/explore_providers.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
@@ -33,17 +37,20 @@ const _categories = [
 /// Opened as soon as the user starts typing in the Explore search bar.
 /// Clearing the query pops back to Explore. Selecting a suggestion pops
 /// back with the selected term as the result.
-class ExploreSearchScreen extends StatefulWidget {
+class ExploreSearchScreen extends ConsumerStatefulWidget {
   const ExploreSearchScreen({super.key, this.initialQuery = ''});
 
   final String initialQuery;
 
   @override
-  State<ExploreSearchScreen> createState() => _ExploreSearchScreenState();
+  ConsumerState<ExploreSearchScreen> createState() =>
+      _ExploreSearchScreenState();
 }
 
-class _ExploreSearchScreenState extends State<ExploreSearchScreen> {
-  late final TextEditingController _controller = TextEditingController(text: widget.initialQuery);
+class _ExploreSearchScreenState extends ConsumerState<ExploreSearchScreen> {
+  late final TextEditingController _controller = TextEditingController(
+    text: widget.initialQuery,
+  );
   final FocusNode _focusNode = FocusNode();
   bool _closing = false;
 
@@ -78,7 +85,21 @@ class _ExploreSearchScreenState extends State<ExploreSearchScreen> {
   @override
   Widget build(BuildContext context) {
     final q = _query.toLowerCase();
-    final matches = q.isEmpty ? <_SearchCategory>[] : _categories.where((c) => c.label.toLowerCase().contains(q)).toList();
+
+    final categoriesAsync = ref.watch(categoriesProvider);
+    final List<_SearchCategory> matches = [];
+    if (q.isNotEmpty && categoriesAsync.hasValue) {
+      final cats = categoriesAsync.value!;
+      for (final cat in cats) {
+        if (cat.name.toLowerCase().contains(q)) {
+          matches.add(_SearchCategory(cat.name, Icons.category_outlined));
+        }
+      }
+    }
+
+    final searchAsync = q.isNotEmpty
+        ? ref.watch(searchProvider(jsonEncode({'q': q, 'limit': 4})))
+        : null;
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -92,7 +113,11 @@ class _ExploreSearchScreenState extends State<ExploreSearchScreen> {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(14),
               boxShadow: [
-                BoxShadow(color: AppColors.primary.withValues(alpha: 0.12), blurRadius: 10, offset: const Offset(0, 3)),
+                BoxShadow(
+                  color: AppColors.primary.withValues(alpha: 0.12),
+                  blurRadius: 10,
+                  offset: const Offset(0, 3),
+                ),
               ],
             ),
             child: TextField(
@@ -102,15 +127,25 @@ class _ExploreSearchScreenState extends State<ExploreSearchScreen> {
               textInputAction: TextInputAction.search,
               onChanged: _onChanged,
               onSubmitted: (v) => v.trim().isEmpty ? null : _close(v.trim()),
-              style: AppTextStyles.bodyLg.copyWith(color: AppColors.textPrimary),
+              style: AppTextStyles.bodyLg.copyWith(
+                color: AppColors.textPrimary,
+              ),
               cursorColor: AppColors.primary,
               decoration: InputDecoration(
                 filled: true,
                 fillColor: Colors.white,
                 contentPadding: const EdgeInsets.symmetric(vertical: 14),
-                prefixIcon: const Icon(Icons.search, color: AppColors.textSecondary, size: 22),
+                prefixIcon: const Icon(
+                  Icons.search,
+                  color: AppColors.textSecondary,
+                  size: 22,
+                ),
                 suffixIcon: IconButton(
-                  icon: const Icon(Icons.close, color: AppColors.textSecondary, size: 20),
+                  icon: const Icon(
+                    Icons.close,
+                    color: AppColors.textSecondary,
+                    size: 20,
+                  ),
                   onPressed: () {
                     _controller.clear();
                     _close();
@@ -122,7 +157,10 @@ class _ExploreSearchScreenState extends State<ExploreSearchScreen> {
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
-                  borderSide: const BorderSide(color: AppColors.primary, width: 1.2),
+                  borderSide: const BorderSide(
+                    color: AppColors.primary,
+                    width: 1.2,
+                  ),
                 ),
               ),
             ),
@@ -142,11 +180,24 @@ class _ExploreSearchScreenState extends State<ExploreSearchScreen> {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(Icons.location_on_outlined, color: AppColors.textSecondary, size: 16),
+                  const Icon(
+                    Icons.location_on_outlined,
+                    color: AppColors.textSecondary,
+                    size: 16,
+                  ),
                   const SizedBox(width: 6),
-                  Text('Current location · 25 km', style: AppTextStyles.bodyMd.copyWith(color: AppColors.textPrimary)),
+                  Text(
+                    'Current location · 25 km',
+                    style: AppTextStyles.bodyMd.copyWith(
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
                   const SizedBox(width: 4),
-                  const Icon(Icons.keyboard_arrow_down, color: AppColors.textSecondary, size: 16),
+                  const Icon(
+                    Icons.keyboard_arrow_down,
+                    color: AppColors.textSecondary,
+                    size: 16,
+                  ),
                 ],
               ),
             ),
@@ -166,7 +217,11 @@ class _ExploreSearchScreenState extends State<ExploreSearchScreen> {
               padding: const EdgeInsets.only(top: 16, bottom: 4),
               child: Text(
                 'CATEGORIES',
-                style: AppTextStyles.labelMd.copyWith(color: AppColors.textSecondary, fontWeight: FontWeight.w500, letterSpacing: 0.6),
+                style: AppTextStyles.labelMd.copyWith(
+                  color: AppColors.textSecondary,
+                  fontWeight: FontWeight.w500,
+                  letterSpacing: 0.6,
+                ),
               ),
             ),
             for (final c in matches)
@@ -177,6 +232,81 @@ class _ExploreSearchScreenState extends State<ExploreSearchScreen> {
                 onTap: () => _close(c.label),
               ),
           ],
+
+          if (searchAsync != null &&
+              searchAsync.hasValue &&
+              searchAsync.value!.items.isNotEmpty) ...[
+            Padding(
+              padding: const EdgeInsets.only(top: 16, bottom: 4),
+              child: Text(
+                'LISTINGS',
+                style: AppTextStyles.labelMd.copyWith(
+                  color: AppColors.textSecondary,
+                  fontWeight: FontWeight.w500,
+                  letterSpacing: 0.6,
+                ),
+              ),
+            ),
+            for (final listing in searchAsync.value!.items)
+              InkWell(
+                onTap: () => context.push('/explore/listing/${listing.id}'),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        width: 48,
+                        height: 48,
+                        decoration: BoxDecoration(
+                          color: Colors.grey[200],
+                          borderRadius: BorderRadius.circular(12),
+                          image: listing.coverUrl != null
+                              ? DecorationImage(
+                                  image: NetworkImage(listing.coverUrl!),
+                                  fit: BoxFit.cover,
+                                )
+                              : null,
+                        ),
+                        child: listing.coverUrl == null
+                            ? const Icon(
+                                Icons.image_outlined,
+                                color: Colors.grey,
+                              )
+                            : null,
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              listing.title,
+                              style: AppTextStyles.bodyLg.copyWith(
+                                color: AppColors.textPrimary,
+                                fontWeight: FontWeight.w500,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              listing.description ?? 'No description available',
+                              style: AppTextStyles.bodyMd.copyWith(
+                                color: AppColors.textSecondary,
+                                fontSize: 13,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+          ],
         ],
       ),
     );
@@ -184,7 +314,12 @@ class _ExploreSearchScreenState extends State<ExploreSearchScreen> {
 }
 
 class _SuggestionTile extends StatelessWidget {
-  const _SuggestionTile({required this.icon, required this.label, required this.onTap, this.labelColor});
+  const _SuggestionTile({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+    this.labelColor,
+  });
 
   final IconData icon;
   final String label;
@@ -207,7 +342,10 @@ class _SuggestionTile extends StatelessWidget {
             Expanded(
               child: Text(
                 label,
-                style: AppTextStyles.bodyLg.copyWith(fontSize: 15, color: labelColor ?? AppColors.textSecondary),
+                style: AppTextStyles.bodyLg.copyWith(
+                  fontSize: 15,
+                  color: labelColor ?? AppColors.textSecondary,
+                ),
                 overflow: TextOverflow.ellipsis,
               ),
             ),

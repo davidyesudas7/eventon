@@ -10,3 +10,26 @@ class ServerFailure extends Failure {
 class NetworkFailure extends Failure {
   const NetworkFailure(super.message);
 }
+
+class AuthFailure extends Failure {
+  const AuthFailure(super.message);
+}
+
+class ProfileRequiredFailure extends Failure {
+  const ProfileRequiredFailure([
+    super.message = 'Profile details required to complete registration',
+  ]);
+}
+
+class UsePasswordFailure extends Failure {
+  const UsePasswordFailure([
+    super.message =
+        'This account uses password authentication. Please sign in with email and password.',
+  ]);
+}
+
+class UnauthorizedFailure extends Failure {
+  const UnauthorizedFailure([
+    super.message = 'Unauthorized or session expired',
+  ]);
+}

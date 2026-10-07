@@ -1,11 +1,15 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../features/auth/presentation/pages/complete_profile_screen.dart';
+import '../../features/auth/presentation/pages/otp_verify_screen.dart';
 import '../../features/auth/presentation/pages/sign_in_email_screen.dart';
 import '../../features/auth/presentation/pages/sign_in_mobile_screen.dart';
 import '../../features/auth/presentation/pages/sign_up_email_screen.dart';
+import '../../features/auth/presentation/providers/auth_providers.dart';
 import '../../features/bookings/domain/entities/booking.dart';
 import '../../features/bookings/presentation/pages/booking_details_screen.dart';
 import '../../features/bookings/presentation/pages/bookings_screen.dart';
@@ -13,12 +17,12 @@ import '../../features/chats/presentation/pages/chats_screen.dart';
 import '../../features/explore/presentation/pages/explore_screen.dart';
 import '../../features/explore/presentation/pages/explore_search_screen.dart';
 import '../../features/home/presentation/pages/home_screen.dart';
-import '../../features/listings/domain/entities/listing.dart';
 import '../../features/listings/presentation/pages/listing_details_screen.dart';
 import '../../features/main/presentation/pages/main_screen.dart';
-import '../../features/occasions/domain/entities/occasion.dart';
-import '../../features/occasions/presentation/pages/occasion_screen.dart';
+
+import '../../features/categories/presentation/pages/occasion_screen.dart';
 import '../../features/profile/presentation/pages/profile_screen.dart';
+import '../../features/quotes/presentation/pages/request_quotes_screen.dart';
 import '../../features/services/presentation/pages/all_services_screen.dart';
 
 part 'app_router.g.dart';
@@ -38,21 +42,79 @@ final _shellNavigatorProfileKey = GlobalKey<NavigatorState>(
 
 @riverpod
 GoRouter goRouter(Ref ref) {
+  final authStateListener = ValueNotifier(ref.read(authControllerProvider));
+  
+  ref.listen(authControllerProvider, (previous, next) {
+    authStateListener.value = next;
+  });
+
   return GoRouter(
-    initialLocation: '/sign-in-email',
+    initialLocation: '/home',
     navigatorKey: _rootNavigatorKey,
+    refreshListenable: authStateListener,
+
+    redirect: (context, state) {
+      final isAuthenticated = authStateListener.value is AuthStateAuthenticated;
+      final location = state.uri.toString();
+
+      final protectedRoutes = ['/profile', '/bookings', '/chats'];
+
+      final isProtectedRoute = protectedRoutes.any(
+        (route) => location == route || location.startsWith('$route/'),
+      );
+
+      final isAuthRoute =
+          location == '/sign-in-mobile' ||
+          location == '/sign-in-email' ||
+          location == '/sign-up-email' ||
+          location == '/otp-verify' ||
+          location == '/complete-profile';
+
+      // Redirect guest users trying to access protected routes to full-screen mobile sign-in
+      if (isProtectedRoute && !isAuthenticated) {
+        return '/sign-in-mobile';
+      }
+
+      // Redirect authenticated users away from auth screens to home
+      if (isAuthRoute && isAuthenticated) {
+        return '/home';
+      }
+
+      return null;
+    },
     routes: [
-      GoRoute(
-        path: '/sign-in-email',
-        builder: (context, state) => const SignInEmailScreen(),
-      ),
       GoRoute(
         path: '/sign-in-mobile',
         builder: (context, state) => const SignInMobileScreen(),
       ),
       GoRoute(
+        path: '/sign-in-email',
+        builder: (context, state) => const SignInEmailScreen(),
+      ),
+      GoRoute(
         path: '/sign-up-email',
         builder: (context, state) => const SignUpEmailScreen(),
+      ),
+      GoRoute(
+        path: '/otp-verify',
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>? ?? {};
+          return OtpVerifyScreen(
+            verificationId: extra['verificationId'] as String? ?? '',
+            phoneNumber: extra['phoneNumber'] as String? ?? '',
+          );
+        },
+      ),
+      GoRoute(
+        path: '/complete-profile',
+        builder: (context, state) {
+          final idToken = state.extra as String? ?? '';
+          return CompleteProfileScreen(idToken: idToken);
+        },
+      ),
+      GoRoute(
+        path: '/request-quotes',
+        builder: (context, state) => const RequestQuotesScreen(),
       ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
@@ -71,19 +133,19 @@ GoRouter goRouter(Ref ref) {
                     builder: (context, state) => const AllServicesScreen(),
                   ),
                   GoRoute(
-                    path: 'occasion/:id',
+                    path: 'occasion/:slug',
                     builder: (context, state) {
-                      final occasion = findOccasionById(state.pathParameters['id']!);
-                      if (occasion == null) return const Scaffold(body: Center(child: Text('Not found')));
-                      return OccasionScreen(occasion: occasion);
+                      return OccasionScreen(
+                        slug: state.pathParameters['slug']!,
+                      );
                     },
                   ),
                   GoRoute(
                     path: 'listing/:id',
                     builder: (context, state) {
-                      final listing = findListingById(state.pathParameters['id']!);
-                      if (listing == null) return const Scaffold(body: Center(child: Text('Not found')));
-                      return ListingDetailsScreen(listing: listing);
+                      return ListingDetailsScreen(
+                        listingId: state.pathParameters['id']!,
+                      );
                     },
                   ),
                 ],
@@ -95,20 +157,25 @@ GoRouter goRouter(Ref ref) {
             routes: [
               GoRoute(
                 path: '/explore',
-                builder: (context, state) => const ExploreScreen(),
+                builder: (context, state) {
+                  final categoryId = state.extra as String?;
+                  return ExploreScreen(initialCategoryId: categoryId);
+                },
                 routes: [
                   GoRoute(
                     path: 'search',
                     builder: (context, state) => ExploreSearchScreen(
-                      initialQuery: state.extra is String ? state.extra as String : '',
+                      initialQuery: state.extra is String
+                          ? state.extra as String
+                          : '',
                     ),
                   ),
                   GoRoute(
                     path: 'listing/:id',
                     builder: (context, state) {
-                      final listing = findListingById(state.pathParameters['id']!);
-                      if (listing == null) return const Scaffold(body: Center(child: Text('Not found')));
-                      return ListingDetailsScreen(listing: listing);
+                      return ListingDetailsScreen(
+                        listingId: state.pathParameters['id']!,
+                      );
                     },
                   ),
                 ],
@@ -129,7 +196,9 @@ GoRouter goRouter(Ref ref) {
                           ? state.extra as Booking
                           : findBookingById(state.pathParameters['id']!);
                       if (booking == null) {
-                        return const Scaffold(body: Center(child: Text('Booking not found')));
+                        return const Scaffold(
+                          body: Center(child: Text('Booking not found')),
+                        );
                       }
                       return BookingDetailsScreen(booking: booking);
                     },

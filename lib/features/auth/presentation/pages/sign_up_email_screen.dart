@@ -1,17 +1,71 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
+import '../providers/auth_providers.dart';
 
-class SignUpEmailScreen extends StatefulWidget {
+class SignUpEmailScreen extends ConsumerStatefulWidget {
   const SignUpEmailScreen({super.key});
 
   @override
-  State<SignUpEmailScreen> createState() => _SignUpEmailScreenState();
+  ConsumerState<SignUpEmailScreen> createState() => _SignUpEmailScreenState();
 }
 
-class _SignUpEmailScreenState extends State<SignUpEmailScreen> {
+class _SignUpEmailScreenState extends ConsumerState<SignUpEmailScreen> {
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
   bool _obscurePassword = true;
+  bool _isLoading = false;
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _handleSignUp() async {
+    final name = _nameController.text.trim();
+    final email = _emailController.text.trim();
+    final password = _passwordController.text;
+
+    if (name.isEmpty || email.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please fill in all fields')),
+      );
+      return;
+    }
+
+    if (password.length < 8) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Password must be at least 8 characters')),
+      );
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    final success = await ref
+        .read(authControllerProvider.notifier)
+        .signUpWithEmail(email, password, name);
+
+    if (!mounted) return;
+    setState(() => _isLoading = false);
+
+    if (success) {
+      context.go('/home');
+    } else {
+      final authState = ref.read(authControllerProvider);
+      if (authState is AuthStateError) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(authState.failure.message)));
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,8 +75,18 @@ class _SignUpEmailScreenState extends State<SignUpEmailScreen> {
         title: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('Event', style: AppTextStyles.headlineLg.copyWith(color: AppColors.textPrimary)),
-            Text('On', style: AppTextStyles.headlineLg.copyWith(color: AppColors.primary)),
+            Text(
+              'Event',
+              style: AppTextStyles.headlineLg.copyWith(
+                color: AppColors.textPrimary,
+              ),
+            ),
+            Text(
+              'On',
+              style: AppTextStyles.headlineLg.copyWith(
+                color: AppColors.primary,
+              ),
+            ),
           ],
         ),
         backgroundColor: Colors.white,
@@ -33,6 +97,8 @@ class _SignUpEmailScreenState extends State<SignUpEmailScreen> {
           onPressed: () {
             if (context.canPop()) {
               context.pop();
+            } else {
+              context.go('/sign-in-mobile');
             }
           },
         ),
@@ -43,13 +109,27 @@ class _SignUpEmailScreenState extends State<SignUpEmailScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Sign up with email', style: AppTextStyles.headlineXl.copyWith(fontSize: 30)),
+              Text(
+                'Sign up with email',
+                style: AppTextStyles.headlineXl.copyWith(fontSize: 30),
+              ),
               const SizedBox(height: 8),
               Row(
                 children: [
-                  Text('Or ', style: AppTextStyles.bodyLg.copyWith(color: AppColors.textSecondary)),
+                  Text(
+                    'Or ',
+                    style: AppTextStyles.bodyLg.copyWith(
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
                   GestureDetector(
-                    onTap: () {},
+                    onTap: () {
+                      if (context.canPop()) {
+                        context.pop();
+                      } else {
+                        context.go('/sign-in-mobile');
+                      }
+                    },
                     child: Text(
                       'go back and use your phone',
                       style: AppTextStyles.bodyLg.copyWith(
@@ -58,14 +138,26 @@ class _SignUpEmailScreenState extends State<SignUpEmailScreen> {
                       ),
                     ),
                   ),
-                  Text('.', style: AppTextStyles.bodyLg.copyWith(color: AppColors.textSecondary)),
+                  Text(
+                    '.',
+                    style: AppTextStyles.bodyLg.copyWith(
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
                 ],
               ),
               const SizedBox(height: 32),
-              
-              Text('Full name', style: AppTextStyles.labelLg.copyWith(color: AppColors.textPrimary)),
+
+              Text(
+                'Full name',
+                style: AppTextStyles.labelLg.copyWith(
+                  color: AppColors.textPrimary,
+                ),
+              ),
               const SizedBox(height: 8),
               TextField(
+                controller: _nameController,
+                textCapitalization: TextCapitalization.words,
                 decoration: InputDecoration(
                   hintText: 'Enter your full name',
                   filled: true,
@@ -81,10 +173,16 @@ class _SignUpEmailScreenState extends State<SignUpEmailScreen> {
                 ),
               ),
               const SizedBox(height: 24),
-              
-              Text('Email', style: AppTextStyles.labelLg.copyWith(color: AppColors.textPrimary)),
+
+              Text(
+                'Email',
+                style: AppTextStyles.labelLg.copyWith(
+                  color: AppColors.textPrimary,
+                ),
+              ),
               const SizedBox(height: 8),
               TextField(
+                controller: _emailController,
                 keyboardType: TextInputType.emailAddress,
                 decoration: InputDecoration(
                   hintText: 'Enter your email',
@@ -101,17 +199,28 @@ class _SignUpEmailScreenState extends State<SignUpEmailScreen> {
                 ),
               ),
               const SizedBox(height: 24),
-              
-              Text('Password', style: AppTextStyles.labelLg.copyWith(color: AppColors.textPrimary)),
+
+              Text(
+                'Password',
+                style: AppTextStyles.labelLg.copyWith(
+                  color: AppColors.textPrimary,
+                ),
+              ),
               const SizedBox(height: 8),
               TextField(
+                controller: _passwordController,
                 obscureText: _obscurePassword,
                 decoration: InputDecoration(
-                  hintText: 'Enter your password',
-                  prefixIcon: const Icon(Icons.lock_outline, color: AppColors.textMuted),
+                  hintText: 'Enter your password (min 8 characters)',
+                  prefixIcon: const Icon(
+                    Icons.lock_outline,
+                    color: AppColors.textMuted,
+                  ),
                   suffixIcon: IconButton(
                     icon: Icon(
-                      _obscurePassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                      _obscurePassword
+                          ? Icons.visibility_off_outlined
+                          : Icons.visibility_outlined,
                       color: AppColors.textMuted,
                     ),
                     onPressed: () {
@@ -133,33 +242,51 @@ class _SignUpEmailScreenState extends State<SignUpEmailScreen> {
                 ),
               ),
               const SizedBox(height: 32),
-              
+
               SizedBox(
                 width: double.infinity,
                 height: 56,
                 child: ElevatedButton(
-                  onPressed: () {},
+                  onPressed: _isLoading ? null : _handleSignUp,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF18252D),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
                   ),
-                  child: const Text('Create account', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
+                  child: _isLoading
+                      ? const CircularProgressIndicator(color: Colors.white)
+                      : const Text(
+                          'Create account',
+                          style: TextStyle(
+                            fontSize: 17,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                          ),
+                        ),
                 ),
               ),
               const SizedBox(height: 48),
-              
+
               Center(
                 child: Column(
                   children: [
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text('Already have an account? ', style: AppTextStyles.bodyMd.copyWith(color: AppColors.textSecondary)),
+                        Text(
+                          'Already have an account? ',
+                          style: AppTextStyles.bodyMd.copyWith(
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
                         GestureDetector(
                           onTap: () => context.go('/sign-in-email'),
                           child: Text(
                             'Sign in',
-                            style: AppTextStyles.labelLg.copyWith(decoration: TextDecoration.underline),
+                            style: AppTextStyles.labelLg.copyWith(
+                              decoration: TextDecoration.underline,
+                            ),
                           ),
                         ),
                       ],
@@ -169,7 +296,9 @@ class _SignUpEmailScreenState extends State<SignUpEmailScreen> {
                       onTap: () {},
                       child: Text(
                         'List your business',
-                        style: AppTextStyles.labelLg.copyWith(decoration: TextDecoration.underline),
+                        style: AppTextStyles.labelLg.copyWith(
+                          decoration: TextDecoration.underline,
+                        ),
                       ),
                     ),
                   ],

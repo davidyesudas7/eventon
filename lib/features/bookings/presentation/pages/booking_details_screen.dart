@@ -6,6 +6,8 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/widgets/eventon_app_bar.dart';
+import '../../../../core/widgets/outlined_card.dart';
+import '../widgets/booking_status_badge.dart';
 import '../../domain/entities/booking.dart';
 
 class BookingDetailsScreen extends StatefulWidget {
@@ -99,11 +101,14 @@ class _BookingDetailsScreenState extends State<BookingDetailsScreen> {
         child: ListView(
           padding: const EdgeInsets.fromLTRB(16, 24, 16, 24),
           children: [
-            Text(b.status.label, style: AppTextStyles.headlineMd),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: BookingStatusBadge(status: b.status),
+            ),
             const SizedBox(height: 16),
 
             // Summary card
-            _OutlinedCard(
+            OutlinedCard(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -131,7 +136,7 @@ class _BookingDetailsScreenState extends State<BookingDetailsScreen> {
 
             if (b.status == BookingStatus.awaitingAdvance) ...[
               const SizedBox(height: 24),
-              _OutlinedCard(
+              OutlinedCard(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -225,22 +230,4 @@ class _BookingDetailsScreenState extends State<BookingDetailsScreen> {
   }
 }
 
-class _OutlinedCard extends StatelessWidget {
-  const _OutlinedCard({required this.child});
-
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppColors.borderSubtle),
-      ),
-      child: child,
-    );
-  }
-}
+  // Removed _OutlinedCard as we now use OutlinedCard

@@ -1,20 +1,44 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
+import '../../../auth/presentation/providers/auth_providers.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final authState = ref.watch(authControllerProvider);
+
+    String name = 'Guest User';
+    String contactInfo = 'Not signed in';
+
+    if (authState is AuthStateAuthenticated) {
+      name = authState.user.fullName;
+      contactInfo =
+          authState.user.email ?? authState.user.phone ?? 'No contact info';
+    }
+
     return Scaffold(
       backgroundColor: AppColors.surfaceBase,
       appBar: AppBar(
         title: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('Event', style: AppTextStyles.headlineLg.copyWith(color: const Color(0xFF13222a))),
-            Text('On', style: AppTextStyles.headlineLg.copyWith(color: AppColors.primary)),
+            Text(
+              'Event',
+              style: AppTextStyles.headlineLg.copyWith(
+                color: const Color(0xFF13222a),
+              ),
+            ),
+            Text(
+              'On',
+              style: AppTextStyles.headlineLg.copyWith(
+                color: AppColors.primary,
+              ),
+            ),
           ],
         ),
         backgroundColor: Colors.white,
@@ -31,7 +55,7 @@ class ProfileScreen extends StatelessWidget {
               style: AppTextStyles.headlineXl.copyWith(fontSize: 28),
             ),
             const SizedBox(height: 24),
-            
+
             // User Details Card
             Container(
               width: double.infinity,
@@ -39,13 +63,19 @@ class ProfileScreen extends StatelessWidget {
               decoration: BoxDecoration(
                 border: Border.all(color: AppColors.borderSubtle),
                 borderRadius: BorderRadius.circular(16),
+                color: Colors.white,
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('David Yesudas', style: AppTextStyles.headlineSm),
+                  Text(name, style: AppTextStyles.headlineSm),
                   const SizedBox(height: 4),
-                  Text('david@gmail.com', style: AppTextStyles.bodyMd),
+                  Text(
+                    contactInfo,
+                    style: AppTextStyles.bodyMd.copyWith(
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -58,6 +88,7 @@ class ProfileScreen extends StatelessWidget {
               decoration: BoxDecoration(
                 border: Border.all(color: AppColors.borderSubtle),
                 borderRadius: BorderRadius.circular(16),
+                color: Colors.white,
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -66,53 +97,75 @@ class ProfileScreen extends StatelessWidget {
                   const SizedBox(height: 8),
                   Text(
                     'Where you live — this can decide which franchise territory a booking\'s commission goes to.',
-                    style: AppTextStyles.bodyMd.copyWith(color: AppColors.textSecondary),
+                    style: AppTextStyles.bodyMd.copyWith(
+                      color: AppColors.textSecondary,
+                    ),
                   ),
                   const SizedBox(height: 20),
-                  
-                  Text('Pincode', style: AppTextStyles.bodyMd.copyWith(color: AppColors.textPrimary)),
+
+                  Text(
+                    'Pincode',
+                    style: AppTextStyles.bodyMd.copyWith(
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
                   const SizedBox(height: 6),
                   TextField(
                     decoration: InputDecoration(
                       hintText: 'e.g. 641004',
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(color: AppColors.borderStrong),
+                        borderSide: const BorderSide(
+                          color: AppColors.borderStrong,
+                        ),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(color: AppColors.borderStrong),
+                        borderSide: const BorderSide(
+                          color: AppColors.borderStrong,
+                        ),
                       ),
                       fillColor: Colors.white,
                     ),
                   ),
                   const SizedBox(height: 16),
-                  
-                  Text('Panchayat, municipality or corporation (Kerala only)', style: AppTextStyles.bodyMd.copyWith(color: AppColors.textPrimary)),
+
+                  Text(
+                    'Panchayat, municipality or corporation (Kerala only)',
+                    style: AppTextStyles.bodyMd.copyWith(
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
                   const SizedBox(height: 6),
                   TextField(
                     decoration: InputDecoration(
                       hintText: 'Start typing your panchayat\'s name...',
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(color: AppColors.borderStrong),
+                        borderSide: const BorderSide(
+                          color: AppColors.borderStrong,
+                        ),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(color: AppColors.borderStrong),
+                        borderSide: const BorderSide(
+                          color: AppColors.borderStrong,
+                        ),
                       ),
                       fillColor: Colors.white,
                     ),
                   ),
                   const SizedBox(height: 20),
-                  
+
                   SizedBox(
                     width: double.infinity,
                     height: 52,
                     child: ElevatedButton(
                       onPressed: () {},
                       style: ElevatedButton.styleFrom(
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
                       child: const Text('Save home location'),
                     ),
@@ -124,30 +177,46 @@ class ProfileScreen extends StatelessWidget {
 
             // Action Buttons
             InkWell(
-              onTap: () {},
+              onTap: () => context.go('/bookings'),
               borderRadius: BorderRadius.circular(16),
               child: Container(
                 width: double.infinity,
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 16,
+                ),
                 decoration: BoxDecoration(
                   border: Border.all(color: AppColors.borderSubtle),
                   borderRadius: BorderRadius.circular(16),
+                  color: Colors.white,
                 ),
                 child: Text('My bookings', style: AppTextStyles.labelLg),
               ),
             ),
             const SizedBox(height: 12),
             InkWell(
-              onTap: () {},
+              onTap: () async {
+                await ref.read(authControllerProvider.notifier).logout();
+                if (context.mounted) {
+                  context.go('/home');
+                }
+              },
               borderRadius: BorderRadius.circular(16),
               child: Container(
                 width: double.infinity,
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 16,
+                ),
                 decoration: BoxDecoration(
                   border: Border.all(color: AppColors.borderSubtle),
                   borderRadius: BorderRadius.circular(16),
+                  color: Colors.white,
                 ),
-                child: Text('Log out', style: AppTextStyles.labelLg.copyWith(color: AppColors.error)),
+                child: Text(
+                  'Log out',
+                  style: AppTextStyles.labelLg.copyWith(color: AppColors.error),
+                ),
               ),
             ),
           ],

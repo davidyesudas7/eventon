@@ -1,0 +1,268 @@
+﻿{
+    "items":  [
+                  {
+                      "id":  "6a8d28e7ed40def1952fb7bb",
+                      "vendorId":  "6a8d28e7186a478a87b6eff0",
+                      "categoryId":  "6a8d1350ed40def1952fb51f",
+                      "territoryId":  null,
+                      "title":  "Royal Wedding Cars",
+                      "description":  "Chauffeur-driven sedans and vintage cars for weddings and photoshoots across the city.",
+                      "attributes":  {
+                                         "vehicleType":  "vintage",
+                                         "seatingCapacity":  4,
+                                         "withDriver":  true,
+                                         "decorationAvailable":  true,
+                                         "maxDistanceKm":  60
+                                     },
+                      "media":  {
+                                    "gallery":  [
+
+                                                ],
+                                    "cover":  {
+                                                  "url":  "https://rapheal-x-untold.s3.amazonaws.com/SS%20new/ev/ev-cars.jpg",
+                                                  "type":  "image",
+                                                  "thumbnailUrl":  null,
+                                                  "caption":  null,
+                                                  "order":  0
+                                              }
+                                },
+                      "status":  "published",
+                      "takedown":  null,
+                      "ratingAvg":  0,
+                      "ratingCount":  0,
+                      "location":  {
+                                       "lat":  9.1748,
+                                       "lng":  76.5013
+                                   },
+                      "priceFrom":  6500,
+                      "priceTo":  6500,
+                      "maxConcurrentBookings":  1,
+                      "minAdvancePercent":  20,
+                      "trustScore":  4
+                  },
+                  {
+                      "id":  "6a8d28e7ed40def1952fb7bf",
+                      "vendorId":  "6a8d28e7186a478a87b6eff0",
+                      "categoryId":  "6a8d1350ed40def1952fb521",
+                      "territoryId":  null,
+                      "title":  "Framed Moments Studio",
+                      "description":  "Candid wedding photography and cinematic videography with a same-week highlight reel.",
+                      "attributes":  {
+                                         "shootTypes":  [
+                                                            "wedding",
+                                                            "candid"
+                                                        ],
+                                         "deliverables":  [
+                                                              "edited-photos",
+                                                              "highlight-video"
+                                                          ],
+                                         "droneAvailable":  true,
+                                         "teamSize":  3,
+                                         "turnaroundDays":  15
+                                     },
+                      "media":  {
+                                    "gallery":  [
+
+                                                ],
+                                    "cover":  {
+                                                  "url":  "https://rapheal-x-untold.s3.amazonaws.com/SS%20new/ev/ev-wedding-photography.jpg",
+                                                  "type":  "image",
+                                                  "thumbnailUrl":  null,
+                                                  "caption":  null,
+                                                  "order":  0
+                                              }
+                                },
+                      "status":  "published",
+                      "takedown":  null,
+                      "ratingAvg":  0,
+                      "ratingCount":  0,
+                      "location":  {
+                                       "lat":  9.3835,
+                                       "lng":  76.36
+                                   },
+                      "priceFrom":  45000,
+                      "priceTo":  45000,
+                      "maxConcurrentBookings":  1,
+                      "minAdvancePercent":  20,
+                      "trustScore":  4
+                  },
+                  {
+                      "id":  "6a8d28e7ed40def1952fb7bd",
+                      "vendorId":  "6a8d28e7186a478a87b6eff0",
+                      "categoryId":  "6a8d1350ed40def1952fb520",
+                      "territoryId":  null,
+                      "title":  "Spice Route Catering",
+                      "description":  "Multi-cuisine catering for weddings, corporate events and intimate gatherings, buffet or plated.",
+                      "attributes":  {
+                                         "cuisineTypes":  [
+                                                              "north-indian",
+                                                              "south-indian"
+                                                          ],
+                                         "serviceStyle":  "buffet",
+                                         "minGuests":  50,
+                                         "maxGuests":  500,
+                                         "vegOnly":  false,
+                                         "staffProvided":  true
+                                     },
+                      "media":  {
+                                    "gallery":  [
+
+                                                ],
+                                    "cover":  {
+                                                  "url":  "https://rapheal-x-untold.s3.amazonaws.com/SS%20new/ev/ev-catering.jpg",
+                                                  "type":  "image",
+                                                  "thumbnailUrl":  null,
+                                                  "caption":  null,
+                                                  "order":  0
+                                              }
+                                },
+                      "status":  "published",
+                      "takedown":  null,
+                      "ratingAvg":  0,
+                      "ratingCount":  0,
+                      "location":  {
+                                       "lat":  9.6844,
+                                       "lng":  76.3363
+                                   },
+                      "priceFrom":  650,
+                      "priceTo":  650,
+                      "maxConcurrentBookings":  1,
+                      "minAdvancePercent":  20,
+                      "trustScore":  4
+                  },
+                  {
+                      "id":  "6a8d28e7ed40def1952fb7c3",
+                      "vendorId":  "6a8d28e7186a478a87b6eff0",
+                      "categoryId":  "6a8d1350ed40def1952fb523",
+                      "territoryId":  null,
+                      "title":  "Beat Drop DJs",
+                      "description":  "High-energy DJ sets for weddings, sangeets and corporate parties — Bollywood to EDM.",
+                      "attributes":  {
+                                         "actType":  "dj",
+                                         "genres":  [
+                                                        "bollywood",
+                                                        "edm"
+                                                    ],
+                                         "setDurationHours":  5,
+                                         "equipmentProvided":  true
+                                     },
+                      "media":  {
+                                    "gallery":  [
+
+                                                ],
+                                    "cover":  {
+                                                  "url":  "https://rapheal-x-untold.s3.amazonaws.com/SS%20new/ev/ev-dj.jpg",
+                                                  "type":  "image",
+                                                  "thumbnailUrl":  null,
+                                                  "caption":  null,
+                                                  "order":  0
+                                              }
+                                },
+                      "status":  "published",
+                      "takedown":  null,
+                      "ratingAvg":  0,
+                      "ratingCount":  0,
+                      "location":  {
+                                       "lat":  9.318,
+                                       "lng":  76.611
+                                   },
+                      "priceFrom":  20000,
+                      "priceTo":  20000,
+                      "maxConcurrentBookings":  1,
+                      "minAdvancePercent":  20,
+                      "trustScore":  4
+                  },
+                  {
+                      "id":  "6ac4cc004bf35e214ffbb826",
+                      "vendorId":  "6ac4c7c54bf35e214ffbb807",
+                      "categoryId":  "6a8d1350ed40def1952fb520",
+                      "territoryId":  "6ac4c45d4bf35e214ffbb802",
+                      "title":  "Usha caterings",
+                      "description":  "Top catering services in and around Chalakudy, Kerala offer wedding feasts, traditional sadhya, and event management.",
+                      "attributes":  {
+                                         "cuisineTypes":  [
+                                                              "south-indian",
+                                                              "north-indian",
+                                                              "chinese"
+                                                          ],
+                                         "serviceStyle":  "plated",
+                                         "minGuests":  200,
+                                         "maxGuests":  2000,
+                                         "vegOnly":  false,
+                                         "staffProvided":  true
+                                     },
+                      "media":  {
+                                    "cover":  {
+                                                  "url":  "https://axyz-flow.s3.ap-south-1.amazonaws.com/uploads/761cd833-7a38-472a-8200-c4a90398c9f4.jpg",
+                                                  "type":  "image",
+                                                  "thumbnailUrl":  null,
+                                                  "caption":  null,
+                                                  "order":  0
+                                              },
+                                    "gallery":  [
+
+                                                ]
+                                },
+                      "status":  "published",
+                      "takedown":  null,
+                      "ratingAvg":  0,
+                      "ratingCount":  0,
+                      "location":  {
+                                       "lat":  10.6879,
+                                       "lng":  76.4284
+                                   },
+                      "priceFrom":  36000,
+                      "priceTo":  36000,
+                      "maxConcurrentBookings":  1,
+                      "minAdvancePercent":  20,
+                      "trustScore":  4
+                  },
+                  {
+                      "id":  "6ac49ed4fb9ec16d269d89d1",
+                      "vendorId":  "6ac4871ceef4ddec49339a91",
+                      "categoryId":  "6a8d1350ed40def1952fb521",
+                      "territoryId":  "6ac4c45d4bf35e214ffbb802",
+                      "title":  "My Face Studio",
+                      "description":  "At My Face Studio, we believe every moment has a story waiting to be told. Specializing in wedding, candid, portrait, and corporate photography, our team combines technical expertise with an artistic eye to capture authentic emotions and timeless memories.",
+                      "attributes":  {
+                                         "shootTypes":  [
+                                                            "wedding",
+                                                            "pre-wedding",
+                                                            "candid"
+                                                        ],
+                                         "deliverables":  [
+                                                              "full-length-video",
+                                                              "highlight-video"
+                                                          ],
+                                         "droneAvailable":  true,
+                                         "teamSize":  10,
+                                         "turnaroundDays":  20
+                                     },
+                      "media":  {
+                                    "cover":  {
+                                                  "url":  "https://axyz-flow.s3.ap-south-1.amazonaws.com/uploads/c48b2ddf-558f-473d-8091-d8c18456d96c.jpg",
+                                                  "type":  "image",
+                                                  "thumbnailUrl":  null,
+                                                  "caption":  null,
+                                                  "order":  0
+                                              },
+                                    "gallery":  [
+
+                                                ]
+                                },
+                      "status":  "published",
+                      "takedown":  null,
+                      "ratingAvg":  0,
+                      "ratingCount":  0,
+                      "location":  null,
+                      "priceFrom":  null,
+                      "priceTo":  null,
+                      "maxConcurrentBookings":  1,
+                      "minAdvancePercent":  20,
+                      "trustScore":  4
+                  }
+              ],
+    "total":  6,
+    "page":  1,
+    "limit":  20
+}

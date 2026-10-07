@@ -1,40 +1,78 @@
+import 'package:eventon/features/quotes/presentation/providers/quote_cart_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/widgets/eventon_app_bar.dart';
+import '../../../../core/widgets/circle_icon_button.dart';
+import '../widgets/listing_package_card.dart';
 import '../../../../core/utils/formatters.dart';
-import '../../domain/entities/listing.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../auth/presentation/providers/auth_providers.dart';
+import '../../data/models/package_model.dart';
+import '../providers/listing_details_providers.dart';
+import '../widgets/listing_review_card.dart';
 
-class ListingDetailsScreen extends StatefulWidget {
-  const ListingDetailsScreen({super.key, required this.listing});
+class ListingDetailsScreen extends ConsumerStatefulWidget {
+  const ListingDetailsScreen({super.key, required this.listingId});
 
-  final Listing listing;
+  final String listingId;
 
   @override
-  State<ListingDetailsScreen> createState() => _ListingDetailsScreenState();
+  ConsumerState<ListingDetailsScreen> createState() =>
+      _ListingDetailsScreenState();
 }
 
-class _ListingDetailsScreenState extends State<ListingDetailsScreen> {
-  bool _addedToQuote = false;
+class _ListingDetailsScreenState extends ConsumerState<ListingDetailsScreen> {
+  void _toggleQuote(String title, String? imageUrl, int? startingPrice) {
+    if (!_checkAuth()) return;
 
-  void _toggleQuote() {
-    setState(() => _addedToQuote = !_addedToQuote);
+    final isAdded = ref
+        .read(quoteCartProvider.notifier)
+        .isAdded(widget.listingId);
+    if (isAdded) {
+      ref.read(quoteCartProvider.notifier).removeQuote(widget.listingId);
+    } else {
+      ref
+          .read(quoteCartProvider.notifier)
+          .addQuote(
+            QuoteItem(
+              id: widget.listingId,
+              title: title,
+              imageUrl: imageUrl,
+              price: startingPrice != null ? 'From ₹$startingPrice' : null,
+            ),
+          );
+    }
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(_addedToQuote ? 'Added to quote request' : 'Removed from quote request'),
+        content: Text(
+          !isAdded ? 'Added to quote request' : 'Removed from quote request',
+        ),
         duration: const Duration(seconds: 2),
       ),
     );
   }
 
-  void _bookNow(ListingPackage package) {
+  bool _checkAuth() {
+    final authState = ref.read(authControllerProvider);
+    if (authState is! AuthStateAuthenticated) {
+      context.push('/sign-in-mobile');
+      return false;
+    }
+    return true;
+  }
+
+  void _bookNow(PackageModel package) {
+    if (!_checkAuth()) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('Starting booking for ${package.name}…')),
     );
   }
 
   void _messageBusiness() {
+    if (!_checkAuth()) return;
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Opening chat with business…')),
     );
@@ -42,308 +80,456 @@ class _ListingDetailsScreenState extends State<ListingDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final l = widget.listing;
+    final asyncData = ref.watch(listingDetailsProvider(widget.listingId));
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: const EventOnAppBar(),
-      body: Stack(
-        children: [
-          ListView(
-            padding: const EdgeInsets.only(bottom: 100), // Space for bottom bar
+      body: asyncData.when(
+        loading: () => const Center(
+          child: CircularProgressIndicator(color: AppColors.primary),
+        ),
+        error: (err, stack) => Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              _buildHero(),
-              Padding(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(l.title, style: AppTextStyles.headlineMd.copyWith(fontSize: 22)),
-                    const SizedBox(height: 4),
-                    if (l.isNew)
-                      Text('New on EventOn', style: AppTextStyles.bodyMd),
-                    const SizedBox(height: 16),
-                    Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                          decoration: BoxDecoration(
-                            border: Border.all(color: AppColors.borderStrong),
-                            borderRadius: BorderRadius.circular(999),
-                          ),
-                          child: Text(l.category, style: AppTextStyles.labelMd.copyWith(color: AppColors.textSecondary)),
-                        ),
-                        const SizedBox(width: 12),
-                        Text('By ${l.providerName}', style: AppTextStyles.bodyMd.copyWith(color: AppColors.textPrimary)),
-                      ],
+              const Icon(Icons.error_outline, size: 48, color: Colors.red),
+              const SizedBox(height: 16),
+              Text('Failed to load listing', style: AppTextStyles.headlineSm),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () =>
+                    ref.invalidate(listingDetailsProvider(widget.listingId)),
+                child: const Text('Retry'),
+              ),
+            ],
+          ),
+        ),
+        data: (data) {
+          final l = data.listing;
+          final vendorName =
+              data.vendor?.businessName ??
+              data.vendor?.fullName ??
+              'Unknown vendor';
+          final categoryName = data.category?.name ?? 'Unknown category';
+          final _addedToQuote = ref
+              .watch(quoteCartProvider)
+              .any((q) => q.id == widget.listingId);
+
+          final startingPrice =
+              l.priceFrom ??
+              (data.packages.isNotEmpty
+                  ? data.packages
+                        .map((p) => p.price)
+                        .reduce((a, b) => a < b ? a : b)
+                  : 0);
+
+          return Stack(
+            children: [
+              ListView(
+                padding: const EdgeInsets.only(
+                  bottom: 100,
+                ), // Space for bottom bar
+                children: [
+                  _buildHero(
+                    l.media?.cover?.url,
+                    _addedToQuote,
+                    () => _toggleQuote(
+                      l.title,
+                      l.media?.cover?.url,
+                      startingPrice.toInt(),
                     ),
-                    const SizedBox(height: 24),
-                    
-                    // Quote Request Card
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        border: Border.all(color: AppColors.borderSubtle),
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              'Comparing prices? Ask this business and others for a quote in one go.',
-                              style: AppTextStyles.bodyMd,
-                            ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          l.title,
+                          style: AppTextStyles.headlineMd.copyWith(
+                            fontSize: 22,
                           ),
-                          const SizedBox(width: 16),
-                          InkWell(
-                            onTap: _toggleQuote,
-                            borderRadius: BorderRadius.circular(999),
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                        ),
+                        const SizedBox(height: 16),
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 6,
+                              ),
                               decoration: BoxDecoration(
-                                color: _addedToQuote ? AppColors.surfaceMintPill : Colors.white,
-                                border: Border.all(color: _addedToQuote ? AppColors.primary : AppColors.borderStrong),
+                                border: Border.all(
+                                  color: AppColors.borderStrong,
+                                ),
                                 borderRadius: BorderRadius.circular(999),
                               ),
-                              child: Row(
+                              child: Text(
+                                categoryName,
+                                style: AppTextStyles.labelMd.copyWith(
+                                  color: AppColors.textSecondary,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Text(
+                              'By $vendorName',
+                              style: AppTextStyles.bodyMd.copyWith(
+                                color: AppColors.textPrimary,
+                              ),
+                            ),
+                            if (l.ratingCount != null &&
+                                l.ratingCount! > 0) ...[
+                              const SizedBox(width: 12),
+                              Row(
                                 children: [
-                                  Icon(
-                                    _addedToQuote ? Icons.check : Icons.add,
+                                  const Icon(
+                                    Icons.star,
+                                    color: Color(0xFFFFB800),
                                     size: 16,
-                                    color: _addedToQuote ? AppColors.primary : AppColors.textPrimary,
                                   ),
-                                  const SizedBox(width: 6),
+                                  const SizedBox(width: 4),
                                   Text(
-                                    _addedToQuote ? 'Added' : 'Add to quote request',
-                                    style: AppTextStyles.labelMd.copyWith(
-                                      color: _addedToQuote ? AppColors.primary : AppColors.textPrimary,
-                                    ),
+                                    '${l.ratingAvg?.toStringAsFixed(1)} (${l.ratingCount})',
+                                    style: AppTextStyles.labelMd,
                                   ),
                                 ],
                               ),
+                            ],
+                          ],
+                        ),
+                        const SizedBox(height: 24),
+
+                        // Quote Request Card
+                        Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: AppColors.borderSubtle),
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  'Comparing prices? Ask this business and others for a quote in one go.',
+                                  style: AppTextStyles.bodyMd,
+                                ),
+                              ),
+                              const SizedBox(width: 16),
+                              InkWell(
+                                onTap: () => _toggleQuote(
+                                  l.title,
+                                  l.media?.cover?.url,
+                                  startingPrice.toInt(),
+                                ),
+                                borderRadius: BorderRadius.circular(999),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 14,
+                                    vertical: 8,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: _addedToQuote
+                                        ? AppColors.surfaceMintPill
+                                        : Colors.white,
+                                    border: Border.all(
+                                      color: _addedToQuote
+                                          ? AppColors.primary
+                                          : AppColors.borderStrong,
+                                    ),
+                                    borderRadius: BorderRadius.circular(999),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Icon(
+                                        _addedToQuote ? Icons.check : Icons.add,
+                                        size: 16,
+                                        color: _addedToQuote
+                                            ? AppColors.primary
+                                            : AppColors.textPrimary,
+                                      ),
+                                      const SizedBox(width: 6),
+                                      Text(
+                                        _addedToQuote
+                                            ? 'Added'
+                                            : 'Add to quote request',
+                                        style: AppTextStyles.labelMd.copyWith(
+                                          color: _addedToQuote
+                                              ? AppColors.primary
+                                              : AppColors.textPrimary,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const Divider(color: AppColors.borderSubtle, height: 1),
+
+                  // About
+                  Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'About',
+                          style: AppTextStyles.headlineSm.copyWith(
+                            fontSize: 17,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          l.description,
+                          style: AppTextStyles.bodyMd.copyWith(height: 1.5),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  if (l.attributes.isNotEmpty) ...[
+                    const Divider(color: AppColors.borderSubtle, height: 1),
+                    Padding(
+                      padding: const EdgeInsets.all(20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Details',
+                            style: AppTextStyles.headlineSm.copyWith(
+                              fontSize: 17,
                             ),
+                          ),
+                          const SizedBox(height: 20),
+                          GridView.builder(
+                            padding: EdgeInsets.zero,
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 2,
+                                  mainAxisSpacing: 24,
+                                  crossAxisSpacing: 16,
+                                  childAspectRatio: 3,
+                                ),
+                            itemCount: l.attributes.length,
+                            itemBuilder: (context, index) {
+                              final key = l.attributes.keys.elementAt(index);
+                              final dynamic rawValue = l.attributes[key];
+
+                              // Format label using schema if available, otherwise humanize key
+                              String label = key;
+                              if (data.category?.attributeSchema != null) {
+                                final schemaProps =
+                                    data
+                                            .category!
+                                            .attributeSchema?['properties']
+                                        as Map<String, dynamic>?;
+                                if (schemaProps != null &&
+                                    schemaProps.containsKey(key)) {
+                                  label = schemaProps[key]?['title'] ?? key;
+                                }
+                              }
+
+                              // Convert snake_case/camelCase to Title Case if still raw
+                              if (label == key) {
+                                label = label
+                                    .replaceAll(RegExp(r'([A-Z])'), ' \$1')
+                                    .replaceAll('_', ' ');
+                                label =
+                                    label.substring(0, 1).toUpperCase() +
+                                    label.substring(1).toLowerCase();
+                              }
+
+                              // Format value
+                              String valueStr = '';
+                              if (rawValue is bool) {
+                                valueStr = rawValue ? 'Yes' : 'No';
+                              } else if (rawValue is List) {
+                                valueStr = rawValue.join(', ');
+                              } else {
+                                valueStr = rawValue.toString();
+                              }
+
+                              return Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    label,
+                                    style: AppTextStyles.bodySm,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    valueStr,
+                                    style: AppTextStyles.labelMd.copyWith(
+                                      fontSize: 15,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ],
+                              );
+                            },
                           ),
                         ],
                       ),
                     ),
                   ],
-                ),
-              ),
 
-              const Divider(color: AppColors.borderSubtle, height: 1),
-              
-              // About
-              Padding(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('About', style: AppTextStyles.headlineSm.copyWith(fontSize: 17)),
-                    const SizedBox(height: 12),
-                    Text(l.about, style: AppTextStyles.bodyMd.copyWith(height: 1.5)),
-                  ],
-                ),
-              ),
-
-              if (l.details.isNotEmpty) ...[
-                const Divider(color: AppColors.borderSubtle, height: 1),
-                Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Details', style: AppTextStyles.headlineSm.copyWith(fontSize: 17)),
-                      const SizedBox(height: 20),
-                      GridView.builder(
-                        padding: EdgeInsets.zero,
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          mainAxisSpacing: 24,
-                          crossAxisSpacing: 16,
-                          childAspectRatio: 3,
-                        ),
-                        itemCount: l.details.length,
-                        itemBuilder: (context, index) {
-                          final key = l.details.keys.elementAt(index);
-                          final value = l.details[key]!;
-                          return Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(key, style: AppTextStyles.bodySm),
-                              const SizedBox(height: 4),
-                              Text(value, style: AppTextStyles.labelMd.copyWith(fontSize: 15)),
-                            ],
-                          );
-                        },
+                  if (data.packages.isNotEmpty) ...[
+                    const Divider(color: AppColors.borderSubtle, height: 1),
+                    Padding(
+                      padding: const EdgeInsets.all(20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Packages',
+                            style: AppTextStyles.headlineSm.copyWith(
+                              fontSize: 17,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          for (final pkg in data.packages) ...[
+                            ListingPackageCard(
+                              package: pkg,
+                              onBook: () => _bookNow(pkg),
+                            ),
+                            const SizedBox(height: 16),
+                          ],
+                        ],
                       ),
-                    ],
-                  ),
-                ),
-              ],
+                    ),
+                  ],
 
-              if (l.packages.isNotEmpty) ...[
-                const Divider(color: AppColors.borderSubtle, height: 1),
-                Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Packages', style: AppTextStyles.headlineSm.copyWith(fontSize: 17)),
-                      const SizedBox(height: 16),
-                      for (final pkg in l.packages) ...[
-                        _buildPackageCard(pkg),
-                        const SizedBox(height: 16),
-                      ],
-                    ],
-                  ),
-                ),
-              ],
-            ],
-          ),
-          
-          // Fixed Bottom Bar
-          Positioned(
-            left: 0, right: 0, bottom: 0,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                border: Border(top: BorderSide(color: AppColors.borderSubtle)),
+                  if (data.reviews.isNotEmpty) ...[
+                    const Divider(color: AppColors.borderSubtle, height: 1),
+                    Padding(
+                      padding: const EdgeInsets.all(20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Reviews (${data.reviewTotal})',
+                            style: AppTextStyles.headlineSm.copyWith(
+                              fontSize: 17,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          for (final review in data.reviews) ...[
+                            ListingReviewCard(review: review),
+                            const SizedBox(height: 16),
+                          ],
+                        ],
+                      ),
+                    ),
+                  ],
+                ],
               ),
-              child: SafeArea(
-                top: false,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
+
+              // Fixed Bottom Bar
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: 0,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 16,
+                  ),
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    border: Border(
+                      top: BorderSide(color: AppColors.borderSubtle),
+                    ),
+                  ),
+                  child: SafeArea(
+                    top: false,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text('Starting at', style: AppTextStyles.labelSm),
-                        Text(formatRupees(l.startingPrice), style: AppTextStyles.headlineSm.copyWith(fontSize: 17)),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text('Starting at', style: AppTextStyles.labelSm),
+                            Text(
+                              formatRupees(startingPrice.toInt()),
+                              style: AppTextStyles.headlineSm.copyWith(
+                                fontSize: 17,
+                              ),
+                            ),
+                          ],
+                        ),
+                        ElevatedButton(
+                          onPressed: _messageBusiness,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF155E56),
+                            foregroundColor: Colors.white,
+                            elevation: 0,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 24,
+                              vertical: 14,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(999),
+                            ),
+                            textStyle: AppTextStyles.labelLg.copyWith(
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          child: const Text('Message business'),
+                        ),
                       ],
                     ),
-                    ElevatedButton(
-                      onPressed: _messageBusiness,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF155E56),
-                        foregroundColor: Colors.white,
-                        elevation: 0,
-                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)),
-                        textStyle: AppTextStyles.labelLg.copyWith(fontWeight: FontWeight.w600),
-                      ),
-                      child: const Text('Message business'),
-                    ),
-                  ],
+                  ),
                 ),
               ),
-            ),
-          ),
-        ],
+            ],
+          );
+        },
       ),
     );
   }
 
-  Widget _buildHero() {
+  Widget _buildHero(
+    String? imageUrl,
+    bool isAdded,
+    VoidCallback onToggleQuote,
+  ) {
     return Stack(
       children: [
-        Container(
-          height: 290,
-          color: const Color(0xFFE2E8F0), // Placeholder color
-          width: double.infinity,
-        ),
-        Positioned(
-          top: 16, left: 16,
-          child: InkWell(
-            onTap: () => context.pop(),
-            customBorder: const CircleBorder(),
-            child: Container(
-              width: 40, height: 40,
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.9),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(Icons.arrow_back, color: AppColors.textPrimary, size: 20),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildPackageCard(ListingPackage pkg) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        border: Border.all(color: AppColors.borderSubtle),
-        borderRadius: BorderRadius.circular(14),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(pkg.name, style: AppTextStyles.headlineSm.copyWith(fontSize: 17)),
-                    if (pkg.duration != null) ...[
-                      const SizedBox(height: 2),
-                      Text(pkg.duration!, style: AppTextStyles.bodyMd),
-                    ],
-                  ],
-                ),
-              ),
-              Text(
-                formatRupees(pkg.price),
-                style: AppTextStyles.labelLg.copyWith(color: AppColors.primary, fontSize: 16),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          for (final f in pkg.features)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 8),
-              child: Row(
-                children: [
-                  const Icon(Icons.check, size: 16, color: AppColors.primary),
-                  const SizedBox(width: 8),
-                  Text(f, style: AppTextStyles.bodyMd.copyWith(color: AppColors.textSecondary)),
-                ],
-              ),
-            ),
-          for (final f in pkg.excludedFeatures)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 8),
-              child: Row(
-                children: [
-                  const Icon(Icons.check, size: 16, color: AppColors.primary),
-                  const SizedBox(width: 8),
-                  Text(f, style: AppTextStyles.bodyMd.copyWith(color: AppColors.textSecondary)),
-                ],
-              ),
-            ),
-          const SizedBox(height: 16),
-          SizedBox(
+        if (imageUrl != null)
+          Image.network(
+            imageUrl,
+            height: 290,
             width: double.infinity,
-            height: 48,
-            child: OutlinedButton(
-              onPressed: () => _bookNow(pkg),
-              style: OutlinedButton.styleFrom(
-                foregroundColor: AppColors.textPrimary,
-                side: const BorderSide(color: AppColors.borderStrong),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              ),
-              child: Text('Book now', style: AppTextStyles.labelLg.copyWith(fontWeight: FontWeight.w600)),
-            ),
+            fit: BoxFit.cover,
+          )
+        else
+          Container(
+            height: 290,
+            color: const Color(0xFFE2E8F0),
+            width: double.infinity,
           ),
-        ],
-      ),
+        // Positioned(
+        //   top: 16,
+        //   left: 16,
+        //   child: CircleIconButton(
+        //     icon: Icons.arrow_back,
+        //     onTap: () => context.pop(),
+        //   ),
+        // ),
+      ],
     );
   }
 }
