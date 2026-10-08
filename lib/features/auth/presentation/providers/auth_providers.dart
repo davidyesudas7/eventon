@@ -12,6 +12,7 @@ import '../../domain/usecases/firebase_sign_in_usecase.dart';
 import '../../domain/usecases/get_current_user_usecase.dart';
 import '../../domain/usecases/logout_usecase.dart';
 import '../../domain/usecases/forgot_password_usecase.dart';
+import '../../../../features/explore/presentation/providers/location_search_provider.dart';
 
 part 'auth_providers.g.dart';
 
@@ -170,6 +171,10 @@ class AuthController extends _$AuthController {
     state = const AuthStateLoading();
     final usecase = ref.read(logoutUseCaseProvider);
     await usecase(const NoParams());
+    
+    // Clear selected location
+    ref.read(exploreLocationProvider.notifier).clearLocation();
+    
     state = const AuthStateUnauthenticated();
   }
 }

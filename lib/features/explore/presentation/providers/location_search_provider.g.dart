@@ -41,7 +41,7 @@ final class ExploreLocationProvider
   }
 }
 
-String _$exploreLocationHash() => r'a085704f49374fa06f0d2b48a0de34a3cf388c7e';
+String _$exploreLocationHash() => r'3432911aa7d7772e3a15b06b8e09816b864214e7';
 
 abstract class _$ExploreLocation extends $Notifier<SavedLocation?> {
   SavedLocation? build();
@@ -94,7 +94,7 @@ final class LocationSearchControllerProvider
 }
 
 String _$locationSearchControllerHash() =>
-    r'caa65fecbeb779241586d45c1c6f5e8b755fadff';
+    r'9c65a1de79214dd87256b25715f5f5395b709926';
 
 abstract class _$LocationSearchController
     extends $Notifier<LocationSearchState> {

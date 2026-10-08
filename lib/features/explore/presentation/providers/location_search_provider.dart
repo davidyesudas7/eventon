@@ -12,15 +12,26 @@ part 'location_search_provider.g.dart';
 class ExploreLocation extends _$ExploreLocation {
   @override
   SavedLocation? build() {
+    _loadPersistedLocation();
     return null;
+  }
+
+  Future<void> _loadPersistedLocation() async {
+    final repo = ref.read(locationHistoryRepositoryProvider);
+    final saved = await repo.getCurrentSelectedLocation();
+    if (saved != null) {
+      state = saved;
+    }
   }
 
   void setLocation(SavedLocation location) {
     state = location;
+    ref.read(locationHistoryRepositoryProvider).saveCurrentSelectedLocation(location);
   }
 
   void clearLocation() {
     state = null;
+    ref.read(locationHistoryRepositoryProvider).clearCurrentSelectedLocation();
   }
 }
 

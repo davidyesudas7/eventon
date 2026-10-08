@@ -12,6 +12,7 @@ LocationHistoryRepository locationHistoryRepository(Ref ref) {
 
 class LocationHistoryRepository {
   static const String _key = 'recent_locations';
+  static const String _currentLocationKey = 'current_selected_location';
   static const int _maxHistory = 10;
 
   Future<List<SavedLocation>> getRecentLocations() async {
@@ -46,5 +47,28 @@ class LocationHistoryRepository {
   Future<void> clearHistory() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_key);
+  }
+
+  Future<SavedLocation?> getCurrentSelectedLocation() async {
+    final prefs = await SharedPreferences.getInstance();
+    final jsonStr = prefs.getString(_currentLocationKey);
+    if (jsonStr != null) {
+      try {
+        return SavedLocation.fromJson(jsonDecode(jsonStr));
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  Future<void> saveCurrentSelectedLocation(SavedLocation location) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_currentLocationKey, jsonEncode(location.toJson()));
+  }
+
+  Future<void> clearCurrentSelectedLocation() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_currentLocationKey);
   }
 }

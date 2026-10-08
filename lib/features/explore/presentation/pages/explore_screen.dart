@@ -17,6 +17,8 @@ import '../../../categories/domain/entities/ui_hint.dart';
 import '../../../listings/presentation/widgets/listing_card.dart';
 import '../providers/explore_providers.dart';
 import '../providers/location_search_provider.dart';
+import '../../../../core/services/location_service.dart';
+import '../../domain/entities/saved_location.dart';
 
 class ExploreScreen extends ConsumerStatefulWidget {
   final String? initialCategoryId;
@@ -30,6 +32,7 @@ class ExploreScreen extends ConsumerStatefulWidget {
 class _ExploreScreenState extends ConsumerState<ExploreScreen> {
   final TextEditingController _searchController = TextEditingController();
   bool _openingSearch = false;
+  bool _isFetchingLocation = false;
 
   String? _selectedCategoryId;
   String? _appliedCategoryId;
@@ -49,6 +52,11 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
 
     // Start rotating hint
     _startHintTimer();
+
+    // Check location permission on enter
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(locationServiceProvider).checkAndRequestPermission();
+    });
   }
 
   void _startHintTimer() {
@@ -99,12 +107,10 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
     }
     queries.addAll(_appliedAttributes);
 
-    if (location != null) {
+    if (location != null && location.radiusKm != null) {
       queries['lat'] = location.latitude;
       queries['lng'] = location.longitude;
-      if (location.radiusKm != null) {
-        queries['radiusKm'] = location.radiusKm;
-      }
+      queries['radiusKm'] = location.radiusKm;
     }
 
     final searchAsync = ref.watch(searchProvider(jsonEncode(queries)));
@@ -286,9 +292,74 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                         ),
                         const SizedBox(width: 8),
                         ElevatedButton(
-                          onPressed: () {
-                            // TODO: Handle Use my location
-                          },
+                          onPressed: _isFetchingLocation
+                              ? null
+                              : () async {
+                                  setState(() {
+                                    _isFetchingLocation = true;
+                                  });
+
+                                  try {
+                                    final locationService = ref.read(
+                                      locationServiceProvider,
+                                    );
+                                    final position = await locationService
+                                        .getCurrentPosition();
+
+                                    if (position != null) {
+                                      final locationData = SavedLocation(
+                                        placeId: 'current',
+                                        name: 'Current Location',
+                                        address: 'Current Location',
+                                        latitude: position.latitude,
+                                        longitude: position.longitude,
+                                      );
+                                      ref
+                                          .read(
+                                            exploreLocationProvider.notifier,
+                                          )
+                                          .setLocation(locationData);
+                                    } else {
+                                      final isDeniedForever =
+                                          await locationService
+                                              .isPermissionDeniedForever();
+                                      if (isDeniedForever && context.mounted) {
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
+                                          SnackBar(
+                                            content: const Text(
+                                              'Location permissions are permanently denied.',
+                                            ),
+                                            action: SnackBarAction(
+                                              label: 'Settings',
+                                              onPressed: () => locationService
+                                                  .openAppSettings(),
+                                            ),
+                                          ),
+                                        );
+                                      }
+                                    }
+                                  } catch (e) {
+                                    if (context.mounted) {
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                            'Failed to fetch location: $e',
+                                          ),
+                                        ),
+                                      );
+                                    }
+                                  } finally {
+                                    if (mounted) {
+                                      setState(() {
+                                        _isFetchingLocation = false;
+                                      });
+                                    }
+                                  }
+                                },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFF15272A),
                             foregroundColor: Colors.white,
@@ -301,10 +372,19 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                             ),
                             minimumSize: Size.zero,
                           ),
-                          child: const Text(
-                            'Use my location',
-                            style: TextStyle(fontWeight: FontWeight.w600),
-                          ),
+                          child: _isFetchingLocation
+                              ? const SizedBox(
+                                  width: 16,
+                                  height: 16,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: Colors.white,
+                                  ),
+                                )
+                              : const Text(
+                                  'Use my location',
+                                  style: TextStyle(fontWeight: FontWeight.w600),
+                                ),
                         ),
                       ],
                     ),

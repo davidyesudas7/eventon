@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
+import '../../../../core/services/location_service.dart';
 import '../providers/location_search_provider.dart';
 import '../../domain/entities/saved_location.dart';
 
@@ -18,6 +19,7 @@ class ExploreLocationScreen extends ConsumerStatefulWidget {
 class _ExploreLocationScreenState extends ConsumerState<ExploreLocationScreen> {
   final TextEditingController _searchController = TextEditingController();
   int? _selectedRadiusKm;
+  bool _isFetchingLocation = false;
 
   @override
   void initState() {
@@ -51,11 +53,13 @@ class _ExploreLocationScreenState extends ConsumerState<ExploreLocationScreen> {
       );
       ref.read(exploreLocationProvider.notifier).setLocation(updatedLocation);
       
-      // Save it locally to recent list
-      ref.read(locationSearchControllerProvider.notifier).selectRecent(
-        updatedLocation, 
-        radiusKm: radius,
-      );
+      // Save it locally to recent list only if it's not the current location
+      if (updatedLocation.placeId != 'current') {
+        ref.read(locationSearchControllerProvider.notifier).selectRecent(
+          updatedLocation, 
+          radiusKm: radius,
+        );
+      }
     }
   }
 
@@ -187,21 +191,74 @@ class _ExploreLocationScreenState extends ConsumerState<ExploreLocationScreen> {
 
           // Current Location Button
           InkWell(
-            onTap: () {
-              // Handle current location
+            onTap: _isFetchingLocation ? null : () async {
+              setState(() {
+                _isFetchingLocation = true;
+              });
+              
+              try {
+                final locationService = ref.read(locationServiceProvider);
+                final position = await locationService.getCurrentPosition();
+                
+                if (position != null) {
+                  final locationData = SavedLocation(
+                    placeId: 'current',
+                    name: 'Current Location',
+                    address: 'Current Location',
+                    latitude: position.latitude,
+                    longitude: position.longitude,
+                    radiusKm: _selectedRadiusKm,
+                  );
+                  // Set to provider but DON'T save to history
+                  ref.read(exploreLocationProvider.notifier).setLocation(locationData);
+                  if (context.mounted) context.pop();
+                } else {
+                  final isDeniedForever = await locationService.isPermissionDeniedForever();
+                  if (isDeniedForever && context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: const Text('Location permissions are permanently denied.'),
+                        action: SnackBarAction(
+                          label: 'Settings',
+                          onPressed: () => locationService.openAppSettings(),
+                        ),
+                      ),
+                    );
+                  }
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Failed to get location: $e')),
+                  );
+                }
+              } finally {
+                if (mounted) {
+                  setState(() {
+                    _isFetchingLocation = false;
+                  });
+                }
+              }
             },
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
               child: Row(
                 children: [
-                  const Icon(
-                    Icons.my_location,
-                    color: AppColors.textSecondary,
-                    size: 20,
-                  ),
+                  if (_isFetchingLocation)
+                    const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  else
+                    const Icon(
+                      Icons.my_location,
+                      color: AppColors.textSecondary,
+                      size: 20,
+                    ),
                   const SizedBox(width: 16),
                   Text(
-                    'Use current location',
+                    _isFetchingLocation ? 'Fetching location...' : 'Use current location',
                     style: AppTextStyles.labelMd.copyWith(
                       color: AppColors.textPrimary,
                     ),
