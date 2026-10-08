@@ -1,33 +1,47 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
-import '../../domain/entities/booking.dart';
 
 class BookingStatusBadge extends StatelessWidget {
   const BookingStatusBadge({super.key, required this.status});
 
-  final BookingStatus status;
+  final String status;
 
   @override
   Widget build(BuildContext context) {
-    final (bg, fg) = switch (status) {
-      BookingStatus.awaitingAdvance => (
-        AppColors.surfaceMintPill,
-        AppColors.brandDeep,
-      ),
-      BookingStatus.confirmed => (
-        AppColors.surfaceMintSubtle,
-        AppColors.primary,
-      ),
-      BookingStatus.completed => (
-        AppColors.surfaceMuted,
-        AppColors.textSecondary,
-      ),
-      BookingStatus.cancelled => (
-        AppColors.errorContainer,
-        AppColors.onErrorContainer,
-      ),
-    };
+    Color bg;
+    Color fg;
+    String label;
+
+    switch (status.toLowerCase()) {
+      case 'awaiting_advance':
+      case 'pending':
+      case 'pending_advance':
+        bg = AppColors.surfaceMintPill;
+        fg = AppColors.brandDeep;
+        label = 'Awaiting advance';
+        break;
+      case 'confirmed':
+      case 'in_progress':
+        bg = AppColors.surfaceMintSubtle;
+        fg = AppColors.primary;
+        label = 'Confirmed';
+        break;
+      case 'completed':
+        bg = AppColors.surfaceMuted;
+        fg = AppColors.textSecondary;
+        label = 'Completed';
+        break;
+      case 'cancelled':
+        bg = AppColors.errorContainer;
+        fg = AppColors.onErrorContainer;
+        label = 'Cancelled';
+        break;
+      default:
+        bg = AppColors.surfaceMuted;
+        fg = AppColors.textSecondary;
+        label = status;
+    }
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
@@ -36,7 +50,7 @@ class BookingStatusBadge extends StatelessWidget {
         borderRadius: BorderRadius.circular(999),
       ),
       child: Text(
-        status.label,
+        label,
         style: AppTextStyles.labelMd.copyWith(
           color: fg,
           fontWeight: FontWeight.w500,

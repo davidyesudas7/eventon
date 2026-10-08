@@ -167,6 +167,68 @@ class AuthController extends _$AuthController {
     );
   }
 
+  Future<bool> signInWithGoogle() async {
+    state = const AuthStateLoading();
+    final repository = ref.read(authRepositoryProvider);
+    final result = await repository.signInWithGoogle();
+
+    return result.fold(
+      (failure) {
+        state = AuthStateError(failure);
+        return false;
+      },
+      (user) {
+        state = AuthStateAuthenticated(user);
+        return true;
+      },
+    );
+  }
+
+  Future<void> verifyPhoneNumber({
+    required String phoneNumber,
+    required void Function(dynamic credential) onVerificationCompleted,
+    required void Function(dynamic e) onVerificationFailed,
+    required void Function(String verificationId, int? resendToken) onCodeSent,
+    required void Function(String verificationId) onCodeAutoRetrievalTimeout,
+  }) async {
+    final repository = ref.read(authRepositoryProvider);
+    final result = await repository.verifyPhoneNumber(
+      phoneNumber: phoneNumber,
+      onVerificationCompleted: onVerificationCompleted,
+      onVerificationFailed: onVerificationFailed,
+      onCodeSent: onCodeSent,
+      onCodeAutoRetrievalTimeout: onCodeAutoRetrievalTimeout,
+    );
+
+    result.fold(
+      (failure) => throw Exception(failure.message),
+      (_) {},
+    );
+  }
+
+  Future<bool> confirmOtp({
+    required String verificationId,
+    required String smsCode,
+  }) async {
+    state = const AuthStateLoading();
+    final repository = ref.read(authRepositoryProvider);
+    final result = await repository.confirmOtp(
+      verificationId: verificationId,
+      smsCode: smsCode,
+    );
+
+    return result.fold(
+      (failure) {
+        state = AuthStateError(failure);
+        return false;
+      },
+      (user) {
+        state = AuthStateAuthenticated(user);
+        return true;
+      },
+    );
+  }
+
   Future<void> logout() async {
     state = const AuthStateLoading();
     final usecase = ref.read(logoutUseCaseProvider);

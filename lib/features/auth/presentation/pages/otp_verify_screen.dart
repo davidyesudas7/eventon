@@ -38,15 +38,12 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifyScreen> {
     setState(() => _isLoading = true);
 
     try {
-      final firebaseDs = ref.read(firebaseAuthDatasourceProvider);
-      final idToken = await firebaseDs.confirmOtp(
-        verificationId: widget.verificationId,
-        smsCode: smsCode,
-      );
-
       final success = await ref
           .read(authControllerProvider.notifier)
-          .firebaseSignIn(idToken: idToken);
+          .confirmOtp(
+            verificationId: widget.verificationId,
+            smsCode: smsCode,
+          );
 
       if (!mounted) return;
       setState(() => _isLoading = false);
@@ -58,7 +55,8 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifyScreen> {
         if (authState is AuthStateError) {
           if (authState.failure is ProfileRequiredFailure) {
             // New user phone account needs full name
-            context.go('/complete-profile', extra: idToken);
+            final failure = authState.failure as ProfileRequiredFailure;
+            context.go('/complete-profile', extra: failure.idToken ?? '');
           } else if (authState.failure is UsePasswordFailure) {
             ScaffoldMessenger.of(
               context,

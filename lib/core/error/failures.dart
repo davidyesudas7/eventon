@@ -16,8 +16,10 @@ class AuthFailure extends Failure {
 }
 
 class ProfileRequiredFailure extends Failure {
+  final String? idToken;
   const ProfileRequiredFailure([
     super.message = 'Profile details required to complete registration',
+    this.idToken,
   ]);
 }
 

@@ -40,7 +40,8 @@ class AuthInterceptor extends QueuedInterceptor {
         path.contains('/auth/login') ||
         path.contains('/auth/register') ||
         path.contains('/auth/firebase') ||
-        path.contains('/auth/refresh');
+        path.contains('/auth/refresh') ||
+        path.contains('/auth/logout');
     log("the api response is ${response?.data}");
     if (response?.statusCode == 401 && !isAuthPath) {
       final refreshToken = await tokenStorage.getRefreshToken();

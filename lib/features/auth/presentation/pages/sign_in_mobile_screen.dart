@@ -42,13 +42,24 @@ class _SignInMobileScreenState extends ConsumerState<SignInMobileScreen> {
     setState(() => _isLoading = true);
 
     try {
-      final firebaseDs = ref.read(firebaseAuthDatasourceProvider);
-      await firebaseDs.verifyPhoneNumber(
+      await ref.read(authControllerProvider.notifier).verifyPhoneNumber(
         phoneNumber: fullPhoneNumber,
         onVerificationCompleted: (credential) async {
+          // In an ideal flow, the repository could handle this directly. 
+          // But since credential is a Firebase object, we could just let the backend handle it or 
+          // do it here if absolutely needed. Wait, confirmOtp does the credential stuff.
+          // The verifyPhoneNumber in the datasource currently doesn't sign in on verification completed,
+          // it just completes it. But the datasource expects PhoneAuthCredential.
+          // Wait, the previous code had:
+          // final userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
+          // final idToken = await userCredential.user?.getIdToken();
+          // final success = await ref.read(authControllerProvider.notifier).firebaseSignIn(idToken: idToken!);
+          
           try {
-            final userCredential = await FirebaseAuth.instance
-                .signInWithCredential(credential);
+            // Because we want to keep UI clean, we would ideally just pass it.
+            // But since the credential is an object, we can just cast it.
+            final fbCredential = credential as AuthCredential;
+            final userCredential = await FirebaseAuth.instance.signInWithCredential(fbCredential);
             final idToken = await userCredential.user?.getIdToken();
             if (idToken != null) {
               final success = await ref
@@ -63,8 +74,16 @@ class _SignInMobileScreenState extends ConsumerState<SignInMobileScreen> {
         onVerificationFailed: (e) {
           if (!mounted) return;
           setState(() => _isLoading = false);
+          
+          String errorMessage = 'Phone verification failed';
+          if (e is FirebaseAuthException) {
+            errorMessage = e.message ?? errorMessage;
+          } else {
+            errorMessage = e.toString();
+          }
+          
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(e.message ?? 'Phone verification failed')),
+            SnackBar(content: Text(errorMessage.replaceAll('Exception: ', ''))),
           );
         },
         onCodeSent: (verificationId, resendToken) {
@@ -93,12 +112,9 @@ class _SignInMobileScreenState extends ConsumerState<SignInMobileScreen> {
     setState(() => _isLoading = true);
 
     try {
-      final firebaseDs = ref.read(firebaseAuthDatasourceProvider);
-      final idToken = await firebaseDs.signInWithGoogle();
-
       final success = await ref
           .read(authControllerProvider.notifier)
-          .firebaseSignIn(idToken: idToken);
+          .signInWithGoogle();
 
       if (!mounted) return;
       setState(() => _isLoading = false);
@@ -109,7 +125,8 @@ class _SignInMobileScreenState extends ConsumerState<SignInMobileScreen> {
         final authState = ref.read(authControllerProvider);
         if (authState is AuthStateError) {
           if (authState.failure is ProfileRequiredFailure) {
-            context.go('/complete-profile', extra: idToken);
+            final failure = authState.failure as ProfileRequiredFailure;
+            context.go('/complete-profile', extra: failure.idToken ?? '');
           } else {
             ScaffoldMessenger.of(
               context,

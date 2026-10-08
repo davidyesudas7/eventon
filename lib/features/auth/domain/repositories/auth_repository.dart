@@ -20,4 +20,20 @@ abstract class AuthRepository {
   Future<Either<Failure, AppUser>> getCurrentUser();
   Future<Either<Failure, void>> logout();
   Future<Either<Failure, void>> forgotPassword(String email);
+  
+  // Firebase Auth methods
+  Future<Either<Failure, AppUser>> signInWithGoogle();
+  
+  Future<Either<Failure, void>> verifyPhoneNumber({
+    required String phoneNumber,
+    required void Function(dynamic credential) onVerificationCompleted,
+    required void Function(dynamic e) onVerificationFailed,
+    required void Function(String verificationId, int? resendToken) onCodeSent,
+    required void Function(String verificationId) onCodeAutoRetrievalTimeout,
+  });
+
+  Future<Either<Failure, AppUser>> confirmOtp({
+    required String verificationId,
+    required String smsCode,
+  });
 }

@@ -43,7 +43,7 @@ class ConversationsNotifier extends _$ConversationsNotifier {
   }
 }
 
-@Riverpod(keepAlive: true)
+@riverpod
 class ChatDetailNotifier extends _$ChatDetailNotifier {
   @override
   FutureOr<List<MessageModel>> build(String conversationId) async {
@@ -90,5 +90,31 @@ class ChatDetailNotifier extends _$ChatDetailNotifier {
         // state = AsyncValue.data([...currentState, newMessage]);
       },
     );
+  }
+}
+
+@riverpod
+class CreateConversationNotifier extends _$CreateConversationNotifier {
+  @override
+  bool build() {
+    return false; // isCreating
+  }
+
+  Future<ConversationModel?> createConversation(String listingId, DateTime eventDate) async {
+    state = true;
+    try {
+      final client = ref.read(apiClientProvider);
+      final conversation = await client.createConversation({
+        'listingId': listingId,
+        'eventDate': eventDate.toUtc().toIso8601String(),
+      });
+      // Invalidate the conversations list so the new chat shows up in the Chats tab
+      ref.invalidate(conversationsProvider);
+      state = false;
+      return conversation;
+    } catch (e) {
+      state = false;
+      return null;
+    }
   }
 }

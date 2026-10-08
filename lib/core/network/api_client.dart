@@ -14,6 +14,7 @@ import '../../features/listings/data/models/vendor_profile_model.dart';
 import '../../features/chat/data/models/conversation_model.dart';
 import '../../features/chat/data/models/message_model.dart';
 import '../../features/quotes/data/models/quote_request_model.dart';
+import '../../features/bookings/data/models/booking_model.dart';
 
 part 'api_client.g.dart';
 
@@ -54,6 +55,9 @@ abstract class ApiClient {
 
   @GET("/conversations")
   Future<List<ConversationModel>> getConversations();
+
+  @POST("/conversations")
+  Future<ConversationModel> createConversation(@Body() Map<String, dynamic> body);
 
   @GET("/conversations/{id}")
   Future<ConversationModel> getConversation(@Path("id") String id);
@@ -105,4 +109,19 @@ abstract class ApiClient {
 
   @POST("/quote-requests/{id}/close")
   Future<void> closeQuoteRequest(@Path("id") String id);
+
+  @POST("/bookings/direct")
+  Future<BookingModel> createDirectBooking(@Body() Map<String, dynamic> body);
+
+  @GET("/bookings")
+  Future<List<BookingModel>> getBookings();
+
+  @GET("/bookings/{id}")
+  Future<BookingModel> getBookingById(@Path("id") String id);
+
+  @POST("/bookings/{id}/pay")
+  Future<BookingModel> payBooking(
+    @Path("id") String id,
+    @Body() Map<String, dynamic> body,
+  );
 }

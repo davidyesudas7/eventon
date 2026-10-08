@@ -17,3 +17,9 @@ String formatRupees(int amount) {
   }
   return '${amount < 0 ? '-' : ''}₹$grouped';
 }
+
+const _months = [
+  'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+];
+
+String formatBookingDate(DateTime d) => '${_months[d.month - 1]} ${d.day}, ${d.year}';

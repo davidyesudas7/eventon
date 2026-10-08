@@ -33,7 +33,7 @@ final class HomeLocationStateProvider
   HomeLocationState create() => HomeLocationState();
 }
 
-String _$homeLocationStateHash() => r'846ca9c732911bf7231a9c2c8d7b682ab199de4b';
+String _$homeLocationStateHash() => r'7a2f2ff9e37a416294903369f82bcaad4fa6e248';
 
 abstract class _$HomeLocationState extends $AsyncNotifier<HomeLocation?> {
   FutureOr<HomeLocation?> build();

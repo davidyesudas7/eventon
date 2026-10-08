@@ -106,7 +106,7 @@ class AuthRepositoryImpl implements AuthRepository {
       );
       return Right(_mapUserModelToEntity(response.user));
     } on DioException catch (e) {
-      return Left(_handleDioError(e));
+      return Left(_handleDioError(e, idToken: idToken));
     } catch (e) {
       return Left(ServerFailure(e.toString()));
     }
@@ -150,7 +150,58 @@ class AuthRepositoryImpl implements AuthRepository {
     }
   }
 
-  Failure _handleDioError(DioException e) {
+  @override
+  Future<Either<Failure, AppUser>> signInWithGoogle() async {
+    try {
+      final idToken = await firebaseAuthDatasource.signInWithGoogle();
+      return await firebaseSignIn(idToken: idToken);
+    } catch (e) {
+      if (e.toString().contains('cancelled')) {
+        return const Left(ServerFailure('Google sign in cancelled by user'));
+      }
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> verifyPhoneNumber({
+    required String phoneNumber,
+    required void Function(dynamic credential) onVerificationCompleted,
+    required void Function(dynamic e) onVerificationFailed,
+    required void Function(String verificationId, int? resendToken) onCodeSent,
+    required void Function(String verificationId) onCodeAutoRetrievalTimeout,
+  }) async {
+    try {
+      await firebaseAuthDatasource.verifyPhoneNumber(
+        phoneNumber: phoneNumber,
+        onVerificationCompleted: onVerificationCompleted,
+        onVerificationFailed: onVerificationFailed,
+        onCodeSent: onCodeSent,
+        onCodeAutoRetrievalTimeout: onCodeAutoRetrievalTimeout,
+      );
+      return const Right(null);
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, AppUser>> confirmOtp({
+    required String verificationId,
+    required String smsCode,
+  }) async {
+    try {
+      final idToken = await firebaseAuthDatasource.confirmOtp(
+        verificationId: verificationId,
+        smsCode: smsCode,
+      );
+      return await firebaseSignIn(idToken: idToken);
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  Failure _handleDioError(DioException e, {String? idToken}) {
     if (e.type == DioExceptionType.connectionTimeout ||
         e.type == DioExceptionType.receiveTimeout ||
         e.type == DioExceptionType.connectionError) {
@@ -177,7 +228,10 @@ class AuthRepositoryImpl implements AuthRepository {
       }
 
       if (statusCode == 422 || message.contains('profile_required')) {
-        return const ProfileRequiredFailure();
+        return ProfileRequiredFailure(
+          'Profile details required to complete registration',
+          idToken,
+        );
       }
       if (statusCode == 409 && message.contains('use_password')) {
         return const UsePasswordFailure();

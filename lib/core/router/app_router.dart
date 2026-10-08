@@ -10,7 +10,6 @@ import '../../features/auth/presentation/pages/sign_in_email_screen.dart';
 import '../../features/auth/presentation/pages/sign_in_mobile_screen.dart';
 import '../../features/auth/presentation/pages/sign_up_email_screen.dart';
 import '../../features/auth/presentation/providers/auth_providers.dart';
-import '../../features/bookings/domain/entities/booking.dart';
 import '../../features/bookings/presentation/pages/booking_details_screen.dart';
 import '../../features/bookings/presentation/pages/bookings_screen.dart';
 import '../../features/chat/presentation/pages/chats_screen.dart';
@@ -213,15 +212,8 @@ GoRouter goRouter(Ref ref) {
                   GoRoute(
                     path: ':id',
                     builder: (context, state) {
-                      final booking = state.extra is Booking
-                          ? state.extra as Booking
-                          : findBookingById(state.pathParameters['id']!);
-                      if (booking == null) {
-                        return const Scaffold(
-                          body: Center(child: Text('Booking not found')),
-                        );
-                      }
-                      return BookingDetailsScreen(booking: booking);
+                      final id = state.pathParameters['id']!;
+                      return BookingDetailsScreen(id: id);
                     },
                   ),
                 ],

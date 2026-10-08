@@ -271,7 +271,7 @@ final class ChatDetailNotifierProvider
   }) : super(
          retry: null,
          name: r'chatDetailProvider',
-         isAutoDispose: false,
+         isAutoDispose: true,
          dependencies: null,
          $allTransitiveDependencies: null,
        );
@@ -302,7 +302,7 @@ final class ChatDetailNotifierProvider
 }
 
 String _$chatDetailNotifierHash() =>
-    r'b9c413b2f2e2e8d485131b6553026569c5305ec4';
+    r'09080d263d18d4dec96f1ef71f034923f8da1b58';
 
 final class ChatDetailNotifierFamily extends $Family
     with
@@ -319,7 +319,7 @@ final class ChatDetailNotifierFamily extends $Family
         name: r'chatDetailProvider',
         dependencies: null,
         $allTransitiveDependencies: null,
-        isAutoDispose: false,
+        isAutoDispose: true,
       );
 
   ChatDetailNotifierProvider call(String conversationId) =>
@@ -348,5 +348,58 @@ abstract class _$ChatDetailNotifier extends $AsyncNotifier<List<MessageModel>> {
               Object?
             >;
     return element.handleCreate(ref, () => build(_$args));
+  }
+}
+
+@ProviderFor(CreateConversationNotifier)
+final createConversationProvider = CreateConversationNotifierProvider._();
+
+final class CreateConversationNotifierProvider
+    extends $NotifierProvider<CreateConversationNotifier, bool> {
+  CreateConversationNotifierProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'createConversationProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$createConversationNotifierHash();
+
+  @$internal
+  @override
+  CreateConversationNotifier create() => CreateConversationNotifier();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(bool value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<bool>(value),
+    );
+  }
+}
+
+String _$createConversationNotifierHash() =>
+    r'f17e27c057c45eef3259be279286e8971ada9e90';
+
+abstract class _$CreateConversationNotifier extends $Notifier<bool> {
+  bool build();
+  @$mustCallSuper
+  @override
+  WhenComplete runBuild() {
+    final ref = this.ref as $Ref<bool, bool>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<bool, bool>,
+              bool,
+              Object?,
+              Object?
+            >;
+    return element.handleCreate(ref, build);
   }
 }

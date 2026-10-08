@@ -1,3 +1,4 @@
+import 'package:eventon/features/bookings/presentation/providers/booking_providers.dart';
 import 'package:eventon/features/quotes/presentation/providers/quote_cart_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -12,6 +13,7 @@ import '../../../auth/presentation/providers/auth_providers.dart';
 import '../../data/models/package_model.dart';
 import '../providers/listing_details_providers.dart';
 import '../widgets/listing_review_card.dart';
+import '../../../../features/chat/presentation/providers/chat_providers.dart';
 
 class ListingDetailsScreen extends ConsumerStatefulWidget {
   const ListingDetailsScreen({super.key, required this.listingId});
@@ -66,15 +68,28 @@ class _ListingDetailsScreenState extends ConsumerState<ListingDetailsScreen> {
 
   void _bookNow(PackageModel package) {
     if (!_checkAuth()) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Starting booking for ${package.name}…')),
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (ctx) =>
+          _BookPackageSheet(listingId: widget.listingId, package: package),
     );
   }
 
   void _messageBusiness() {
     if (!_checkAuth()) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Opening chat with business…')),
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (ctx) => _MessageBusinessSheet(listingId: widget.listingId),
     );
   }
 
@@ -530,6 +545,288 @@ class _ListingDetailsScreenState extends ConsumerState<ListingDetailsScreen> {
         //   ),
         // ),
       ],
+    );
+  }
+}
+
+class _BookPackageSheet extends ConsumerStatefulWidget {
+  final String listingId;
+  final PackageModel package;
+
+  const _BookPackageSheet({required this.listingId, required this.package});
+
+  @override
+  ConsumerState<_BookPackageSheet> createState() => _BookPackageSheetState();
+}
+
+class _BookPackageSheetState extends ConsumerState<_BookPackageSheet> {
+  DateTime? _selectedDate;
+
+  void _confirmBooking() async {
+    if (_selectedDate == null) return;
+    final booking = await ref
+        .read(createBookingProvider.notifier)
+        .createBooking(
+          listingId: widget.listingId,
+          packageId: widget.package.id,
+          eventDate: _selectedDate!,
+        );
+    if (booking != null && mounted) {
+      Navigator.pop(context); // Close sheet
+      context.go('/bookings/${booking.id}', extra: booking); // Go to details
+    } else if (mounted) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Failed to create booking')));
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isCreating = ref.watch(createBookingProvider);
+    final dateStr = _selectedDate != null
+        ? '${_selectedDate!.month.toString().padLeft(2, '0')}/${_selectedDate!.day.toString().padLeft(2, '0')}/${_selectedDate!.year}'
+        : 'mm/dd/yyyy';
+
+    return Padding(
+      padding: EdgeInsets.only(
+        left: 20,
+        right: 20,
+        top: 24,
+        bottom: MediaQuery.of(context).viewInsets.bottom + 24,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Center(
+            child: Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: AppColors.borderStrong,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+          ),
+          const SizedBox(height: 24),
+          Text(
+            'Book ${widget.package.name}',
+            style: AppTextStyles.headlineSm.copyWith(fontSize: 18),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            formatRupees(widget.package.price.toInt()),
+            style: AppTextStyles.bodyMd.copyWith(color: AppColors.primary),
+          ),
+          const SizedBox(height: 24),
+          Text("When's your event?", style: AppTextStyles.labelMd),
+          const SizedBox(height: 8),
+          InkWell(
+            onTap: () async {
+              final date = await showDatePicker(
+                context: context,
+                initialDate: DateTime.now().add(const Duration(days: 1)),
+                firstDate: DateTime.now(),
+                lastDate: DateTime.now().add(const Duration(days: 365 * 2)),
+              );
+              if (date != null) {
+                setState(() => _selectedDate = date);
+              }
+            },
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              decoration: BoxDecoration(
+                border: Border.all(color: AppColors.borderSubtle),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    dateStr,
+                    style: AppTextStyles.bodyMd.copyWith(
+                      color: _selectedDate != null
+                          ? AppColors.textPrimary
+                          : AppColors.textSecondary,
+                    ),
+                  ),
+                  const Icon(
+                    Icons.calendar_today,
+                    size: 18,
+                    color: AppColors.textPrimary,
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 24),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: _selectedDate == null || isCreating
+                  ? null
+                  : _confirmBooking,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: isCreating
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                        strokeWidth: 2,
+                      ),
+                    )
+                  : const Text('Confirm booking'),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _MessageBusinessSheet extends ConsumerStatefulWidget {
+  final String listingId;
+
+  const _MessageBusinessSheet({required this.listingId});
+
+  @override
+  ConsumerState<_MessageBusinessSheet> createState() => _MessageBusinessSheetState();
+}
+
+class _MessageBusinessSheetState extends ConsumerState<_MessageBusinessSheet> {
+  DateTime? _selectedDate;
+
+  void _startConversation() async {
+    if (_selectedDate == null) return;
+    final conversation = await ref
+        .read(createConversationProvider.notifier)
+        .createConversation(widget.listingId, _selectedDate!);
+        
+    if (conversation != null && mounted) {
+      Navigator.pop(context); // Close sheet
+      context.push('/chats/${conversation.id}'); // Go to chat screen
+    } else if (mounted) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Failed to start conversation')));
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isCreating = ref.watch(createConversationProvider);
+    final dateStr = _selectedDate != null
+        ? '${_selectedDate!.month.toString().padLeft(2, '0')}/${_selectedDate!.day.toString().padLeft(2, '0')}/${_selectedDate!.year}'
+        : 'mm/dd/yyyy';
+
+    return Padding(
+      padding: EdgeInsets.only(
+        left: 20,
+        right: 20,
+        top: 24,
+        bottom: MediaQuery.of(context).viewInsets.bottom + 24,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Center(
+            child: Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: AppColors.borderStrong,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+          ),
+          const SizedBox(height: 24),
+          Text(
+            "When's your event?",
+            style: AppTextStyles.headlineSm.copyWith(fontSize: 18),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            "This starts a chat with the business about that date.",
+            style: AppTextStyles.bodyMd.copyWith(color: AppColors.textSecondary),
+          ),
+          const SizedBox(height: 16),
+          InkWell(
+            onTap: () async {
+              final date = await showDatePicker(
+                context: context,
+                initialDate: DateTime.now().add(const Duration(days: 1)),
+                firstDate: DateTime.now(),
+                lastDate: DateTime.now().add(const Duration(days: 365 * 2)),
+              );
+              if (date != null) {
+                setState(() => _selectedDate = date);
+              }
+            },
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              decoration: BoxDecoration(
+                border: Border.all(color: AppColors.borderSubtle),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    dateStr,
+                    style: AppTextStyles.bodyMd.copyWith(
+                      color: _selectedDate != null
+                          ? AppColors.textPrimary
+                          : AppColors.textSecondary,
+                    ),
+                  ),
+                  const Icon(
+                    Icons.calendar_today,
+                    size: 18,
+                    color: AppColors.textPrimary,
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 24),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: _selectedDate == null || isCreating
+                  ? null
+                  : _startConversation,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF155E56),
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: isCreating
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                        strokeWidth: 2,
+                      ),
+                    )
+                  : const Text('Start conversation'),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
