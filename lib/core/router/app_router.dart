@@ -13,7 +13,8 @@ import '../../features/auth/presentation/providers/auth_providers.dart';
 import '../../features/bookings/domain/entities/booking.dart';
 import '../../features/bookings/presentation/pages/booking_details_screen.dart';
 import '../../features/bookings/presentation/pages/bookings_screen.dart';
-import '../../features/chats/presentation/pages/chats_screen.dart';
+import '../../features/chat/presentation/pages/chats_screen.dart';
+import '../../features/chat/presentation/pages/chat_detail_screen.dart';
 import '../../features/explore/presentation/pages/explore_screen.dart';
 import '../../features/explore/presentation/pages/explore_search_screen.dart';
 import '../../features/explore/presentation/pages/explore_location_screen.dart';
@@ -24,6 +25,8 @@ import '../../features/main/presentation/pages/main_screen.dart';
 import '../../features/categories/presentation/pages/occasion_screen.dart';
 import '../../features/profile/presentation/pages/profile_screen.dart';
 import '../../features/quotes/presentation/pages/request_quotes_screen.dart';
+import '../../features/quotes/presentation/pages/quotes_listing_screen.dart';
+import '../../features/quotes/presentation/pages/quotes_detail_screen.dart';
 import '../../features/services/presentation/pages/all_services_screen.dart';
 
 part 'app_router.g.dart';
@@ -116,6 +119,19 @@ GoRouter goRouter(Ref ref) {
       GoRoute(
         path: '/request-quotes',
         builder: (context, state) => const RequestQuotesScreen(),
+      ),
+      GoRoute(
+        path: '/quote-requests',
+        builder: (context, state) => const QuotesListingScreen(),
+        routes: [
+          GoRoute(
+            path: ':id',
+            builder: (context, state) {
+              final id = state.pathParameters['id']!;
+              return QuotesDetailScreen(id: id);
+            },
+          ),
+        ],
       ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
@@ -218,6 +234,16 @@ GoRouter goRouter(Ref ref) {
               GoRoute(
                 path: '/chats',
                 builder: (context, state) => const ChatsScreen(),
+                routes: [
+                  GoRoute(
+                    path: ':id',
+                    parentNavigatorKey: _rootNavigatorKey,
+                    builder: (context, state) {
+                      final id = state.pathParameters['id']!;
+                      return ChatDetailScreen(conversationId: id);
+                    },
+                  ),
+                ],
               ),
             ],
           ),

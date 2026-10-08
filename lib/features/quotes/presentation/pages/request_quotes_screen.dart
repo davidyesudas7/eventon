@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../providers/quote_cart_provider.dart';
+import '../providers/quotes_providers.dart';
 
 class RequestQuotesScreen extends ConsumerStatefulWidget {
   const RequestQuotesScreen({super.key});
@@ -49,14 +50,41 @@ class _RequestQuotesScreenState extends ConsumerState<RequestQuotesScreen> {
     }
   }
 
-  void _sendQuoteRequest() {
+  Future<void> _sendQuoteRequest() async {
     if (_formKey.currentState?.validate() ?? false) {
-      // In a real app, we would send this data to the backend.
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Quote requests sent successfully!')),
-      );
-      ref.read(quoteCartProvider.notifier).clearQuotes();
-      context.pop();
+      final quoteItems = ref.read(quoteCartProvider);
+      
+      final Map<String, dynamic> body = {
+        'listingIds': quoteItems.map((q) => q.id).toList(),
+        if (_selectedDate != null) 'eventDate': _selectedDate!.toIso8601String(),
+        if (_guestsController.text.isNotEmpty) 'guestCount': int.tryParse(_guestsController.text),
+        if (_budgetController.text.isNotEmpty) 'budget': num.tryParse(_budgetController.text),
+        if (_whereController.text.isNotEmpty) 'location': _whereController.text,
+        if (_requirementsController.text.isNotEmpty) 'requirements': _requirementsController.text,
+      };
+
+      try {
+        final result = await ref.read(quotesRepositoryProvider).createQuoteRequest(body);
+        result.fold(
+          (failure) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Error: ${failure.message}')),
+            );
+          },
+          (quoteRequest) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Quote requests sent successfully!')),
+            );
+            ref.read(quoteCartProvider.notifier).clearQuotes();
+            // Navigate to the detail screen and clear the current route stack
+            context.go('/quote-requests/${quoteRequest.id}');
+          },
+        );
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e')),
+        );
+      }
     }
   }
 

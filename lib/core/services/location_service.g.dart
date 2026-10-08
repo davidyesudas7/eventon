@@ -49,4 +49,4 @@ final class LocationServiceProvider
   }
 }
 
-String _$locationServiceHash() => r'f7b3dbe3e362693a99dbd0c857f576f80a3f5f74';
+String _$locationServiceHash() => r'38d15292e1d1d4553c8f07a36b00411aa0a8d30e';

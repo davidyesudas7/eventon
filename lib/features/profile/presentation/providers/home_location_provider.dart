@@ -8,8 +8,13 @@ part 'home_location_provider.g.dart';
 
 @riverpod
 class HomeLocationState extends _$HomeLocationState {
+  bool _mounted = true;
+
   @override
   Future<HomeLocation?> build() async {
+    _mounted = true;
+    ref.onDispose(() => _mounted = false);
+    
     final prefs = await SharedPreferences.getInstance();
     final jsonStr = prefs.getString('home_location');
     if (jsonStr != null) {
@@ -65,7 +70,9 @@ class HomeLocationState extends _$HomeLocationState {
       } : null,
     }));
     
-    ref.invalidateSelf();
+    if (_mounted) {
+      ref.invalidateSelf();
+    }
   }
 
   Future<void> clearLocation() async {

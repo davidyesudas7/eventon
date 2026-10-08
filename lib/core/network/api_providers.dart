@@ -3,6 +3,8 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'api_client.dart';
 import 'auth_interceptor.dart';
 import 'token_storage.dart';
+import '../router/app_router.dart';
+import '../../features/auth/presentation/providers/auth_providers.dart';
 
 part 'api_providers.g.dart';
 
@@ -37,7 +39,23 @@ Dio dio(Ref ref) {
       tokenStorage: tokenStorage,
       refreshDio: refreshDio,
       onUnauthorized: () {
-        // Handled by AuthNotifier listening or checking auth status
+        // Logout user state
+        ref.read(authControllerProvider.notifier).logout();
+        // Force redirect to login page
+        ref.read(goRouterProvider).go('/sign-in-mobile');
+      },
+    ),
+  );
+
+  dio.interceptors.add(
+    InterceptorsWrapper(
+      onResponse: (response, handler) {
+        print('API Response [${response.requestOptions.path}]: ${response.data}');
+        handler.next(response);
+      },
+      onError: (DioException e, handler) {
+        print('API Error [${e.requestOptions.path}]: ${e.response?.data}');
+        handler.next(e);
       },
     ),
   );

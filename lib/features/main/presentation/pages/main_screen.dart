@@ -1,18 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-class MainScreen extends StatelessWidget {
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:eventon/features/chat/presentation/providers/chat_providers.dart';
+
+class MainScreen extends ConsumerWidget {
   final StatefulNavigationShell navigationShell;
 
   const MainScreen({super.key, required this.navigationShell});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       body: navigationShell,
       bottomNavigationBar: NavigationBar(
         selectedIndex: navigationShell.currentIndex,
         onDestinationSelected: (index) {
+          if (index == 3) { // Chats tab
+            ref.invalidate(conversationsProvider);
+          }
           navigationShell.goBranch(
             index,
             initialLocation: index == navigationShell.currentIndex,

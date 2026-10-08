@@ -398,60 +398,66 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                     if (result.items.isEmpty) {
                       return const Center(child: Text('No listings found'));
                     }
-                    return ListView.separated(
-                      padding: const EdgeInsets.all(16).copyWith(bottom: 96),
-                      itemCount: result.items.length,
-                      separatorBuilder: (context, index) =>
-                          const SizedBox(height: 16),
-                      itemBuilder: (context, index) {
-                        final listing = result.items[index];
-                        final quoteCart = ref.watch(quoteCartProvider);
-                        final isAdded = ref
-                            .read(quoteCartProvider.notifier)
-                            .isAdded(listing.id);
-
-                        return ListingCard(
-                          id: listing.id,
-                          title: listing.title,
-                          category:
-                              '', // Handled by description mostly in this variant
-                          description: listing.description,
-                          imageUrl: listing.coverUrl,
-                          price: listing.priceFrom != null
-                              ? 'From ₹${listing.priceFrom}'
-                              : null,
-                          hasQuoteButton: !isAdded,
-                          hasAddedBadge: isAdded,
-                          onQuoteTap: () {
-                            final authState = ref.read(authControllerProvider);
-                            if (authState is! AuthStateAuthenticated) {
-                              context.push('/sign-in-mobile');
-                              return;
-                            }
-
-                            if (isAdded) {
-                              ref
-                                  .read(quoteCartProvider.notifier)
-                                  .removeQuote(listing.id);
-                            } else {
-                              ref
-                                  .read(quoteCartProvider.notifier)
-                                  .addQuote(
-                                    QuoteItem(
-                                      id: listing.id,
-                                      title: listing.title,
-                                      imageUrl: listing.coverUrl,
-                                      price: listing.priceFrom != null
-                                          ? 'From ₹${listing.priceFrom}'
-                                          : null,
-                                    ),
-                                  );
-                            }
-                          },
-                          onTap: () =>
-                              context.push('/explore/listing/${listing.id}'),
-                        );
+                    return RefreshIndicator(
+                      onRefresh: () async {
+                        ref.invalidate(searchProvider(jsonEncode(queries)));
+                        await ref.read(searchProvider(jsonEncode(queries)).future);
                       },
+                      child: ListView.separated(
+                        padding: const EdgeInsets.all(16).copyWith(bottom: 96),
+                        itemCount: result.items.length,
+                        separatorBuilder: (context, index) =>
+                            const SizedBox(height: 16),
+                        itemBuilder: (context, index) {
+                          final listing = result.items[index];
+                          final quoteCart = ref.watch(quoteCartProvider);
+                          final isAdded = ref
+                              .read(quoteCartProvider.notifier)
+                              .isAdded(listing.id);
+
+                          return ListingCard(
+                            id: listing.id,
+                            title: listing.title,
+                            category:
+                                '', // Handled by description mostly in this variant
+                            description: listing.description,
+                            imageUrl: listing.coverUrl,
+                            price: listing.priceFrom != null
+                                ? 'From ₹${listing.priceFrom}'
+                                : null,
+                            hasQuoteButton: !isAdded,
+                            hasAddedBadge: isAdded,
+                            onQuoteTap: () {
+                              final authState = ref.read(authControllerProvider);
+                              if (authState is! AuthStateAuthenticated) {
+                                context.push('/sign-in-mobile');
+                                return;
+                              }
+
+                              if (isAdded) {
+                                ref
+                                    .read(quoteCartProvider.notifier)
+                                    .removeQuote(listing.id);
+                              } else {
+                                ref
+                                    .read(quoteCartProvider.notifier)
+                                    .addQuote(
+                                      QuoteItem(
+                                        id: listing.id,
+                                        title: listing.title,
+                                        imageUrl: listing.coverUrl,
+                                        price: listing.priceFrom != null
+                                            ? 'From ₹${listing.priceFrom}'
+                                            : null,
+                                      ),
+                                    );
+                              }
+                            },
+                            onTap: () =>
+                                context.push('/explore/listing/${listing.id}'),
+                          );
+                        },
+                      ),
                     );
                   },
                   loading: () =>
