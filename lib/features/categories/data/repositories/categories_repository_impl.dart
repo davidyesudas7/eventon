@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:dartz/dartz.dart';
 import '../../../../core/error/failures.dart';
 import '../../../../core/network/api_client.dart';
@@ -17,10 +15,11 @@ class CategoriesRepositoryImpl implements CategoriesRepository {
   Future<Either<Failure, List<Category>>> getCategories() async {
     try {
       final models = await _apiClient.getCategories();
-
       return Right(models.map((model) => model.toEntity()).toList());
     } catch (e) {
-      return Left(ServerFailure(e.toString()));
+      return Left(
+        handleApiError(e, defaultMessage: 'Failed to load categories'),
+      );
     }
   }
 
@@ -30,7 +29,9 @@ class CategoriesRepositoryImpl implements CategoriesRepository {
       final models = await _apiClient.getOccasions();
       return Right(models.map((model) => model.toEntity()).toList());
     } catch (e) {
-      return Left(ServerFailure(e.toString()));
+      return Left(
+        handleApiError(e, defaultMessage: 'Failed to load occasions'),
+      );
     }
   }
 
@@ -40,7 +41,9 @@ class CategoriesRepositoryImpl implements CategoriesRepository {
       final model = await _apiClient.getOccasion(slug);
       return Right(model.toEntity());
     } catch (e) {
-      return Left(ServerFailure(e.toString()));
+      return Left(
+        handleApiError(e, defaultMessage: 'Failed to load occasion details'),
+      );
     }
   }
 }

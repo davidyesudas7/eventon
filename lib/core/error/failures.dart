@@ -1,3 +1,5 @@
+export 'error_handler.dart';
+
 abstract class Failure {
   final String message;
   const Failure(this.message);

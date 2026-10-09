@@ -1,5 +1,4 @@
 import 'dart:developer';
-
 import 'package:dartz/dartz.dart';
 import '../../../../core/error/failures.dart';
 import '../../../../core/network/api_client.dart';
@@ -18,10 +17,11 @@ class QuotesRepositoryImpl implements QuotesRepository {
     try {
       log(body.toString());
       final response = await apiClient.createQuoteRequest(body);
-
       return Right(response);
     } catch (e) {
-      return Left(ServerFailure(e.toString()));
+      return Left(
+        handleApiError(e, defaultMessage: 'Failed to submit quote request'),
+      );
     }
   }
 
@@ -31,7 +31,9 @@ class QuotesRepositoryImpl implements QuotesRepository {
       final response = await apiClient.getQuoteRequests();
       return Right(response);
     } catch (e) {
-      return Left(ServerFailure(e.toString()));
+      return Left(
+        handleApiError(e, defaultMessage: 'Failed to load quote requests'),
+      );
     }
   }
 
@@ -43,7 +45,9 @@ class QuotesRepositoryImpl implements QuotesRepository {
       final response = await apiClient.getQuoteRequestById(id);
       return Right(response);
     } catch (e) {
-      return Left(ServerFailure(e.toString()));
+      return Left(
+        handleApiError(e, defaultMessage: 'Failed to load quote request details'),
+      );
     }
   }
 
@@ -53,7 +57,9 @@ class QuotesRepositoryImpl implements QuotesRepository {
       await apiClient.closeQuoteRequest(id);
       return const Right(null);
     } catch (e) {
-      return Left(ServerFailure(e.toString()));
+      return Left(
+        handleApiError(e, defaultMessage: 'Failed to close quote request'),
+      );
     }
   }
 }

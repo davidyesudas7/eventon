@@ -1,7 +1,7 @@
 import 'package:eventon/core/network/api_providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/error/failures.dart';
 import '../../../../core/network/api_client.dart';
-
 import '../../domain/entities/search_result.dart';
 
 final exploreRepositoryProvider = Provider<ExploreRepository>((ref) {
@@ -17,7 +17,9 @@ class ExploreRepository {
       final res = await _apiClient.search(queries);
       return res.toEntity();
     } catch (e) {
-      throw Exception('Failed to search: $e');
+      throw Exception(
+        extractErrorMessage(e, defaultMessage: 'Failed to search listings'),
+      );
     }
   }
 }

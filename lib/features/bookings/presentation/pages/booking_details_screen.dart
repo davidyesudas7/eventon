@@ -7,6 +7,8 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/widgets/eventon_app_bar.dart';
 import '../../../../core/widgets/outlined_card.dart';
+import '../../../../core/widgets/inline_error_banner.dart';
+import '../../../../core/error/failures.dart';
 import '../widgets/booking_status_badge.dart';
 import '../../data/models/booking_model.dart';
 import '../providers/booking_providers.dart';
@@ -37,11 +39,32 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
   bool _showDisputeForm = false;
   bool _isCreatingOrder = false;
 
+  String? _advancePaymentError;
+  String? _balancePaymentError;
+  String? _reviewError;
+  String? _disputeError;
+
   static const _payButtonColor = Color(0xFF155E56);
 
   @override
   void initState() {
     super.initState();
+    _advanceController.addListener(() {
+      if (_advancePaymentError != null) {
+        setState(() => _advancePaymentError = null);
+      }
+    });
+    _reviewController.addListener(() {
+      if (_reviewError != null) {
+        setState(() => _reviewError = null);
+      }
+    });
+    _disputeController.addListener(() {
+      if (_disputeError != null) {
+        setState(() => _disputeError = null);
+      }
+    });
+
     _razorpayService = RazorpayService(
       onExternalWallet: (response) {
         // Handle external wallet
@@ -61,6 +84,8 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
         if (mounted) {
           setState(() {
             _paymentReceived = true;
+            _advancePaymentError = null;
+            _balancePaymentError = null;
           });
           ref.read(bookingDetailProvider(widget.id).notifier).refresh();
           ref.read(bookingsProvider.notifier).refresh();
@@ -71,9 +96,14 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
       },
       onError: (error) {
         if (mounted) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text('Payment failed: $error')));
+          final errorMsg = extractErrorMessage(
+            error,
+            defaultMessage: 'Payment failed. Please try again.',
+          );
+          setState(() {
+            _advancePaymentError = errorMsg;
+            _balancePaymentError = errorMsg;
+          });
         }
       },
     );
@@ -96,14 +126,14 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
   }) async {
     if (amount <= 0 || _isCreatingOrder) return;
 
-    setState(() => _isCreatingOrder = true);
-    final messenger = ScaffoldMessenger.of(context);
-
-    messenger.showSnackBar(
-      SnackBar(
-        content: Text('Creating payment order for ${formatRupees(amount.toInt())}…'),
-      ),
-    );
+    setState(() {
+      _isCreatingOrder = true;
+      if (purpose == 'advance') {
+        _advancePaymentError = null;
+      } else {
+        _balancePaymentError = null;
+      }
+    });
 
     final repo = ref.read(bookingRepositoryProvider);
     final result = await repo.createPaymentOrder(
@@ -117,9 +147,13 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
 
     result.fold(
       (failure) {
-        messenger.showSnackBar(
-          SnackBar(content: Text(failure.message)),
-        );
+        setState(() {
+          if (purpose == 'advance') {
+            _advancePaymentError = failure.message;
+          } else {
+            _balancePaymentError = failure.message;
+          }
+        });
       },
       (order) {
         final authState = ref.read(authControllerProvider);
@@ -154,13 +188,14 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
   Future<void> _submitReview(BookingModel b) async {
     final comment = _reviewController.text.trim();
     if (comment.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter your review comment')),
-      );
+      setState(() => _reviewError = 'Please enter your review comment');
       return;
     }
 
-    setState(() => _isSubmittingReview = true);
+    setState(() {
+      _reviewError = null;
+      _isSubmittingReview = true;
+    });
     final repo = ref.read(bookingRepositoryProvider);
     final result = await repo.createReview(
       bookingId: b.id,
@@ -172,11 +207,10 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
 
     result.fold(
       (failure) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(failure.message)),
-        );
+        setState(() => _reviewError = failure.message);
       },
       (_) {
+        setState(() => _reviewError = null);
         _reviewController.clear();
         ref.read(bookingDetailProvider(widget.id).notifier).refresh();
         ScaffoldMessenger.of(context).showSnackBar(
@@ -189,13 +223,14 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
   Future<void> _submitDispute(BookingModel b) async {
     final reason = _disputeController.text.trim();
     if (reason.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please describe the issue')),
-      );
+      setState(() => _disputeError = 'Please describe the issue');
       return;
     }
 
-    setState(() => _isSubmittingDispute = true);
+    setState(() {
+      _disputeError = null;
+      _isSubmittingDispute = true;
+    });
     final repo = ref.read(bookingRepositoryProvider);
     final result = await repo.disputeBooking(
       bookingId: b.id,
@@ -206,12 +241,13 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
 
     result.fold(
       (failure) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(failure.message)),
-        );
+        setState(() => _disputeError = failure.message);
       },
       (_) {
-        setState(() => _showDisputeForm = false);
+        setState(() {
+          _disputeError = null;
+          _showDisputeForm = false;
+        });
         _disputeController.clear();
         ref.read(bookingDetailProvider(widget.id).notifier).refresh();
         ref.read(bookingsProvider.notifier).refresh();
@@ -230,29 +266,25 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
       builder: (ctx) => _CancelBookingDialog(
         booking: b,
         onCancel: (reason) async {
-          final messenger = ScaffoldMessenger.of(context);
           final repo = ref.read(bookingRepositoryProvider);
           final result = await repo.cancelBooking(
             bookingId: b.id,
             reason: reason,
           );
 
-          if (!mounted) return;
-
-          result.fold(
-            (failure) {
-              messenger.showSnackBar(
-                SnackBar(content: Text(failure.message)),
-              );
-            },
+          return result.fold(
+            (failure) => failure.message,
             (_) {
-              ref.read(bookingDetailProvider(widget.id).notifier).refresh();
-              ref.read(bookingsProvider.notifier).refresh();
-              messenger.showSnackBar(
-                const SnackBar(
-                  content: Text('Booking cancelled successfully'),
-                ),
-              );
+              if (mounted) {
+                ref.read(bookingDetailProvider(widget.id).notifier).refresh();
+                ref.read(bookingsProvider.notifier).refresh();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Booking cancelled successfully'),
+                  ),
+                );
+              }
+              return null;
             },
           );
         },
@@ -408,6 +440,16 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
                             'Minimum advance: ${formatRupees(b.minAdvance.toInt())} (${b.minAdvancePercent?.toInt() ?? 20}%)',
                             style: AppTextStyles.bodySm,
                           ),
+                          if (_advancePaymentError != null &&
+                              _advancePaymentError!.isNotEmpty) ...[
+                            const SizedBox(height: 10),
+                            InlineErrorBanner(
+                              message: _advancePaymentError,
+                              margin: EdgeInsets.zero,
+                              onDismiss: () =>
+                                  setState(() => _advancePaymentError = null),
+                            ),
+                          ],
                           const SizedBox(height: 10),
                           Row(
                             children: [
@@ -455,13 +497,9 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
                                               ) ??
                                               0;
                                           if (amount < b.minAdvance) {
-                                            ScaffoldMessenger.of(context).showSnackBar(
-                                              SnackBar(
-                                                content: Text(
-                                                  'Minimum advance is ${formatRupees(b.minAdvance.toInt())}',
-                                                ),
-                                              ),
-                                            );
+                                            setState(() =>
+                                                _advancePaymentError =
+                                                    'Minimum advance is ${formatRupees(b.minAdvance.toInt())}');
                                             return;
                                           }
                                           _payNow(
@@ -566,6 +604,16 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
                               'Balance amount: ${formatRupees(b.effectiveBalance.toInt())}',
                               style: AppTextStyles.bodySm,
                             ),
+                            if (_balancePaymentError != null &&
+                                _balancePaymentError!.isNotEmpty) ...[
+                              const SizedBox(height: 10),
+                              InlineErrorBanner(
+                                message: _balancePaymentError,
+                                margin: EdgeInsets.zero,
+                                onDismiss: () =>
+                                    setState(() => _balancePaymentError = null),
+                              ),
+                            ],
                             const SizedBox(height: 10),
                             Row(
                               children: [
@@ -762,6 +810,16 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
                                 ),
                               ),
                             ),
+                            if (_reviewError != null &&
+                                _reviewError!.isNotEmpty) ...[
+                              const SizedBox(height: 12),
+                              InlineErrorBanner(
+                                message: _reviewError,
+                                margin: EdgeInsets.zero,
+                                onDismiss: () =>
+                                    setState(() => _reviewError = null),
+                              ),
+                            ],
                             const SizedBox(height: 16),
                             SizedBox(
                               width: double.infinity,
@@ -881,6 +939,16 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
                                   ),
                                 ),
                               ),
+                              if (_disputeError != null &&
+                                  _disputeError!.isNotEmpty) ...[
+                                const SizedBox(height: 12),
+                                InlineErrorBanner(
+                                  message: _disputeError,
+                                  margin: EdgeInsets.zero,
+                                  onDismiss: () =>
+                                      setState(() => _disputeError = null),
+                                ),
+                              ],
                               const SizedBox(height: 14),
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.end,
@@ -889,6 +957,7 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
                                     onPressed: () {
                                       setState(() {
                                         _showDisputeForm = false;
+                                        _disputeError = null;
                                       });
                                     },
                                     child: const Text('Cancel'),
@@ -953,7 +1022,7 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
 
 class _CancelBookingDialog extends StatefulWidget {
   final BookingModel booking;
-  final Future<void> Function(String reason) onCancel;
+  final Future<String?> Function(String reason) onCancel;
 
   const _CancelBookingDialog({
     required this.booking,
@@ -967,6 +1036,17 @@ class _CancelBookingDialog extends StatefulWidget {
 class _CancelBookingDialogState extends State<_CancelBookingDialog> {
   final TextEditingController _reasonController = TextEditingController();
   bool _isCancelling = false;
+  String? _dialogError;
+
+  @override
+  void initState() {
+    super.initState();
+    _reasonController.addListener(() {
+      if (_dialogError != null) {
+        setState(() => _dialogError = null);
+      }
+    });
+  }
 
   @override
   void dispose() {
@@ -1023,6 +1103,14 @@ class _CancelBookingDialogState extends State<_CancelBookingDialog> {
                 ),
               ),
             ),
+            if (_dialogError != null && _dialogError!.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              InlineErrorBanner(
+                message: _dialogError,
+                margin: EdgeInsets.zero,
+                onDismiss: () => setState(() => _dialogError = null),
+              ),
+            ],
           ],
         ),
       ),
@@ -1037,21 +1125,26 @@ class _CancelBookingDialogState extends State<_CancelBookingDialog> {
               : () async {
                   final reason = _reasonController.text.trim();
                   if (reason.isEmpty) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text(
-                          'Please provide a reason for cancellation',
-                        ),
-                      ),
-                    );
+                    setState(() =>
+                        _dialogError = 'Please provide a reason for cancellation');
                     return;
                   }
 
-                  setState(() => _isCancelling = true);
+                  setState(() {
+                    _isCancelling = true;
+                    _dialogError = null;
+                  });
                   final navigator = Navigator.of(context);
-                  await widget.onCancel(reason);
+                  final error = await widget.onCancel(reason);
                   if (mounted) {
-                    navigator.pop();
+                    if (error != null) {
+                      setState(() {
+                        _isCancelling = false;
+                        _dialogError = error;
+                      });
+                    } else {
+                      navigator.pop();
+                    }
                   }
                 },
           style: ElevatedButton.styleFrom(

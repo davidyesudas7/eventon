@@ -1,5 +1,4 @@
 import 'package:dartz/dartz.dart';
-import 'package:dio/dio.dart';
 import '../../../../core/error/failures.dart';
 import '../../../../core/network/api_client.dart';
 import '../../domain/repositories/booking_repository.dart';
@@ -23,16 +22,10 @@ class BookingRepositoryImpl implements BookingRepository {
         'eventDate': eventDate.toIso8601String(),
       });
       return Right(result);
-    } on DioException catch (e) {
-      return Left(
-        ServerFailure(
-          e.response?.data['message'] ??
-              e.message ??
-              'Failed to create booking',
-        ),
-      );
     } catch (e) {
-      return Left(ServerFailure(e.toString()));
+      return Left(
+        handleApiError(e, defaultMessage: 'Failed to create booking'),
+      );
     }
   }
 
@@ -41,14 +34,10 @@ class BookingRepositoryImpl implements BookingRepository {
     try {
       final result = await apiClient.getBookings();
       return Right(result);
-    } on DioException catch (e) {
-      return Left(
-        ServerFailure(
-          e.response?.data['message'] ?? e.message ?? 'Failed to get bookings',
-        ),
-      );
     } catch (e) {
-      return Left(ServerFailure(e.toString()));
+      return Left(
+        handleApiError(e, defaultMessage: 'Failed to load bookings'),
+      );
     }
   }
 
@@ -57,14 +46,10 @@ class BookingRepositoryImpl implements BookingRepository {
     try {
       final result = await apiClient.getBookingById(id);
       return Right(result);
-    } on DioException catch (e) {
-      return Left(
-        ServerFailure(
-          e.response?.data['message'] ?? e.message ?? 'Failed to get booking',
-        ),
-      );
     } catch (e) {
-      return Left(ServerFailure(e.toString()));
+      return Left(
+        handleApiError(e, defaultMessage: 'Failed to load booking details'),
+      );
     }
   }
 
@@ -76,14 +61,10 @@ class BookingRepositoryImpl implements BookingRepository {
     try {
       final result = await apiClient.payBooking(id, paymentData);
       return Right(result);
-    } on DioException catch (e) {
-      return Left(
-        ServerFailure(
-          e.response?.data['message'] ?? e.message ?? 'Failed to pay booking',
-        ),
-      );
     } catch (e) {
-      return Left(ServerFailure(e.toString()));
+      return Left(
+        handleApiError(e, defaultMessage: 'Failed to process booking payment'),
+      );
     }
   }
 
@@ -100,16 +81,10 @@ class BookingRepositoryImpl implements BookingRepository {
         'comment': comment,
       });
       return Right(result);
-    } on DioException catch (e) {
-      return Left(
-        ServerFailure(
-          e.response?.data['message'] ??
-              e.message ??
-              'Failed to submit review',
-        ),
-      );
     } catch (e) {
-      return Left(ServerFailure(e.toString()));
+      return Left(
+        handleApiError(e, defaultMessage: 'Failed to submit review'),
+      );
     }
   }
 
@@ -123,16 +98,10 @@ class BookingRepositoryImpl implements BookingRepository {
         'reason': reason,
       });
       return Right(result);
-    } on DioException catch (e) {
-      return Left(
-        ServerFailure(
-          e.response?.data['message'] ??
-              e.message ??
-              'Failed to report issue',
-        ),
-      );
     } catch (e) {
-      return Left(ServerFailure(e.toString()));
+      return Left(
+        handleApiError(e, defaultMessage: 'Failed to submit dispute report'),
+      );
     }
   }
 
@@ -149,16 +118,10 @@ class BookingRepositoryImpl implements BookingRepository {
         'amount': amount,
       });
       return Right(result);
-    } on DioException catch (e) {
-      return Left(
-        ServerFailure(
-          e.response?.data['message'] ??
-              e.message ??
-              'Failed to create payment order',
-        ),
-      );
     } catch (e) {
-      return Left(ServerFailure(e.toString()));
+      return Left(
+        handleApiError(e, defaultMessage: 'Failed to initiate payment order'),
+      );
     }
   }
 
@@ -172,16 +135,10 @@ class BookingRepositoryImpl implements BookingRepository {
         'reason': reason,
       });
       return Right(result);
-    } on DioException catch (e) {
-      return Left(
-        ServerFailure(
-          e.response?.data['message'] ??
-              e.message ??
-              'Failed to cancel booking',
-        ),
-      );
     } catch (e) {
-      return Left(ServerFailure(e.toString()));
+      return Left(
+        handleApiError(e, defaultMessage: 'Failed to cancel booking'),
+      );
     }
   }
 }

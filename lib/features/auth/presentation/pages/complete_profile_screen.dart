@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
+import '../../../../core/widgets/inline_error_banner.dart';
 import '../providers/auth_providers.dart';
 
 class CompleteProfileScreen extends ConsumerStatefulWidget {
@@ -19,17 +20,32 @@ class _CompleteProfileScreenState extends ConsumerState<CompleteProfileScreen> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   bool _isLoading = false;
+  String? _errorMessage;
+
+  @override
+  void initState() {
+    super.initState();
+    _nameController.addListener(_clearError);
+    _emailController.addListener(_clearError);
+  }
+
+  void _clearError() {
+    if (_errorMessage != null) {
+      setState(() => _errorMessage = null);
+    }
+  }
 
   Future<void> _submit() async {
     final name = _nameController.text.trim();
     if (name.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter your full name')),
-      );
+      setState(() => _errorMessage = 'Please enter your full name');
       return;
     }
 
-    setState(() => _isLoading = true);
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
 
     final success = await ref
         .read(authControllerProvider.notifier)
@@ -49,9 +65,7 @@ class _CompleteProfileScreenState extends ConsumerState<CompleteProfileScreen> {
     } else {
       final state = ref.read(authControllerProvider);
       if (state is AuthStateError) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(state.failure.message)));
+        setState(() => _errorMessage = state.failure.message);
       }
     }
   }
@@ -132,6 +146,14 @@ class _CompleteProfileScreenState extends ConsumerState<CompleteProfileScreen> {
                   ),
                 ),
               ),
+              if (_errorMessage != null && _errorMessage!.isNotEmpty) ...[
+                const SizedBox(height: 16),
+                InlineErrorBanner(
+                  message: _errorMessage,
+                  margin: EdgeInsets.zero,
+                  onDismiss: () => setState(() => _errorMessage = null),
+                ),
+              ],
               const SizedBox(height: 32),
               SizedBox(
                 width: double.infinity,

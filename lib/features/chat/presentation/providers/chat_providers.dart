@@ -1,5 +1,6 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../../core/error/failures.dart';
 import '../../../../core/network/api_providers.dart';
 import '../../../../core/services/socket_service.dart';
 import '../../../listings/data/models/listing_detail_model.dart';
@@ -144,7 +145,10 @@ class CreateConversationNotifier extends _$CreateConversationNotifier {
     return false; // isCreating
   }
 
+  String? lastError;
+
   Future<ConversationModel?> createConversation(String listingId, DateTime eventDate) async {
+    lastError = null;
     state = true;
     try {
       final client = ref.read(apiClientProvider);
@@ -157,6 +161,7 @@ class CreateConversationNotifier extends _$CreateConversationNotifier {
       state = false;
       return conversation;
     } catch (e) {
+      lastError = extractErrorMessage(e, defaultMessage: 'Failed to start conversation');
       state = false;
       return null;
     }

@@ -64,11 +64,14 @@ class CreateBookingNotifier extends _$CreateBookingNotifier {
   @override
   bool build() => false;
 
+  String? lastError;
+
   Future<BookingModel?> createBooking({
     required String listingId,
     required String packageId,
     required DateTime eventDate,
   }) async {
+    lastError = null;
     state = true;
     final repo = ref.read(bookingRepositoryProvider);
     final result = await repo.createDirectBooking(
@@ -78,12 +81,18 @@ class CreateBookingNotifier extends _$CreateBookingNotifier {
     if (!ref.mounted) return null;
     state = false;
 
-    return result.fold((l) => null, (r) {
-      if (ref.mounted) {
-        ref.invalidate(bookingsProvider);
-      }
-      return r;
-    });
+    return result.fold(
+      (l) {
+        lastError = l.message;
+        return null;
+      },
+      (r) {
+        if (ref.mounted) {
+          ref.invalidate(bookingsProvider);
+        }
+        return r;
+      },
+    );
   }
 }
 

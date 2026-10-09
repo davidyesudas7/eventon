@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/error/failures.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
+import '../../../../core/widgets/inline_error_banner.dart';
 import '../providers/auth_providers.dart';
 
 class OtpVerifyScreen extends ConsumerStatefulWidget {
@@ -23,19 +24,30 @@ class OtpVerifyScreen extends ConsumerStatefulWidget {
 class _OtpVerifyScreenState extends ConsumerState<OtpVerifyScreen> {
   final TextEditingController _otpController = TextEditingController();
   bool _isLoading = false;
+  String? _errorMessage;
+
+  @override
+  void initState() {
+    super.initState();
+    _otpController.addListener(() {
+      if (_errorMessage != null) {
+        setState(() => _errorMessage = null);
+      }
+    });
+  }
 
   Future<void> _verifyOtp() async {
     final smsCode = _otpController.text.trim();
     if (smsCode.length < 6) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please enter a 6-digit verification code'),
-        ),
-      );
+      setState(() =>
+          _errorMessage = 'Please enter a 6-digit verification code');
       return;
     }
 
-    setState(() => _isLoading = true);
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
 
     try {
       final success = await ref
@@ -58,23 +70,18 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifyScreen> {
             final failure = authState.failure as ProfileRequiredFailure;
             context.go('/complete-profile', extra: failure.idToken ?? '');
           } else if (authState.failure is UsePasswordFailure) {
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(SnackBar(content: Text(authState.failure.message)));
             context.go('/sign-in-email');
           } else {
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(SnackBar(content: Text(authState.failure.message)));
+            setState(() => _errorMessage = authState.failure.message);
           }
         }
       }
     } catch (e) {
       if (!mounted) return;
-      setState(() => _isLoading = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.toString().replaceAll('Exception: ', ''))),
-      );
+      setState(() {
+        _isLoading = false;
+        _errorMessage = extractErrorMessage(e);
+      });
     }
   }
 
@@ -133,6 +140,14 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifyScreen> {
                   ),
                 ),
               ),
+              if (_errorMessage != null && _errorMessage!.isNotEmpty) ...[
+                const SizedBox(height: 16),
+                InlineErrorBanner(
+                  message: _errorMessage,
+                  margin: EdgeInsets.zero,
+                  onDismiss: () => setState(() => _errorMessage = null),
+                ),
+              ],
               const SizedBox(height: 32),
               SizedBox(
                 width: double.infinity,

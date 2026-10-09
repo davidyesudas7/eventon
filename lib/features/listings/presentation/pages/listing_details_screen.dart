@@ -13,6 +13,7 @@ import '../../data/models/package_model.dart';
 import '../providers/listing_details_providers.dart';
 import '../widgets/listing_review_card.dart';
 import '../../../../features/chat/presentation/providers/chat_providers.dart';
+import '../../../../core/widgets/inline_error_banner.dart';
 
 class ListingDetailsScreen extends ConsumerStatefulWidget {
   const ListingDetailsScreen({super.key, required this.listingId});
@@ -597,23 +598,27 @@ class _BookPackageSheet extends ConsumerStatefulWidget {
 
 class _BookPackageSheetState extends ConsumerState<_BookPackageSheet> {
   DateTime? _selectedDate;
+  String? _errorMessage;
 
   void _confirmBooking() async {
-    if (_selectedDate == null) return;
-    final booking = await ref
-        .read(createBookingProvider.notifier)
-        .createBooking(
-          listingId: widget.listingId,
-          packageId: widget.package.id,
-          eventDate: _selectedDate!,
-        );
+    if (_selectedDate == null) {
+      setState(() => _errorMessage = 'Please select your event date');
+      return;
+    }
+    setState(() => _errorMessage = null);
+    final notifier = ref.read(createBookingProvider.notifier);
+    final booking = await notifier.createBooking(
+      listingId: widget.listingId,
+      packageId: widget.package.id,
+      eventDate: _selectedDate!,
+    );
     if (booking != null && mounted) {
       Navigator.pop(context); // Close sheet
       context.go('/bookings/${booking.id}', extra: booking); // Go to details
     } else if (mounted) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Failed to create booking')));
+      setState(() {
+        _errorMessage = notifier.lastError ?? 'Failed to create booking';
+      });
     }
   }
 
@@ -667,7 +672,10 @@ class _BookPackageSheetState extends ConsumerState<_BookPackageSheet> {
                 lastDate: DateTime.now().add(const Duration(days: 365 * 2)),
               );
               if (date != null) {
-                setState(() => _selectedDate = date);
+                setState(() {
+                  _selectedDate = date;
+                  _errorMessage = null;
+                });
               }
             },
             child: Container(
@@ -696,6 +704,14 @@ class _BookPackageSheetState extends ConsumerState<_BookPackageSheet> {
               ),
             ),
           ),
+          if (_errorMessage != null && _errorMessage!.isNotEmpty) ...[
+            const SizedBox(height: 16),
+            InlineErrorBanner(
+              message: _errorMessage,
+              margin: EdgeInsets.zero,
+              onDismiss: () => setState(() => _errorMessage = null),
+            ),
+          ],
           const SizedBox(height: 24),
           SizedBox(
             width: double.infinity,
@@ -740,20 +756,24 @@ class _MessageBusinessSheet extends ConsumerStatefulWidget {
 
 class _MessageBusinessSheetState extends ConsumerState<_MessageBusinessSheet> {
   DateTime? _selectedDate;
+  String? _errorMessage;
 
   void _startConversation() async {
-    if (_selectedDate == null) return;
-    final conversation = await ref
-        .read(createConversationProvider.notifier)
-        .createConversation(widget.listingId, _selectedDate!);
+    if (_selectedDate == null) {
+      setState(() => _errorMessage = 'Please select your event date');
+      return;
+    }
+    setState(() => _errorMessage = null);
+    final notifier = ref.read(createConversationProvider.notifier);
+    final conversation = await notifier.createConversation(widget.listingId, _selectedDate!);
         
     if (conversation != null && mounted) {
       Navigator.pop(context); // Close sheet
       context.push('/chats/${conversation.id}'); // Go to chat screen
     } else if (mounted) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Failed to start conversation')));
+      setState(() {
+        _errorMessage = notifier.lastError ?? 'Failed to start conversation';
+      });
     }
   }
 
@@ -805,7 +825,10 @@ class _MessageBusinessSheetState extends ConsumerState<_MessageBusinessSheet> {
                 lastDate: DateTime.now().add(const Duration(days: 365 * 2)),
               );
               if (date != null) {
-                setState(() => _selectedDate = date);
+                setState(() {
+                  _selectedDate = date;
+                  _errorMessage = null;
+                });
               }
             },
             child: Container(
@@ -834,6 +857,14 @@ class _MessageBusinessSheetState extends ConsumerState<_MessageBusinessSheet> {
               ),
             ),
           ),
+          if (_errorMessage != null && _errorMessage!.isNotEmpty) ...[
+            const SizedBox(height: 16),
+            InlineErrorBanner(
+              message: _errorMessage,
+              margin: EdgeInsets.zero,
+              onDismiss: () => setState(() => _errorMessage = null),
+            ),
+          ],
           const SizedBox(height: 24),
           SizedBox(
             width: double.infinity,

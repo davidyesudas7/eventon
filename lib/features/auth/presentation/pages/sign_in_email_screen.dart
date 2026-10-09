@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
+import '../../../../core/widgets/inline_error_banner.dart';
 import '../../../profile/presentation/providers/home_location_provider.dart';
 import '../providers/auth_providers.dart';
 
@@ -18,6 +19,20 @@ class _SignInEmailScreenState extends ConsumerState<SignInEmailScreen> {
   final TextEditingController _passwordController = TextEditingController();
   bool _obscurePassword = true;
   bool _isLoading = false;
+  String? _errorMessage;
+
+  @override
+  void initState() {
+    super.initState();
+    _emailController.addListener(_clearError);
+    _passwordController.addListener(_clearError);
+  }
+
+  void _clearError() {
+    if (_errorMessage != null) {
+      setState(() => _errorMessage = null);
+    }
+  }
 
   @override
   void dispose() {
@@ -31,13 +46,14 @@ class _SignInEmailScreenState extends ConsumerState<SignInEmailScreen> {
     final password = _passwordController.text;
 
     if (email.isEmpty || password.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter both email and password')),
-      );
+      setState(() => _errorMessage = 'Please enter both email and password');
       return;
     }
 
-    setState(() => _isLoading = true);
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
 
     final success = await ref
         .read(authControllerProvider.notifier)
@@ -53,6 +69,7 @@ class _SignInEmailScreenState extends ConsumerState<SignInEmailScreen> {
         await ref.read(homeLocationStateProvider.notifier).saveFromLogin(user.basePincode, user.lsgId);
       }
 
+      if (!mounted) return;
       if (context.canPop()) {
         context.pop();
       } else {
@@ -61,9 +78,7 @@ class _SignInEmailScreenState extends ConsumerState<SignInEmailScreen> {
     } else {
       final authState = ref.read(authControllerProvider);
       if (authState is AuthStateError) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(authState.failure.message)));
+        setState(() => _errorMessage = authState.failure.message);
       }
     }
   }
@@ -71,23 +86,18 @@ class _SignInEmailScreenState extends ConsumerState<SignInEmailScreen> {
   Future<void> _handleForgotPassword() async {
     final email = _emailController.text.trim();
     if (email.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please enter your email first to reset password'),
-        ),
-      );
+      setState(() => _errorMessage = 'Please enter your email first to reset password');
       return;
     }
 
+    setState(() => _errorMessage = null);
     final repository = ref.read(authRepositoryProvider);
     final result = await repository.forgotPassword(email);
 
     if (!mounted) return;
 
     result.fold(
-      (failure) => ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(failure.message))),
+      (failure) => setState(() => _errorMessage = failure.message),
       (_) => ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Password reset link sent if account exists'),
@@ -240,7 +250,12 @@ class _SignInEmailScreenState extends ConsumerState<SignInEmailScreen> {
                   ),
                 ),
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: 20),
+
+              InlineErrorBanner(
+                message: _errorMessage,
+                onDismiss: () => setState(() => _errorMessage = null),
+              ),
 
               SizedBox(
                 width: double.infinity,

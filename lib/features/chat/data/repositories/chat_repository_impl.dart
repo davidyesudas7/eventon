@@ -1,5 +1,4 @@
 import 'dart:developer';
-
 import 'package:dartz/dartz.dart';
 import '../../../../core/error/failures.dart';
 import '../../../../core/network/api_client.dart';
@@ -18,7 +17,9 @@ class ChatRepositoryImpl implements ChatRepository {
       final response = await apiClient.getConversations();
       return Right(response);
     } catch (e) {
-      return Left(ServerFailure(e.toString()));
+      return Left(
+        handleApiError(e, defaultMessage: 'Failed to load conversations'),
+      );
     }
   }
 
@@ -28,7 +29,9 @@ class ChatRepositoryImpl implements ChatRepository {
       final response = await apiClient.getConversation(id);
       return Right(response);
     } catch (e) {
-      return Left(ServerFailure(e.toString()));
+      return Left(
+        handleApiError(e, defaultMessage: 'Failed to load conversation'),
+      );
     }
   }
 
@@ -38,10 +41,11 @@ class ChatRepositoryImpl implements ChatRepository {
   ) async {
     try {
       final response = await apiClient.getMessages(conversationId);
-
       return Right(response.items);
     } catch (e) {
-      return Left(ServerFailure(e.toString()));
+      return Left(
+        handleApiError(e, defaultMessage: 'Failed to load messages'),
+      );
     }
   }
 
@@ -57,7 +61,9 @@ class ChatRepositoryImpl implements ChatRepository {
       log('the message send response is ${response.toString()}');
       return Right(response);
     } catch (e) {
-      return Left(ServerFailure(e.toString()));
+      return Left(
+        handleApiError(e, defaultMessage: 'Failed to send message'),
+      );
     }
   }
 
@@ -71,7 +77,9 @@ class ChatRepositoryImpl implements ChatRepository {
       log('Accept quote response: ${response.toString()}');
       return Right(response);
     } catch (e) {
-      return Left(ServerFailure(e.toString()));
+      return Left(
+        handleApiError(e, defaultMessage: 'Failed to accept quote'),
+      );
     }
   }
 
@@ -85,7 +93,9 @@ class ChatRepositoryImpl implements ChatRepository {
       log('Reject quote response: ${response.toString()}');
       return Right(response);
     } catch (e) {
-      return Left(ServerFailure(e.toString()));
+      return Left(
+        handleApiError(e, defaultMessage: 'Failed to reject quote'),
+      );
     }
   }
 }

@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
+import '../../../../core/error/failures.dart';
+import '../../../../core/widgets/inline_error_banner.dart';
 import '../providers/quote_cart_provider.dart';
 import '../providers/quotes_providers.dart';
 
@@ -24,6 +26,21 @@ class _RequestQuotesScreenState extends ConsumerState<RequestQuotesScreen> {
   final _requirementsController = TextEditingController();
 
   DateTime? _selectedDate;
+  bool _isSubmitting = false;
+  String? _errorMessage;
+
+  @override
+  void initState() {
+    super.initState();
+    _requirementsController.addListener(_clearError);
+    _dateController.addListener(_clearError);
+  }
+
+  void _clearError() {
+    if (_errorMessage != null) {
+      setState(() => _errorMessage = null);
+    }
+  }
 
   @override
   void dispose() {
@@ -46,45 +63,63 @@ class _RequestQuotesScreenState extends ConsumerState<RequestQuotesScreen> {
       setState(() {
         _selectedDate = picked;
         _dateController.text = DateFormat('MM/dd/yyyy').format(picked);
+        _errorMessage = null;
       });
     }
   }
 
   Future<void> _sendQuoteRequest() async {
-    if (_formKey.currentState?.validate() ?? false) {
-      final quoteItems = ref.read(quoteCartProvider);
-      
-      final Map<String, dynamic> body = {
-        'listingIds': quoteItems.map((q) => q.id).toList(),
-        if (_selectedDate != null) 'eventDate': _selectedDate!.toIso8601String().substring(0, 10),
-        if (_guestsController.text.isNotEmpty) 'guestCount': int.tryParse(_guestsController.text),
-        if (_budgetController.text.isNotEmpty) 'budget': num.tryParse(_budgetController.text),
-        if (_whereController.text.isNotEmpty) 'eventLocation': _whereController.text,
-        if (_requirementsController.text.isNotEmpty) 'message': _requirementsController.text,
-      };
+    if (!(_formKey.currentState?.validate() ?? false)) {
+      setState(() => _errorMessage = 'Please complete the required fields');
+      return;
+    }
 
-      try {
-        final result = await ref.read(quotesRepositoryProvider).createQuoteRequest(body);
-        result.fold(
-          (failure) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Error: ${failure.message}')),
-            );
-          },
-          (quoteRequest) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Quote requests sent successfully!')),
-            );
-            ref.read(quoteCartProvider.notifier).clearQuotes();
-            // Navigate to the detail screen and clear the current route stack
-            context.go('/quote-requests/${quoteRequest.id}');
-          },
-        );
-      } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
-        );
-      }
+    final quoteItems = ref.read(quoteCartProvider);
+    if (quoteItems.isEmpty) {
+      setState(() => _errorMessage = 'No businesses selected for quote');
+      return;
+    }
+
+    final Map<String, dynamic> body = {
+      'listingIds': quoteItems.map((q) => q.id).toList(),
+      if (_selectedDate != null)
+        'eventDate': _selectedDate!.toIso8601String().substring(0, 10),
+      if (_guestsController.text.isNotEmpty)
+        'guestCount': int.tryParse(_guestsController.text),
+      if (_budgetController.text.isNotEmpty)
+        'budget': num.tryParse(_budgetController.text),
+      if (_whereController.text.isNotEmpty)
+        'eventLocation': _whereController.text,
+      if (_requirementsController.text.isNotEmpty)
+        'message': _requirementsController.text,
+    };
+
+    setState(() {
+      _isSubmitting = true;
+      _errorMessage = null;
+    });
+
+    try {
+      final result =
+          await ref.read(quotesRepositoryProvider).createQuoteRequest(body);
+      if (!mounted) return;
+      setState(() => _isSubmitting = false);
+
+      result.fold(
+        (failure) {
+          setState(() => _errorMessage = failure.message);
+        },
+        (quoteRequest) {
+          ref.read(quoteCartProvider.notifier).clearQuotes();
+          context.go('/quote-requests/${quoteRequest.id}');
+        },
+      );
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _isSubmitting = false;
+        _errorMessage = extractErrorMessage(e);
+      });
     }
   }
 
@@ -269,20 +304,41 @@ class _RequestQuotesScreenState extends ConsumerState<RequestQuotesScreen> {
               ),
             ],
           ),
-          child: ElevatedButton(
-            onPressed: _sendQuoteRequest,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF155E56),
-              foregroundColor: Colors.white,
-              minimumSize: const Size(double.infinity, 56),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (_errorMessage != null && _errorMessage!.isNotEmpty) ...[
+                InlineErrorBanner(
+                  message: _errorMessage,
+                  margin: const EdgeInsets.only(bottom: 12),
+                  onDismiss: () => setState(() => _errorMessage = null),
+                ),
+              ],
+              ElevatedButton(
+                onPressed: _isSubmitting ? null : _sendQuoteRequest,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF155E56),
+                  foregroundColor: Colors.white,
+                  minimumSize: const Size(double.infinity, 56),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  textStyle: AppTextStyles.labelLg.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                child: _isSubmitting
+                    ? const SizedBox(
+                        width: 22,
+                        height: 22,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                    : Text('Send to ${items.length} businesses'),
               ),
-              textStyle: AppTextStyles.labelLg.copyWith(
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-            child: Text('Send to ${items.length} businesses'),
+            ],
           ),
         ),
       ],

@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/error/failures.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
+import '../../../../core/widgets/inline_error_banner.dart';
 import '../providers/auth_providers.dart';
 
 class SignInMobileScreen extends ConsumerStatefulWidget {
@@ -18,6 +19,17 @@ class _SignInMobileScreenState extends ConsumerState<SignInMobileScreen> {
   final TextEditingController _phoneController = TextEditingController();
   bool _isLoading = false;
   bool _isSignUp = false;
+  String? _errorMessage;
+
+  @override
+  void initState() {
+    super.initState();
+    _phoneController.addListener(() {
+      if (_errorMessage != null) {
+        setState(() => _errorMessage = null);
+      }
+    });
+  }
 
   @override
   void dispose() {
@@ -31,34 +43,22 @@ class _SignInMobileScreenState extends ConsumerState<SignInMobileScreen> {
         .replaceAll(' ', '')
         .replaceAll('-', '');
     if (rawPhone.length < 10) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please enter a valid 10-digit mobile number'),
-        ),
-      );
+      setState(() =>
+          _errorMessage = 'Please enter a valid 10-digit mobile number');
       return;
     }
 
     final fullPhoneNumber = '+91$rawPhone';
-    setState(() => _isLoading = true);
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
 
     try {
       await ref.read(authControllerProvider.notifier).verifyPhoneNumber(
         phoneNumber: fullPhoneNumber,
         onVerificationCompleted: (credential) async {
-          // In an ideal flow, the repository could handle this directly. 
-          // But since credential is a Firebase object, we could just let the backend handle it or 
-          // do it here if absolutely needed. Wait, confirmOtp does the credential stuff.
-          // The verifyPhoneNumber in the datasource currently doesn't sign in on verification completed,
-          // it just completes it. But the datasource expects PhoneAuthCredential.
-          // Wait, the previous code had:
-          // final userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
-          // final idToken = await userCredential.user?.getIdToken();
-          // final success = await ref.read(authControllerProvider.notifier).firebaseSignIn(idToken: idToken!);
-          
           try {
-            // Because we want to keep UI clean, we would ideally just pass it.
-            // But since the credential is an object, we can just cast it.
             final fbCredential = credential as AuthCredential;
             final userCredential = await FirebaseAuth.instance.signInWithCredential(fbCredential);
             final idToken = await userCredential.user?.getIdToken();
@@ -74,18 +74,16 @@ class _SignInMobileScreenState extends ConsumerState<SignInMobileScreen> {
         },
         onVerificationFailed: (e) {
           if (!mounted) return;
-          setState(() => _isLoading = false);
-          
           String errorMessage = 'Phone verification failed';
           if (e is FirebaseAuthException) {
             errorMessage = e.message ?? errorMessage;
           } else {
-            errorMessage = e.toString();
+            errorMessage = extractErrorMessage(e);
           }
-          
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(errorMessage.replaceAll('Exception: ', ''))),
-          );
+          setState(() {
+            _isLoading = false;
+            _errorMessage = errorMessage;
+          });
         },
         onCodeSent: (verificationId, resendToken) {
           if (!mounted) return;
@@ -102,15 +100,18 @@ class _SignInMobileScreenState extends ConsumerState<SignInMobileScreen> {
       );
     } catch (e) {
       if (!mounted) return;
-      setState(() => _isLoading = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.toString().replaceAll('Exception: ', ''))),
-      );
+      setState(() {
+        _isLoading = false;
+        _errorMessage = extractErrorMessage(e);
+      });
     }
   }
 
   Future<void> _handleGoogleSignIn() async {
-    setState(() => _isLoading = true);
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
 
     try {
       final success = await ref
@@ -129,9 +130,7 @@ class _SignInMobileScreenState extends ConsumerState<SignInMobileScreen> {
             final failure = authState.failure as ProfileRequiredFailure;
             context.go('/complete-profile', extra: failure.idToken ?? '');
           } else {
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(SnackBar(content: Text(authState.failure.message)));
+            setState(() => _errorMessage = authState.failure.message);
           }
         }
       }
@@ -139,9 +138,7 @@ class _SignInMobileScreenState extends ConsumerState<SignInMobileScreen> {
       if (!mounted) return;
       setState(() => _isLoading = false);
       if (!e.toString().contains('cancelled')) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.toString().replaceAll('Exception: ', ''))),
-        );
+        setState(() => _errorMessage = extractErrorMessage(e));
       }
     }
   }
@@ -256,6 +253,14 @@ class _SignInMobileScreenState extends ConsumerState<SignInMobileScreen> {
                     ],
                   ),
                 ),
+                if (_errorMessage != null && _errorMessage!.isNotEmpty) ...[
+                  const SizedBox(height: 12),
+                  InlineErrorBanner(
+                    message: _errorMessage,
+                    margin: EdgeInsets.zero,
+                    onDismiss: () => setState(() => _errorMessage = null),
+                  ),
+                ],
                 const SizedBox(height: 16),
 
                 SizedBox(

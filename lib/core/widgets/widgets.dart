@@ -8,3 +8,4 @@ export 'outlined_card.dart';
 export 'app_text_field.dart';
 export 'app_buttons.dart';
 export 'circle_icon_button.dart';
+export 'inline_error_banner.dart';

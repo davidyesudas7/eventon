@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
+import '../../../../core/widgets/inline_error_banner.dart';
 import '../providers/auth_providers.dart';
 
 class SignUpEmailScreen extends ConsumerStatefulWidget {
@@ -18,6 +19,21 @@ class _SignUpEmailScreenState extends ConsumerState<SignUpEmailScreen> {
   final TextEditingController _passwordController = TextEditingController();
   bool _obscurePassword = true;
   bool _isLoading = false;
+  String? _errorMessage;
+
+  @override
+  void initState() {
+    super.initState();
+    _nameController.addListener(_clearError);
+    _emailController.addListener(_clearError);
+    _passwordController.addListener(_clearError);
+  }
+
+  void _clearError() {
+    if (_errorMessage != null) {
+      setState(() => _errorMessage = null);
+    }
+  }
 
   @override
   void dispose() {
@@ -33,20 +49,19 @@ class _SignUpEmailScreenState extends ConsumerState<SignUpEmailScreen> {
     final password = _passwordController.text;
 
     if (name.isEmpty || email.isEmpty || password.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please fill in all fields')),
-      );
+      setState(() => _errorMessage = 'Please fill in all fields');
       return;
     }
 
     if (password.length < 8) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Password must be at least 8 characters')),
-      );
+      setState(() => _errorMessage = 'Password must be at least 8 characters');
       return;
     }
 
-    setState(() => _isLoading = true);
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
 
     final success = await ref
         .read(authControllerProvider.notifier)
@@ -60,9 +75,7 @@ class _SignUpEmailScreenState extends ConsumerState<SignUpEmailScreen> {
     } else {
       final authState = ref.read(authControllerProvider);
       if (authState is AuthStateError) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(authState.failure.message)));
+        setState(() => _errorMessage = authState.failure.message);
       }
     }
   }
@@ -241,7 +254,12 @@ class _SignUpEmailScreenState extends ConsumerState<SignUpEmailScreen> {
                   ),
                 ),
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: 20),
+
+              InlineErrorBanner(
+                message: _errorMessage,
+                onDismiss: () => setState(() => _errorMessage = null),
+              ),
 
               SizedBox(
                 width: double.infinity,
