@@ -4,6 +4,7 @@ import '../../../../core/error/failures.dart';
 import '../../../../core/network/api_client.dart';
 import '../../domain/repositories/booking_repository.dart';
 import '../models/booking_model.dart';
+import '../../../listings/data/models/review_model.dart';
 
 class BookingRepositoryImpl implements BookingRepository {
   final ApiClient apiClient;
@@ -78,6 +79,55 @@ class BookingRepositoryImpl implements BookingRepository {
       return Left(
         ServerFailure(
           e.response?.data['message'] ?? e.message ?? 'Failed to pay booking',
+        ),
+      );
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, ReviewModel>> createReview({
+    required String bookingId,
+    required double rating,
+    required String comment,
+  }) async {
+    try {
+      final result = await apiClient.createReview({
+        'bookingId': bookingId,
+        'rating': rating,
+        'comment': comment,
+      });
+      return Right(result);
+    } on DioException catch (e) {
+      return Left(
+        ServerFailure(
+          e.response?.data['message'] ??
+              e.message ??
+              'Failed to submit review',
+        ),
+      );
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, BookingModel>> disputeBooking({
+    required String bookingId,
+    required String reason,
+  }) async {
+    try {
+      final result = await apiClient.disputeBooking(bookingId, {
+        'reason': reason,
+      });
+      return Right(result);
+    } on DioException catch (e) {
+      return Left(
+        ServerFailure(
+          e.response?.data['message'] ??
+              e.message ??
+              'Failed to report issue',
         ),
       );
     } catch (e) {

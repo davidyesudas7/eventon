@@ -18,9 +18,9 @@ import '../../features/bookings/data/models/booking_model.dart';
 
 part 'api_client.g.dart';
 
-@RestApi(baseUrl: "https://api.eventongo.in")
+@RestApi()
 abstract class ApiClient {
-  factory ApiClient(Dio dio, {String baseUrl}) = _ApiClient;
+  factory ApiClient(Dio dio) = _ApiClient;
 
   @GET("/categories")
   Future<List<CategoryModel>> getCategories();
@@ -57,7 +57,9 @@ abstract class ApiClient {
   Future<List<ConversationModel>> getConversations();
 
   @POST("/conversations")
-  Future<ConversationModel> createConversation(@Body() Map<String, dynamic> body);
+  Future<ConversationModel> createConversation(
+    @Body() Map<String, dynamic> body,
+  );
 
   @GET("/conversations/{id}")
   Future<ConversationModel> getConversation(@Path("id") String id);
@@ -72,6 +74,18 @@ abstract class ApiClient {
   Future<MessageModel> sendMessage(
     @Path("id") String id,
     @Body() Map<String, dynamic> body,
+  );
+
+  @POST("/conversations/{id}/messages/{messageId}/accept")
+  Future<MessageModel> acceptQuote(
+    @Path("id") String id,
+    @Path("messageId") String messageId,
+  );
+
+  @POST("/conversations/{id}/messages/{messageId}/reject")
+  Future<MessageModel> rejectQuote(
+    @Path("id") String id,
+    @Path("messageId") String messageId,
   );
 
   // @PATCH("/conversations/{id}/read")
@@ -99,7 +113,9 @@ abstract class ApiClient {
   Future<void> forgotPassword(@Body() ForgotPasswordDto dto);
 
   @POST("/quote-requests")
-  Future<QuoteRequestModel> createQuoteRequest(@Body() Map<String, dynamic> body);
+  Future<QuoteRequestModel> createQuoteRequest(
+    @Body() Map<String, dynamic> body,
+  );
 
   @GET("/quote-requests")
   Future<List<QuoteRequestModel>> getQuoteRequests();
@@ -121,6 +137,15 @@ abstract class ApiClient {
 
   @POST("/bookings/{id}/pay")
   Future<BookingModel> payBooking(
+    @Path("id") String id,
+    @Body() Map<String, dynamic> body,
+  );
+
+  @POST("/reviews")
+  Future<ReviewModel> createReview(@Body() Map<String, dynamic> body);
+
+  @POST("/bookings/{id}/dispute")
+  Future<BookingModel> disputeBooking(
     @Path("id") String id,
     @Body() Map<String, dynamic> body,
   );

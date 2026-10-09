@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 
 class QuoteRequestWidget extends StatelessWidget {
-  const QuoteRequestWidget({super.key});
+  final String quoteRequestId;
+
+  const QuoteRequestWidget({
+    super.key,
+    this.quoteRequestId = '1', // default fallback for hardcoded demo
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -62,23 +68,28 @@ class QuoteRequestWidget extends StatelessWidget {
           ),
           const SizedBox(height: 24),
           Center(
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  "Compare every business's quote",
-                  style: AppTextStyles.bodyMd.copyWith(
-                    color: const Color(0xFF15272A),
-                    fontWeight: FontWeight.w500,
+            child: GestureDetector(
+              onTap: () {
+                context.push('/quote-requests/$quoteRequestId');
+              },
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    "Compare every business's quote",
+                    style: AppTextStyles.bodyMd.copyWith(
+                      color: const Color(0xFF15272A),
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
-                ),
-                const SizedBox(width: 4),
-                const Icon(
-                  Icons.arrow_right_alt,
-                  color: Color(0xFF15272A),
-                  size: 20,
-                ),
-              ],
+                  const SizedBox(width: 4),
+                  const Icon(
+                    Icons.arrow_right_alt,
+                    color: Color(0xFF15272A),
+                    size: 20,
+                  ),
+                ],
+              ),
             ),
           ),
         ],

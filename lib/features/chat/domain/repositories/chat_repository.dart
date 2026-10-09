@@ -9,6 +9,7 @@ abstract class ChatRepository {
   Future<Either<Failure, List<MessageModel>>> getMessages(
     String conversationId,
   );
-  // Future<Either<Failure, void>> markAsRead(String conversationId);
   Future<Either<Failure, MessageModel>> sendMessage(String conversationId, String text);
+  Future<Either<Failure, MessageModel>> acceptQuote(String conversationId, String messageId);
+  Future<Either<Failure, MessageModel>> rejectQuote(String conversationId, String messageId);
 }

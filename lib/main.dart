@@ -13,7 +13,7 @@ void main() async {
   } catch (e) {
     debugPrint('DotEnv initialization warning: $e');
   }
-  
+
   try {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
@@ -34,6 +34,7 @@ class MyApp extends ConsumerWidget {
     final router = ref.watch(goRouterProvider);
 
     return MaterialApp.router(
+      debugShowCheckedModeBanner: false,
       title: 'EventOnGo',
       theme: AppTheme.lightTheme,
       routerConfig: router,

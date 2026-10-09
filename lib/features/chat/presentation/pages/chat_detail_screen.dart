@@ -3,9 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
+import '../../data/models/message_model.dart';
 import '../providers/chat_providers.dart';
 import '../../../auth/presentation/providers/auth_providers.dart';
 import '../widgets/quote_request_widget.dart';
+import '../widgets/custom_quote_widget.dart';
 
 class ChatDetailScreen extends ConsumerStatefulWidget {
   final String conversationId;
@@ -17,10 +19,28 @@ class ChatDetailScreen extends ConsumerStatefulWidget {
 
 class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
   final TextEditingController _messageController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
+
+  void _scrollToBottom({bool animate = true}) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_scrollController.hasClients) {
+        if (animate) {
+          _scrollController.animateTo(
+            _scrollController.position.maxScrollExtent,
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeOut,
+          );
+        } else {
+          _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+        }
+      }
+    });
+  }
 
   @override
   void dispose() {
     _messageController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -28,6 +48,19 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
   Widget build(BuildContext context) {
     final messagesState = ref.watch(chatDetailProvider(widget.conversationId));
     final authState = ref.watch(authControllerProvider);
+
+    // Auto-scroll to bottom on initial load and when new messages arrive (matches Vue scrollToBottom())
+    ref.listen<AsyncValue<List<MessageModel>>>(
+      chatDetailProvider(widget.conversationId),
+      (previous, next) {
+        next.whenData((messages) {
+          final prevLength = previous?.value?.length ?? 0;
+          if (messages.length > prevLength || prevLength == 0) {
+            _scrollToBottom();
+          }
+        });
+      },
+    );
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -42,10 +75,7 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
         title: ChatDetailTitleWidget(conversationId: widget.conversationId),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(1),
-          child: Container(
-            color: AppColors.borderSubtle,
-            height: 1,
-          ),
+          child: Container(color: AppColors.borderSubtle, height: 1),
         ),
       ),
       body: Column(
@@ -57,23 +87,30 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
                   return Center(
                     child: Text(
                       'No messages yet',
-                      style: AppTextStyles.bodyMd.copyWith(color: AppColors.textSecondary),
+                      style: AppTextStyles.bodyMd.copyWith(
+                        color: AppColors.textSecondary,
+                      ),
                     ),
                   );
                 }
                 return RefreshIndicator(
                   onRefresh: () async {
                     ref.invalidate(chatDetailProvider(widget.conversationId));
-                    await ref.read(chatDetailProvider(widget.conversationId).future);
+                    await ref.read(
+                      chatDetailProvider(widget.conversationId).future,
+                    );
+                    _scrollToBottom(animate: false);
                   },
                   child: ListView.builder(
+                    controller: _scrollController,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     itemCount: messages.length,
                     itemBuilder: (context, index) {
                       final message = messages[index];
-                      final isMe = authState is AuthStateAuthenticated && 
-                                   message.senderId == authState.user.id;
-                      
+                      final isMe =
+                          authState is AuthStateAuthenticated &&
+                          message.senderId == authState.user.id;
+
                       if (message.type == 'system') {
                         return Center(
                           child: Padding(
@@ -87,28 +124,46 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
                           ),
                         );
                       }
-                      
+
                       if (message.type == 'quote_request') {
-                        return const QuoteRequestWidget();
+                        final reqId = message.quoteRequest?['quoteRequestId'];
+                        return QuoteRequestWidget(quoteRequestId: reqId);
                       }
-                      
+
+                      if (message.type == 'quote') {
+                        return CustomQuoteWidget(
+                          message: message,
+                          conversationId: widget.conversationId,
+                          isMe: isMe,
+                        );
+                      }
+
                       return Align(
-                        alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
+                        alignment: isMe
+                            ? Alignment.centerRight
+                            : Alignment.centerLeft,
                         child: Container(
                           margin: EdgeInsets.only(
                             right: isMe ? 16 : 64,
                             left: isMe ? 64 : 16,
                             bottom: 16,
                           ),
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 12,
+                          ),
                           decoration: BoxDecoration(
-                            color: isMe ? const Color(0xFFE5F1EF) : AppColors.surfaceMuted,
+                            color: isMe
+                                ? const Color(0xFFE5F1EF)
+                                : AppColors.surfaceMuted,
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Text(
                             message.text ?? '',
                             style: AppTextStyles.bodyMd.copyWith(
-                              color: isMe ? const Color(0xFF15272A) : AppColors.textPrimary,
+                              color: isMe
+                                  ? const Color(0xFF15272A)
+                                  : AppColors.textPrimary,
                             ),
                           ),
                         ),
@@ -126,7 +181,7 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
               ),
             ),
           ),
-          
+
           // Bottom Input Bar
           SafeArea(
             child: Container(
@@ -145,18 +200,27 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
                         hintStyle: AppTextStyles.bodyMd.copyWith(
                           color: AppColors.textSecondary,
                         ),
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(24),
-                          borderSide: const BorderSide(color: AppColors.borderStrong),
+                          borderSide: const BorderSide(
+                            color: AppColors.borderStrong,
+                          ),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(24),
-                          borderSide: const BorderSide(color: AppColors.borderStrong),
+                          borderSide: const BorderSide(
+                            color: AppColors.borderStrong,
+                          ),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(24),
-                          borderSide: const BorderSide(color: AppColors.primary),
+                          borderSide: const BorderSide(
+                            color: AppColors.primary,
+                          ),
                         ),
                       ),
                     ),
@@ -167,9 +231,14 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
                       final text = _messageController.text.trim();
                       if (text.isNotEmpty) {
                         ref
-                            .read(chatDetailProvider(widget.conversationId).notifier)
+                            .read(
+                              chatDetailProvider(
+                                widget.conversationId,
+                              ).notifier,
+                            )
                             .sendMessage(text);
                         _messageController.clear();
+                        _scrollToBottom();
                       }
                     },
                     child: Container(
@@ -203,14 +272,18 @@ class ChatDetailTitleWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final conversationState = ref.watch(conversationDetailProvider(conversationId));
+    final conversationState = ref.watch(
+      conversationDetailProvider(conversationId),
+    );
 
     return conversationState.when(
       data: (conversation) {
-        final listingState = ref.watch(listingDetailProvider(conversation.listingId));
+        final listingState = ref.watch(
+          listingDetailProvider(conversation.listingId),
+        );
         return listingState.when(
           data: (listing) => Text(
-            listing.title ?? 'Unknown Listing',
+            listing.title,
             style: AppTextStyles.headlineSm.copyWith(
               color: AppColors.primary,
               fontWeight: FontWeight.bold,
@@ -223,7 +296,7 @@ class ChatDetailTitleWidget extends ConsumerWidget {
               fontWeight: FontWeight.bold,
             ),
           ),
-          error: (_, __) => Text(
+          error: (_, _) => Text(
             'Unknown',
             style: AppTextStyles.headlineSm.copyWith(
               color: AppColors.primary,
@@ -239,7 +312,7 @@ class ChatDetailTitleWidget extends ConsumerWidget {
           fontWeight: FontWeight.bold,
         ),
       ),
-      error: (_, __) => Text(
+      error: (_, _) => Text(
         'Unknown',
         style: AppTextStyles.headlineSm.copyWith(
           color: AppColors.primary,

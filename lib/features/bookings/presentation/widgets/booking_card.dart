@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../../../core/widgets/outlined_card.dart';
@@ -24,7 +23,7 @@ class BookingCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              BookingStatusBadge(status: booking.status ?? 'pending'),
+              BookingStatusBadge(status: booking.status ?? 'pending_advance'),
               if (booking.eventDate != null)
                 Text(
                   formatBookingDate(booking.eventDate!),

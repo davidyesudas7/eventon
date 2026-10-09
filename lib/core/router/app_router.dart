@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -211,6 +209,7 @@ GoRouter goRouter(Ref ref) {
                 routes: [
                   GoRoute(
                     path: ':id',
+                    parentNavigatorKey: _rootNavigatorKey,
                     builder: (context, state) {
                       final id = state.pathParameters['id']!;
                       return BookingDetailsScreen(id: id);

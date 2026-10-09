@@ -61,13 +61,31 @@ class ChatRepositoryImpl implements ChatRepository {
     }
   }
 
-  // @override
-  // Future<Either<Failure, void>> markAsRead(String conversationId) async {
-  //   try {
-  //     await apiClient.markConversationAsRead(conversationId);
-  //     return const Right(null);
-  //   } catch (e) {
-  //     return Left(ServerFailure(e.toString()));
-  //   }
-  // }
+  @override
+  Future<Either<Failure, MessageModel>> acceptQuote(
+    String conversationId,
+    String messageId,
+  ) async {
+    try {
+      final response = await apiClient.acceptQuote(conversationId, messageId);
+      log('Accept quote response: ${response.toString()}');
+      return Right(response);
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, MessageModel>> rejectQuote(
+    String conversationId,
+    String messageId,
+  ) async {
+    try {
+      final response = await apiClient.rejectQuote(conversationId, messageId);
+      log('Reject quote response: ${response.toString()}');
+      return Right(response);
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
 }

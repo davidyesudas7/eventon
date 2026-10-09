@@ -25,8 +25,16 @@ class BookingDetailsScreen extends ConsumerStatefulWidget {
 
 class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
   final TextEditingController _advanceController = TextEditingController();
+  final TextEditingController _balanceController = TextEditingController();
+  final TextEditingController _reviewController = TextEditingController();
+  final TextEditingController _disputeController = TextEditingController();
+
   RazorpayService? _razorpayService;
   bool _paymentReceived = false;
+  int _selectedRating = 5;
+  bool _isSubmittingReview = false;
+  bool _isSubmittingDispute = false;
+  bool _showDisputeForm = false;
 
   static const _payButtonColor = Color(0xFF155E56);
 
@@ -50,6 +58,8 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
           setState(() {
             _paymentReceived = true;
           });
+          ref.read(bookingDetailProvider(widget.id).notifier).refresh();
+          ref.read(bookingsProvider.notifier).refresh();
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Payment received successfully')),
           );
@@ -68,6 +78,9 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
   @override
   void dispose() {
     _advanceController.dispose();
+    _balanceController.dispose();
+    _reviewController.dispose();
+    _disputeController.dispose();
     super.dispose();
   }
 
@@ -75,8 +88,6 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
     if (amount <= 0) return;
     final messenger = ScaffoldMessenger.of(context);
 
-    // In a real app, this amount needs to be created as an order on backend
-    // But for this demo, we're just directly passing it to RazorpayService
     messenger.showSnackBar(
       SnackBar(
         content: Text('Proceeding to pay ${formatRupees(amount.toInt())}…'),
@@ -85,9 +96,82 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
 
     _razorpayService?.openCheckout(
       amount: amount,
-      prefillContact: '', // add contact if needed
+      prefillContact: '',
       prefillEmail: '',
-      orderId: b.id, // add email if needed
+      orderId: b.id,
+    );
+  }
+
+  Future<void> _submitReview(BookingModel b) async {
+    final comment = _reviewController.text.trim();
+    if (comment.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter your review comment')),
+      );
+      return;
+    }
+
+    setState(() => _isSubmittingReview = true);
+    final repo = ref.read(bookingRepositoryProvider);
+    final result = await repo.createReview(
+      bookingId: b.id,
+      rating: _selectedRating.toDouble(),
+      comment: comment,
+    );
+    if (!mounted) return;
+    setState(() => _isSubmittingReview = false);
+
+    result.fold(
+      (failure) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(failure.message)),
+        );
+      },
+      (_) {
+        _reviewController.clear();
+        ref.read(bookingDetailProvider(widget.id).notifier).refresh();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Review submitted successfully')),
+        );
+      },
+    );
+  }
+
+  Future<void> _submitDispute(BookingModel b) async {
+    final reason = _disputeController.text.trim();
+    if (reason.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please describe the issue')),
+      );
+      return;
+    }
+
+    setState(() => _isSubmittingDispute = true);
+    final repo = ref.read(bookingRepositoryProvider);
+    final result = await repo.disputeBooking(
+      bookingId: b.id,
+      reason: reason,
+    );
+    if (!mounted) return;
+    setState(() => _isSubmittingDispute = false);
+
+    result.fold(
+      (failure) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(failure.message)),
+        );
+      },
+      (_) {
+        setState(() => _showDisputeForm = false);
+        _disputeController.clear();
+        ref.read(bookingDetailProvider(widget.id).notifier).refresh();
+        ref.read(bookingsProvider.notifier).refresh();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Issue reported. Our team will review this booking.'),
+          ),
+        );
+      },
     );
   }
 
@@ -115,7 +199,6 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
       ),
     );
     if (confirmed == true && mounted) {
-      // TODO: call cancel booking API.
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text('Booking cancelled')));
@@ -156,12 +239,13 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
             ),
           ),
           data: (b) {
-            final statusStr = b.status?.toLowerCase() ?? 'pending';
+            final isAwaitingAdvance = b.isPendingAdvance;
+            final isConfirmed = b.isConfirmed;
+            final isInProgress = b.isInProgress;
+            final isCompleted = b.isCompleted;
+            final isDisputed = b.isDisputed;
             final canCancel =
-                statusStr == 'awaiting_advance' ||
-                statusStr == 'pending_advance' ||
-                statusStr == 'pending' ||
-                statusStr == 'confirmed';
+                (isAwaitingAdvance || isConfirmed) && !isDisputed;
 
             final serviceName = b.serviceName;
             final dateStr = b.eventDate != null
@@ -172,98 +256,533 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
             if (_advanceController.text.isEmpty && b.minAdvance > 0) {
               _advanceController.text = b.minAdvance.toInt().toString();
             }
+            _balanceController.text = b.effectiveBalance.toInt().toString();
 
-            final isAwaitingAdvance =
-                statusStr == 'pending' ||
-                statusStr == 'awaiting_advance' ||
-                statusStr == 'pending_advance';
-            final isInProgress = statusStr == 'in_progress';
-            final isCompleted = statusStr == 'completed';
-
-            return ListView(
-              padding: const EdgeInsets.fromLTRB(16, 24, 16, 24),
-              children: [
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: BookingStatusBadge(
-                    status: _mapStatusToEnum(statusStr),
-                  ),
-                ),
-                const SizedBox(height: 16),
-
-                // Summary card
-                OutlinedCard(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(serviceName, style: AppTextStyles.bodyMd),
-                      const SizedBox(height: 8),
-                      Row(
-                        children: [
-                          const Icon(
-                            Icons.calendar_today_outlined,
-                            size: 15,
-                            color: AppColors.textSecondary,
-                          ),
-                          const SizedBox(width: 6),
-                          Text(dateStr, style: AppTextStyles.bodyMd),
-                        ],
-                      ),
-                      const SizedBox(height: 10),
-                      Text(
-                        formatRupees(b.totalAmount.toInt()),
-                        style: AppTextStyles.headlineMd,
-                      ),
-                    ],
-                  ),
-                ),
-
-                if (isPaying)
-                  const Padding(
-                    padding: EdgeInsets.only(top: 24),
-                    child: Center(
-                      child: CircularProgressIndicator(
-                        color: AppColors.primary,
+            return RefreshIndicator(
+              onRefresh: () async {
+                await ref
+                    .read(bookingDetailProvider(widget.id).notifier)
+                    .refresh();
+              },
+              child: ListView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: const EdgeInsets.fromLTRB(16, 24, 16, 24),
+                children: [
+                  if (isDisputed)
+                    Text('Disputed', style: AppTextStyles.headlineMd)
+                  else if (isCompleted)
+                    Text('Completed', style: AppTextStyles.headlineMd)
+                  else
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: BookingStatusBadge(
+                        status: b.status ?? 'pending_advance',
                       ),
                     ),
-                  )
-                else if (isAwaitingAdvance) ...[
-                  const SizedBox(height: 15),
-                  if (b.paidAmount > 0 || _paymentReceived) ...[
-                    Text(
-                      'Payment received. This booking will be updated when your payment is cleared.',
-                      style: AppTextStyles.bodySm.copyWith(),
-                    ),
-                  ],
+                  const SizedBox(height: 16),
+
+                  // Summary card
                   OutlinedCard(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Pay advance', style: AppTextStyles.labelLg),
-                        const SizedBox(height: 4),
-                        Text(
-                          'Minimum advance: ${formatRupees(b.minAdvance.toInt())} (20%)',
-                          style: AppTextStyles.bodySm,
-                        ),
-                        const SizedBox(height: 10),
+                        Text(serviceName, style: AppTextStyles.bodyMd),
+                        const SizedBox(height: 8),
                         Row(
                           children: [
-                            Expanded(
-                              child: TextField(
-                                controller: _advanceController,
-                                keyboardType: TextInputType.number,
-                                inputFormatters: [
-                                  FilteringTextInputFormatter.digitsOnly,
-                                ],
-                                style: AppTextStyles.bodyLg.copyWith(
-                                  color: AppColors.textPrimary,
-                                ),
-                                decoration: InputDecoration(
-                                  isDense: true,
-                                  contentPadding: const EdgeInsets.symmetric(
-                                    horizontal: 16,
-                                    vertical: 12,
+                            const Icon(
+                              Icons.calendar_today_outlined,
+                              size: 15,
+                              color: AppColors.textSecondary,
+                            ),
+                            const SizedBox(width: 6),
+                            Text(dateStr, style: AppTextStyles.bodyMd),
+                          ],
+                        ),
+                        const SizedBox(height: 10),
+                        Text(
+                          formatRupees(b.totalAmount.toInt()),
+                          style: AppTextStyles.headlineMd,
+                        ),
+                        if (isCompleted || isDisputed) ...[
+                          const SizedBox(height: 8),
+                          Text(
+                            'Advance paid: ${formatRupees(b.paidAmount.toInt())}',
+                            style: AppTextStyles.bodySm.copyWith(
+                              color: AppColors.textSecondary,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            'Balance settled: ${formatRupees(b.effectiveBalance.toInt())}',
+                            style: AppTextStyles.bodySm.copyWith(
+                              color: AppColors.textSecondary,
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+
+                  if (isPaying)
+                    const Padding(
+                      padding: EdgeInsets.only(top: 24),
+                      child: Center(
+                        child: CircularProgressIndicator(
+                          color: AppColors.primary,
+                        ),
+                      ),
+                    )
+                  else if (isAwaitingAdvance) ...[
+                    const SizedBox(height: 15),
+                    if (_paymentReceived) ...[
+                      Text(
+                        'Payment received. This booking will be updated when your payment is cleared.',
+                        style: AppTextStyles.bodySm.copyWith(
+                          color: AppColors.primary,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                    ],
+                    OutlinedCard(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Pay advance', style: AppTextStyles.labelLg),
+                          const SizedBox(height: 4),
+                          Text(
+                            'Minimum advance: ${formatRupees(b.minAdvance.toInt())} (${b.minAdvancePercent?.toInt() ?? 20}%)',
+                            style: AppTextStyles.bodySm,
+                          ),
+                          const SizedBox(height: 10),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: TextField(
+                                  controller: _advanceController,
+                                  keyboardType: TextInputType.number,
+                                  inputFormatters: [
+                                    FilteringTextInputFormatter.digitsOnly,
+                                  ],
+                                  style: AppTextStyles.bodyLg.copyWith(
+                                    color: AppColors.textPrimary,
                                   ),
+                                  decoration: InputDecoration(
+                                    isDense: true,
+                                    contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: 16,
+                                      vertical: 12,
+                                    ),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      borderSide: const BorderSide(
+                                        color: AppColors.borderSubtle,
+                                      ),
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      borderSide: const BorderSide(
+                                        color: AppColors.primary,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              SizedBox(
+                                height: 46,
+                                child: ElevatedButton.icon(
+                                  onPressed: () {
+                                    final amount =
+                                        double.tryParse(
+                                          _advanceController.text.trim(),
+                                        ) ??
+                                        0;
+                                    if (amount < b.minAdvance) {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                            'Minimum advance is ${formatRupees(b.minAdvance.toInt())}',
+                                          ),
+                                        ),
+                                      );
+                                      return;
+                                    }
+                                    _payNow(b, amount);
+                                  },
+                                  icon: const Icon(Icons.lock_outline, size: 16),
+                                  label: const Text('Pay now'),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: _payButtonColor,
+                                    foregroundColor: Colors.white,
+                                    elevation: 0,
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 22,
+                                    ),
+                                    shape: const StadiumBorder(),
+                                    textStyle: AppTextStyles.labelLg.copyWith(
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ] else if (isConfirmed) ...[
+                    const SizedBox(height: 16),
+                    OutlinedCard(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Advance captured', style: AppTextStyles.labelLg),
+                          const SizedBox(height: 8),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text('Advance paid', style: AppTextStyles.bodyMd),
+                              Text(
+                                formatRupees(b.paidAmount.toInt()),
+                                style: AppTextStyles.bodyMd.copyWith(
+                                  color: AppColors.primary,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 6),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text('Remaining balance', style: AppTextStyles.bodyMd),
+                              Text(
+                                formatRupees(b.effectiveBalance.toInt()),
+                                style: AppTextStyles.bodyMd,
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 10),
+                          Text(
+                            'Your booking is confirmed! The balance payment can be settled on the event day.',
+                            style: AppTextStyles.bodySm.copyWith(
+                              color: AppColors.textSecondary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ] else if (isInProgress) ...[
+                    const SizedBox(height: 24),
+                    if (_paymentReceived) ...[
+                      Text(
+                        'Payment received. This booking will be updated when your payment is cleared.',
+                        style: AppTextStyles.bodySm.copyWith(
+                          color: AppColors.primary,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                    ],
+                    if (b.effectiveBalance > 0)
+                      OutlinedCard(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('Pay balance', style: AppTextStyles.labelLg),
+                            const SizedBox(height: 4),
+                            Text(
+                              'Balance amount: ${formatRupees(b.effectiveBalance.toInt())}',
+                              style: AppTextStyles.bodySm,
+                            ),
+                            const SizedBox(height: 10),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: TextField(
+                                    controller: _balanceController,
+                                    readOnly: true,
+                                    keyboardType: TextInputType.number,
+                                    style: AppTextStyles.bodyLg.copyWith(
+                                      color: AppColors.textPrimary,
+                                    ),
+                                    decoration: InputDecoration(
+                                      isDense: true,
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
+                                        horizontal: 16,
+                                        vertical: 12,
+                                      ),
+                                      enabledBorder: OutlineInputBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(12),
+                                        borderSide: const BorderSide(
+                                          color: AppColors.borderSubtle,
+                                        ),
+                                      ),
+                                      focusedBorder: OutlineInputBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(12),
+                                        borderSide: const BorderSide(
+                                          color: AppColors.borderSubtle,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 10),
+                                SizedBox(
+                                  height: 46,
+                                  child: ElevatedButton.icon(
+                                    onPressed: () =>
+                                        _payNow(b, b.effectiveBalance),
+                                    icon: const Icon(
+                                      Icons.lock_outline,
+                                      size: 16,
+                                    ),
+                                    label: const Text('Pay now'),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: _payButtonColor,
+                                      foregroundColor: Colors.white,
+                                      elevation: 0,
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 22,
+                                      ),
+                                      shape: const StadiumBorder(),
+                                      textStyle: AppTextStyles.labelLg.copyWith(
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      )
+                    else
+                      OutlinedCard(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('Payment status', style: AppTextStyles.labelLg),
+                            const SizedBox(height: 8),
+                            Text(
+                              'Balance is settled. The event is in progress.',
+                              style: AppTextStyles.bodyMd,
+                            ),
+                          ],
+                        ),
+                      ),
+                  ] else if (isDisputed) ...[
+                    const SizedBox(height: 24),
+                    Text(
+                      'This booking is under review by our team.',
+                      style: AppTextStyles.bodyMd.copyWith(
+                        color: const Color(0xFF475569),
+                      ),
+                    ),
+                  ] else if (isCompleted) ...[
+                    if (b.isDisputeResolved) ...[
+                      const SizedBox(height: 16),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 12,
+                        ),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF1F5F9),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: const Color(0xFFE2E8F0),
+                          ),
+                        ),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Icon(
+                              Icons.verified_outlined,
+                              size: 18,
+                              color: Color(0xFF155E56),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                'Dispute resolved: ${b.disputeResolution ?? 'Resolved by our team'}',
+                                style: AppTextStyles.bodySm.copyWith(
+                                  color: const Color(0xFF334155),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                    if (b.reviewedAt == null) ...[
+                      const SizedBox(height: 24),
+                      OutlinedCard(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Leave a review',
+                              style: AppTextStyles.labelLg.copyWith(
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            Row(
+                              children: List.generate(5, (index) {
+                                final isSelected = index < _selectedRating;
+                                return GestureDetector(
+                                  onTap: () {
+                                    setState(() {
+                                      _selectedRating = index + 1;
+                                    });
+                                  },
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(right: 6),
+                                    child: Icon(
+                                      isSelected
+                                          ? Icons.star_rounded
+                                          : Icons.star_outline_rounded,
+                                      size: 28,
+                                      color: const Color(0xFF155E56),
+                                    ),
+                                  ),
+                                );
+                              }),
+                            ),
+                            const SizedBox(height: 16),
+                            TextField(
+                              controller: _reviewController,
+                              maxLines: 4,
+                              minLines: 3,
+                              decoration: InputDecoration(
+                                hintText: 'How did it go?',
+                                hintStyle: AppTextStyles.bodyMd.copyWith(
+                                  color: AppColors.textSecondary,
+                                ),
+                                contentPadding: const EdgeInsets.all(14),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: const BorderSide(
+                                    color: AppColors.borderSubtle,
+                                  ),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: const BorderSide(
+                                    color: Color(0xFF155E56),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            SizedBox(
+                              width: double.infinity,
+                              height: 46,
+                              child: ElevatedButton(
+                                onPressed: _isSubmittingReview
+                                    ? null
+                                    : () => _submitReview(b),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFF155E56),
+                                  foregroundColor: Colors.white,
+                                  elevation: 0,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  textStyle: AppTextStyles.labelLg.copyWith(
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                child: _isSubmittingReview
+                                    ? const SizedBox(
+                                        width: 20,
+                                        height: 20,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          color: Colors.white,
+                                        ),
+                                      )
+                                    : const Text('Submit review'),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ] else ...[
+                      const SizedBox(height: 16),
+                      Row(
+                        children: [
+                          const Icon(
+                            Icons.check_circle_rounded,
+                            size: 18,
+                            color: Color(0xFF155E56),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            'You reviewed this booking',
+                            style: AppTextStyles.bodySm.copyWith(
+                              color: AppColors.textSecondary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+
+                    if (b.disputedAt == null) ...[
+                      const SizedBox(height: 20),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _showDisputeForm = !_showDisputeForm;
+                            });
+                          },
+                          child: Text(
+                            'Report an issue with this booking',
+                            style: AppTextStyles.bodySm.copyWith(
+                              color: const Color(0xFF475569),
+                              decoration: TextDecoration.underline,
+                              decorationColor: const Color(0xFF94A3B8),
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      if (_showDisputeForm) ...[
+                        const SizedBox(height: 16),
+                        OutlinedCard(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Report an issue',
+                                style: AppTextStyles.labelLg.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              const SizedBox(height: 6),
+                              Text(
+                                'Describe what went wrong with this booking.',
+                                style: AppTextStyles.bodySm.copyWith(
+                                  color: AppColors.textSecondary,
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                              TextField(
+                                controller: _disputeController,
+                                maxLines: 4,
+                                minLines: 3,
+                                decoration: InputDecoration(
+                                  hintText: 'What went wrong?',
+                                  hintStyle: AppTextStyles.bodyMd.copyWith(
+                                    color: AppColors.textSecondary,
+                                  ),
+                                  contentPadding: const EdgeInsets.all(14),
                                   enabledBorder: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(12),
                                     borderSide: const BorderSide(
@@ -273,174 +792,77 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
                                   focusedBorder: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(12),
                                     borderSide: const BorderSide(
-                                      color: AppColors.primary,
+                                      color: AppColors.error,
                                     ),
                                   ),
                                 ),
                               ),
-                            ),
-                            const SizedBox(width: 10),
-                            SizedBox(
-                              height: 46,
-                              child: ElevatedButton.icon(
-                                onPressed: () {
-                                  final amount =
-                                      double.tryParse(
-                                        _advanceController.text.trim(),
-                                      ) ??
-                                      0;
-                                  if (amount < b.minAdvance) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text(
-                                          'Minimum advance is ${formatRupees(b.minAdvance.toInt())}',
-                                        ),
+                              const SizedBox(height: 14),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  TextButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        _showDisputeForm = false;
+                                      });
+                                    },
+                                    child: const Text('Cancel'),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  ElevatedButton(
+                                    onPressed: _isSubmittingDispute
+                                        ? null
+                                        : () => _submitDispute(b),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: const Color(0xFFC2410C),
+                                      foregroundColor: Colors.white,
+                                      elevation: 0,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8),
                                       ),
-                                    );
-                                    return;
-                                  }
-                                  _payNow(b, amount);
-                                },
-                                icon: const Icon(Icons.lock_outline, size: 16),
-                                label: const Text('Pay now'),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: _payButtonColor,
-                                  foregroundColor: Colors.white,
-                                  elevation: 0,
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 22,
+                                    ),
+                                    child: _isSubmittingDispute
+                                        ? const SizedBox(
+                                            width: 18,
+                                            height: 18,
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 2,
+                                              color: Colors.white,
+                                            ),
+                                          )
+                                        : const Text('Submit report'),
                                   ),
-                                  shape: const StadiumBorder(),
-                                  textStyle: AppTextStyles.labelLg.copyWith(
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
+                                ],
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ],
-                    ),
-                  ),
-                ] else if (isInProgress) ...[
-                  const SizedBox(height: 24),
-                  if ((b.paidAmount > 0 && (b.balanceAmount ?? 0) > 0) ||
-                      _paymentReceived) ...[
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      margin: const EdgeInsets.only(bottom: 16),
-                      decoration: BoxDecoration(
-                        color: AppColors.surfaceMintPill,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(
-                        'Payment received. This booking will be updated when your payment is cleared.',
-                        style: AppTextStyles.bodySm.copyWith(
-                          color: AppColors.primary,
+                    ],
+                  ],
+
+                  if (canCancel) ...[
+                    const SizedBox(height: 20),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: GestureDetector(
+                        onTap: () => _cancelBooking(b),
+                        child: Text(
+                          'Cancel booking',
+                          style: AppTextStyles.bodyMd.copyWith(
+                            color: const Color(0xFFC2410C),
+                          ),
                         ),
                       ),
                     ),
                   ],
-                  if ((b.balanceAmount ?? 0) > 0)
-                    OutlinedCard(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('Pay balance', style: AppTextStyles.labelLg),
-                          const SizedBox(height: 4),
-                          Text(
-                            'Balance amount: ${formatRupees((b.balanceAmount ?? 0).toInt())}',
-                            style: AppTextStyles.bodySm,
-                          ),
-                          const SizedBox(height: 10),
-                          SizedBox(
-                            width: double.infinity,
-                            height: 46,
-                            child: ElevatedButton.icon(
-                              onPressed: () => _payNow(b, b.balanceAmount ?? 0),
-                              icon: const Icon(Icons.lock_outline, size: 16),
-                              label: const Text('Pay now'),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: _payButtonColor,
-                                foregroundColor: Colors.white,
-                                elevation: 0,
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 22,
-                                ),
-                                shape: const StadiumBorder(),
-                                textStyle: AppTextStyles.labelLg.copyWith(
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                ] else if (isCompleted) ...[
-                  const SizedBox(height: 24),
-                  OutlinedCard(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('Payment summary', style: AppTextStyles.labelLg),
-                        const SizedBox(height: 12),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text('Total amount', style: AppTextStyles.bodyMd),
-                            Text(
-                              formatRupees(b.totalAmount.toInt()),
-                              style: AppTextStyles.bodyMd,
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text('Amount paid', style: AppTextStyles.bodyMd),
-                            Text(
-                              formatRupees(b.paidAmount.toInt()),
-                              style: AppTextStyles.bodyMd,
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
                 ],
-
-                if (canCancel) ...[
-                  const SizedBox(height: 20),
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: GestureDetector(
-                      onTap: () => _cancelBooking(b),
-                      child: Text(
-                        'Cancel booking',
-                        style: AppTextStyles.bodyMd.copyWith(
-                          color: const Color(0xFFC2410C),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ],
+              ),
             );
           },
         ),
       ),
     );
-  }
-
-  // Temporary enum mapping
-  dynamic _mapStatusToEnum(String status) {
-    // Return dummy enum value that matches BookingStatusBadge requirements
-    // This assumes BookingStatusBadge was using the old BookingStatus enum.
-    // If BookingStatusBadge takes a String, this can be simplified.
-    // We'll return null to let the badge fallback if needed, or define a local mapping.
-    // Let's just return a String if the badge accepts it, otherwise we might need to modify the badge.
-    return status;
   }
 }

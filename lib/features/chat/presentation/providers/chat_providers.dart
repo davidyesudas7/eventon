@@ -1,4 +1,3 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../core/network/api_providers.dart';
@@ -47,22 +46,41 @@ class ConversationsNotifier extends _$ConversationsNotifier {
 class ChatDetailNotifier extends _$ChatDetailNotifier {
   @override
   FutureOr<List<MessageModel>> build(String conversationId) async {
-    // Listen to socket for new messages
     final socketService = ref.watch(socketServiceProvider);
-    
+
+    // 1. Connect to socket with auth token and join conversation room
+    final token = await ref.read(tokenStorageProvider).getAccessToken();
+    if (token != null) {
+      socketService.connect(
+        token: token,
+        conversationId: conversationId,
+      );
+    }
+
+    // 2. Listen to socket message event with deduplication
     final subscription = socketService.messageStream.listen((data) {
-      final newMessage = MessageModel.fromJson(data);
-      if (newMessage.conversationId == conversationId) {
-         final currentState = state.value ?? [];
-         // Add new message to the list (assuming latest at the bottom)
-         state = AsyncValue.data([...currentState, newMessage]); 
+      try {
+        final newMessage = MessageModel.fromJson(data);
+        if (newMessage.conversationId == conversationId) {
+          final currentState = state.value ?? [];
+          // Deduplication: prevent adding if message ID already exists
+          if (currentState.any((m) => m.id == newMessage.id)) {
+            return;
+          }
+          state = AsyncValue.data([...currentState, newMessage]);
+        }
+      } catch (e) {
+        // Catch parsing error if payload format differs
       }
     });
 
+    // 3. Lifecycle: Cancel listener and disconnect socket on dispose
     ref.onDispose(() {
       subscription.cancel();
+      socketService.disconnect();
     });
 
+    // 4. Initial load of messages via REST API
     return _fetchMessages(conversationId);
   }
 
@@ -78,16 +96,42 @@ class ChatDetailNotifier extends _$ChatDetailNotifier {
   Future<void> sendMessage(String text) async {
     final repository = ref.read(chatRepositoryProvider);
     final result = await repository.sendMessage(conversationId, text);
-    
+
     result.fold(
       (failure) {
         throw Exception(failure.message);
       },
       (newMessage) {
-        // The backend might echo the message via socket, 
-        // but if we want it to show immediately, we can uncomment below:
-        // final currentState = state.value ?? [];
-        // state = AsyncValue.data([...currentState, newMessage]);
+        final currentState = state.value ?? [];
+        if (!currentState.any((m) => m.id == newMessage.id)) {
+          state = AsyncValue.data([...currentState, newMessage]);
+        }
+      },
+    );
+  }
+
+  Future<MessageModel> respondToQuote({
+    required String messageId,
+    required bool accept,
+  }) async {
+    final repository = ref.read(chatRepositoryProvider);
+    final result = accept
+        ? await repository.acceptQuote(conversationId, messageId)
+        : await repository.rejectQuote(conversationId, messageId);
+
+    return result.fold(
+      (failure) {
+        throw Exception(failure.message);
+      },
+      (updatedMessage) {
+        final currentMessages = state.value ?? [];
+        final index = currentMessages.indexWhere((m) => m.id == messageId);
+        if (index != -1) {
+          final updatedList = List<MessageModel>.from(currentMessages);
+          updatedList[index] = updatedMessage;
+          state = AsyncValue.data(updatedList);
+        }
+        return updatedMessage;
       },
     );
   }

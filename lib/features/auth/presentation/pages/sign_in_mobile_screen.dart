@@ -17,6 +17,7 @@ class SignInMobileScreen extends ConsumerStatefulWidget {
 class _SignInMobileScreenState extends ConsumerState<SignInMobileScreen> {
   final TextEditingController _phoneController = TextEditingController();
   bool _isLoading = false;
+  bool _isSignUp = false;
 
   @override
   void dispose() {
@@ -198,12 +199,14 @@ class _SignInMobileScreenState extends ConsumerState<SignInMobileScreen> {
                 const SizedBox(height: 48),
 
                 Text(
-                  'Sign in',
+                  _isSignUp ? 'Create account' : 'Sign in',
                   style: AppTextStyles.headlineXl.copyWith(fontSize: 28),
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Welcome back to EventOn.',
+                  _isSignUp
+                      ? 'Join EventOn today.'
+                      : 'Welcome back to EventOn.',
                   style: AppTextStyles.bodyLg.copyWith(
                     color: AppColors.textSecondary,
                   ),
@@ -338,7 +341,13 @@ class _SignInMobileScreenState extends ConsumerState<SignInMobileScreen> {
 
                 Center(
                   child: TextButton(
-                    onPressed: () => context.push('/sign-in-email'),
+                    onPressed: () {
+                      if (_isSignUp) {
+                        context.push('/sign-up-email');
+                      } else {
+                        context.push('/sign-in-email');
+                      }
+                    },
                     child: Text(
                       'Use email and password instead',
                       style: AppTextStyles.bodyMd.copyWith(
@@ -358,15 +367,21 @@ class _SignInMobileScreenState extends ConsumerState<SignInMobileScreen> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            'New to EventOn? ',
+                            _isSignUp
+                                ? 'Already have an account? '
+                                : 'New to EventOn? ',
                             style: AppTextStyles.bodyMd.copyWith(
                               color: AppColors.textSecondary,
                             ),
                           ),
                           GestureDetector(
-                            onTap: () => context.push('/sign-up-email'),
+                            onTap: () {
+                              setState(() {
+                                _isSignUp = !_isSignUp;
+                              });
+                            },
                             child: Text(
-                              'Create an account',
+                              _isSignUp ? 'Sign in' : 'Create an account',
                               style: AppTextStyles.labelLg.copyWith(
                                 decoration: TextDecoration.underline,
                               ),

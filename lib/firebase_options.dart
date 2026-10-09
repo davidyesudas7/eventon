@@ -34,13 +34,13 @@ class DefaultFirebaseOptions {
     storageBucket: 'eventon-app.appspot.com',
   );
 
-  // TODO: Insert your Firebase Android options here (or rely on google-services.json)
+  // Android options extracted from google-services.json
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'YOUR_ANDROID_API_KEY',
-    appId: 'YOUR_ANDROID_APP_ID',
-    messagingSenderId: 'YOUR_MESSAGING_SENDER_ID',
-    projectId: 'eventon-app',
-    storageBucket: 'eventon-app.appspot.com',
+    apiKey: 'AIzaSyCmFM8V-wEHASj1JxfXeV3raFyfBEIENy0',
+    appId: '1:220479295788:android:5a1a2259d043ceaa15dc89',
+    messagingSenderId: '220479295788',
+    projectId: 'event-on-e975f',
+    storageBucket: 'event-on-e975f.firebasestorage.app',
   );
 
   // TODO: Insert your Firebase iOS options here (or rely on GoogleService-Info.plist)

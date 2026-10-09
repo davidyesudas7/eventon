@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:dartz/dartz.dart';
 import '../../../../core/error/failures.dart';
 import '../../../../core/network/api_client.dart';
@@ -10,9 +12,13 @@ class QuotesRepositoryImpl implements QuotesRepository {
   QuotesRepositoryImpl(this.apiClient);
 
   @override
-  Future<Either<Failure, QuoteRequestModel>> createQuoteRequest(Map<String, dynamic> body) async {
+  Future<Either<Failure, QuoteRequestModel>> createQuoteRequest(
+    Map<String, dynamic> body,
+  ) async {
     try {
+      log(body.toString());
       final response = await apiClient.createQuoteRequest(body);
+
       return Right(response);
     } catch (e) {
       return Left(ServerFailure(e.toString()));
@@ -30,7 +36,9 @@ class QuotesRepositoryImpl implements QuotesRepository {
   }
 
   @override
-  Future<Either<Failure, QuoteRequestModel>> getQuoteRequestById(String id) async {
+  Future<Either<Failure, QuoteRequestModel>> getQuoteRequestById(
+    String id,
+  ) async {
     try {
       final response = await apiClient.getQuoteRequestById(id);
       return Right(response);

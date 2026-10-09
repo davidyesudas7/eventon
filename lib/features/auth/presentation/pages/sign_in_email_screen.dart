@@ -280,7 +280,7 @@ class _SignInEmailScreenState extends ConsumerState<SignInEmailScreen> {
                           ),
                         ),
                         GestureDetector(
-                          onTap: () => context.push('/sign-up-email'),
+                          onTap: () => context.go('/sign-in-mobile'),
                           child: Text(
                             'Create an account',
                             style: AppTextStyles.labelLg.copyWith(

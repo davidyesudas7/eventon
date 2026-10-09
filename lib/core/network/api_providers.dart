@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'api_client.dart';
 import 'auth_interceptor.dart';
@@ -16,7 +17,7 @@ TokenStorage tokenStorage(Ref ref) {
 @riverpod
 Dio dio(Ref ref) {
   final tokenStorage = ref.watch(tokenStorageProvider);
-  final baseUrl = "https://api.eventongo.in";
+  final baseUrl = dotenv.env['BASE_URL']!;
 
   final refreshDio = Dio(
     BaseOptions(
@@ -50,7 +51,9 @@ Dio dio(Ref ref) {
   dio.interceptors.add(
     InterceptorsWrapper(
       onResponse: (response, handler) {
-        print('API Response [${response.requestOptions.path}]: ${response.data}');
+        print(
+          'API Response [${response.requestOptions.path}]: ${response.data}',
+        );
         handler.next(response);
       },
       onError: (DioException e, handler) {

@@ -19,14 +19,19 @@ class BookingsNotifier extends _$BookingsNotifier {
   }
 
   Future<List<BookingModel>> _fetchBookings() async {
+    if (!ref.mounted) return [];
     final repo = ref.read(bookingRepositoryProvider);
     final result = await repo.getBookings();
+    if (!ref.mounted) return [];
     return result.fold((l) => throw l, (r) => r);
   }
 
   Future<void> refresh() async {
+    if (!ref.mounted) return;
     state = const AsyncValue.loading();
-    state = await AsyncValue.guard(_fetchBookings);
+    final res = await AsyncValue.guard(_fetchBookings);
+    if (!ref.mounted) return;
+    state = res;
   }
 }
 
@@ -38,14 +43,19 @@ class BookingDetailNotifier extends _$BookingDetailNotifier {
   }
 
   Future<BookingModel> _fetchBooking(String id) async {
+    if (!ref.mounted) throw 'Disposed';
     final repo = ref.read(bookingRepositoryProvider);
     final result = await repo.getBookingById(id);
+    if (!ref.mounted) throw 'Disposed';
     return result.fold((l) => throw l, (r) => r);
   }
 
   Future<void> refresh() async {
+    if (!ref.mounted) return;
     state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() => _fetchBooking(id));
+    final res = await AsyncValue.guard(() => _fetchBooking(id));
+    if (!ref.mounted) return;
+    state = res;
   }
 }
 
@@ -65,10 +75,13 @@ class CreateBookingNotifier extends _$CreateBookingNotifier {
       packageId: packageId,
       eventDate: eventDate,
     );
+    if (!ref.mounted) return null;
     state = false;
 
     return result.fold((l) => null, (r) {
-      ref.invalidate(bookingsProvider);
+      if (ref.mounted) {
+        ref.invalidate(bookingsProvider);
+      }
       return r;
     });
   }
@@ -86,11 +99,14 @@ class PayBookingNotifier extends _$PayBookingNotifier {
     state = true;
     final repo = ref.read(bookingRepositoryProvider);
     final result = await repo.payBooking(id: id, paymentData: paymentData);
+    if (!ref.mounted) return false;
     state = false;
 
     return result.fold((l) => false, (r) {
-      ref.invalidate(bookingDetailProvider(id));
-      ref.invalidate(bookingsProvider);
+      if (ref.mounted) {
+        ref.invalidate(bookingDetailProvider(id));
+        ref.invalidate(bookingsProvider);
+      }
       return true;
     });
   }

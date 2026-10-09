@@ -24,6 +24,17 @@ BookingModel _$BookingModelFromJson(Map<String, dynamic> json) => BookingModel(
   createdAt: json['createdAt'] == null
       ? null
       : DateTime.parse(json['createdAt'] as String),
+  reviewedAt: json['reviewedAt'] == null
+      ? null
+      : DateTime.parse(json['reviewedAt'] as String),
+  disputedAt: json['disputedAt'] == null
+      ? null
+      : DateTime.parse(json['disputedAt'] as String),
+  disputeReason: json['disputeReason'] as String?,
+  disputeResolvedAt: json['disputeResolvedAt'] == null
+      ? null
+      : DateTime.parse(json['disputeResolvedAt'] as String),
+  disputeResolution: json['disputeResolution'] as String?,
 );
 
 Map<String, dynamic> _$BookingModelToJson(BookingModel instance) =>
@@ -41,4 +52,9 @@ Map<String, dynamic> _$BookingModelToJson(BookingModel instance) =>
       'conversationId': instance.conversationId,
       'minAdvancePercent': instance.minAdvancePercent,
       'createdAt': instance.createdAt?.toIso8601String(),
+      'reviewedAt': instance.reviewedAt?.toIso8601String(),
+      'disputedAt': instance.disputedAt?.toIso8601String(),
+      'disputeReason': instance.disputeReason,
+      'disputeResolvedAt': instance.disputeResolvedAt?.toIso8601String(),
+      'disputeResolution': instance.disputeResolution,
     };

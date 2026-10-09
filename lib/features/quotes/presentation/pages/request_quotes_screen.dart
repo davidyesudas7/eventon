@@ -56,11 +56,11 @@ class _RequestQuotesScreenState extends ConsumerState<RequestQuotesScreen> {
       
       final Map<String, dynamic> body = {
         'listingIds': quoteItems.map((q) => q.id).toList(),
-        if (_selectedDate != null) 'eventDate': _selectedDate!.toIso8601String(),
+        if (_selectedDate != null) 'eventDate': _selectedDate!.toIso8601String().substring(0, 10),
         if (_guestsController.text.isNotEmpty) 'guestCount': int.tryParse(_guestsController.text),
         if (_budgetController.text.isNotEmpty) 'budget': num.tryParse(_budgetController.text),
-        if (_whereController.text.isNotEmpty) 'location': _whereController.text,
-        if (_requirementsController.text.isNotEmpty) 'requirements': _requirementsController.text,
+        if (_whereController.text.isNotEmpty) 'eventLocation': _whereController.text,
+        if (_requirementsController.text.isNotEmpty) 'message': _requirementsController.text,
       };
 
       try {

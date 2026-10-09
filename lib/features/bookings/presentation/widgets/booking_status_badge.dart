@@ -21,8 +21,13 @@ class BookingStatusBadge extends StatelessWidget {
         fg = AppColors.brandDeep;
         label = 'Awaiting advance';
         break;
-      case 'confirmed':
       case 'in_progress':
+      case 'inprogress':
+        bg = const Color(0xFFFEF3C7);
+        fg = const Color(0xFF92400E);
+        label = 'In progress';
+        break;
+      case 'confirmed':
         bg = AppColors.surfaceMintSubtle;
         fg = AppColors.primary;
         label = 'Confirmed';
@@ -36,6 +41,11 @@ class BookingStatusBadge extends StatelessWidget {
         bg = AppColors.errorContainer;
         fg = AppColors.onErrorContainer;
         label = 'Cancelled';
+        break;
+      case 'disputed':
+        bg = const Color(0xFFFEE2E2);
+        fg = const Color(0xFF991B1B);
+        label = 'Disputed';
         break;
       default:
         bg = AppColors.surfaceMuted;
