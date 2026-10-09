@@ -8,12 +8,15 @@ part of 'search_result_model.dart';
 
 SearchListingModel _$SearchListingModelFromJson(Map<String, dynamic> json) =>
     SearchListingModel(
-      id: json['id'] as String,
-      title: json['title'] as String,
-      categoryId: json['categoryId'] as String,
+      id: json['id'] as String? ?? '',
+      title: json['title'] as String? ?? '',
+      categoryId: json['categoryId'] as String? ?? '',
       description: json['description'] as String?,
       priceFrom: json['priceFrom'] as num?,
       media: json['media'] as Map<String, dynamic>?,
+      ratingAvg: (json['ratingAvg'] ?? json['rating']) as num?,
+      ratingCount: (json['ratingCount'] as num?)?.toInt(),
+      distanceMeters: json['distanceMeters'] as num?,
     );
 
 Map<String, dynamic> _$SearchListingModelToJson(SearchListingModel instance) =>
@@ -24,6 +27,9 @@ Map<String, dynamic> _$SearchListingModelToJson(SearchListingModel instance) =>
       'description': instance.description,
       'priceFrom': instance.priceFrom,
       'media': instance.media,
+      'ratingAvg': instance.ratingAvg,
+      'ratingCount': instance.ratingCount,
+      'distanceMeters': instance.distanceMeters,
     };
 
 SearchResultModel _$SearchResultModelFromJson(Map<String, dynamic> json) =>

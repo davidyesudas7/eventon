@@ -4,6 +4,7 @@ import '../../../../core/error/failures.dart';
 import '../../../../core/network/api_client.dart';
 import '../../domain/repositories/booking_repository.dart';
 import '../models/booking_model.dart';
+import '../models/payment_order_model.dart';
 import '../../../listings/data/models/review_model.dart';
 
 class BookingRepositoryImpl implements BookingRepository {
@@ -128,6 +129,55 @@ class BookingRepositoryImpl implements BookingRepository {
           e.response?.data['message'] ??
               e.message ??
               'Failed to report issue',
+        ),
+      );
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, PaymentOrderModel>> createPaymentOrder({
+    required String bookingId,
+    required String purpose,
+    required double amount,
+  }) async {
+    try {
+      final result = await apiClient.createPaymentOrder({
+        'bookingId': bookingId,
+        'purpose': purpose,
+        'amount': amount,
+      });
+      return Right(result);
+    } on DioException catch (e) {
+      return Left(
+        ServerFailure(
+          e.response?.data['message'] ??
+              e.message ??
+              'Failed to create payment order',
+        ),
+      );
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, BookingModel>> cancelBooking({
+    required String bookingId,
+    required String reason,
+  }) async {
+    try {
+      final result = await apiClient.cancelBooking(bookingId, {
+        'reason': reason,
+      });
+      return Right(result);
+    } on DioException catch (e) {
+      return Left(
+        ServerFailure(
+          e.response?.data['message'] ??
+              e.message ??
+              'Failed to cancel booking',
         ),
       );
     } catch (e) {

@@ -2,7 +2,6 @@ import 'package:eventon/core/utils/formatters.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
@@ -12,6 +11,7 @@ import '../widgets/booking_status_badge.dart';
 import '../../data/models/booking_model.dart';
 import '../providers/booking_providers.dart';
 import '../../../../core/services/razor_pay_service.dart';
+import '../../../auth/presentation/providers/auth_providers.dart';
 
 class BookingDetailsScreen extends ConsumerStatefulWidget {
   const BookingDetailsScreen({super.key, required this.id});
@@ -35,6 +35,7 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
   bool _isSubmittingReview = false;
   bool _isSubmittingDispute = false;
   bool _showDisputeForm = false;
+  bool _isCreatingOrder = false;
 
   static const _payButtonColor = Color(0xFF155E56);
 
@@ -51,9 +52,12 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
           'razorpay_order_id': response.orderId,
           'razorpay_signature': response.signature,
         };
-        await ref
-            .read(payBookingProvider.notifier)
-            .payBooking(id: widget.id, paymentData: paymentData);
+        try {
+          await ref
+              .read(payBookingProvider.notifier)
+              .payBooking(id: widget.id, paymentData: paymentData);
+        } catch (_) {}
+
         if (mounted) {
           setState(() {
             _paymentReceived = true;
@@ -81,24 +85,69 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
     _balanceController.dispose();
     _reviewController.dispose();
     _disputeController.dispose();
+    _razorpayService?.dispose();
     super.dispose();
   }
 
-  void _payNow(BookingModel b, double amount) {
-    if (amount <= 0) return;
+  Future<void> _payNow(
+    BookingModel b,
+    double amount, {
+    required String purpose,
+  }) async {
+    if (amount <= 0 || _isCreatingOrder) return;
+
+    setState(() => _isCreatingOrder = true);
     final messenger = ScaffoldMessenger.of(context);
 
     messenger.showSnackBar(
       SnackBar(
-        content: Text('Proceeding to pay ${formatRupees(amount.toInt())}…'),
+        content: Text('Creating payment order for ${formatRupees(amount.toInt())}…'),
       ),
     );
 
-    _razorpayService?.openCheckout(
+    final repo = ref.read(bookingRepositoryProvider);
+    final result = await repo.createPaymentOrder(
+      bookingId: b.id,
+      purpose: purpose,
       amount: amount,
-      prefillContact: '',
-      prefillEmail: '',
-      orderId: b.id,
+    );
+
+    if (!mounted) return;
+    setState(() => _isCreatingOrder = false);
+
+    result.fold(
+      (failure) {
+        messenger.showSnackBar(
+          SnackBar(content: Text(failure.message)),
+        );
+      },
+      (order) {
+        final authState = ref.read(authControllerProvider);
+        String? userEmail;
+        String? userContact;
+        if (authState is AuthStateAuthenticated) {
+          userEmail = authState.user.email;
+          userContact = authState.user.phone;
+        }
+
+        _razorpayService?.openCheckout(
+          key: order.razorpayKeyId,
+          orderId: order.razorpayOrderId,
+          amount: order.amount,
+          currency: order.currency,
+          name: 'EventOn',
+          description: purpose == 'advance'
+              ? 'Advance Payment - ${b.serviceName}'
+              : 'Balance Payment - ${b.serviceName}',
+          prefillEmail: userEmail,
+          prefillContact: userContact,
+          notes: {
+            'paymentOrderId': order.paymentOrderId,
+            'bookingId': b.id,
+            'purpose': purpose,
+          },
+        );
+      },
     );
   }
 
@@ -176,34 +225,39 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
   }
 
   Future<void> _cancelBooking(BookingModel b) async {
-    final confirmed = await showDialog<bool>(
+    await showDialog<void>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: Colors.white,
-        title: const Text('Cancel booking?', style: AppTextStyles.headlineMd),
-        content: Text(
-          'Are you sure you want to cancel "${b.serviceName}"?',
-          style: AppTextStyles.bodyMd,
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Keep'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            style: TextButton.styleFrom(foregroundColor: AppColors.error),
-            child: const Text('Cancel booking'),
-          ),
-        ],
+      builder: (ctx) => _CancelBookingDialog(
+        booking: b,
+        onCancel: (reason) async {
+          final messenger = ScaffoldMessenger.of(context);
+          final repo = ref.read(bookingRepositoryProvider);
+          final result = await repo.cancelBooking(
+            bookingId: b.id,
+            reason: reason,
+          );
+
+          if (!mounted) return;
+
+          result.fold(
+            (failure) {
+              messenger.showSnackBar(
+                SnackBar(content: Text(failure.message)),
+              );
+            },
+            (_) {
+              ref.read(bookingDetailProvider(widget.id).notifier).refresh();
+              ref.read(bookingsProvider.notifier).refresh();
+              messenger.showSnackBar(
+                const SnackBar(
+                  content: Text('Booking cancelled successfully'),
+                ),
+              );
+            },
+          );
+        },
       ),
     );
-    if (confirmed == true && mounted) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Booking cancelled')));
-      context.pop();
-    }
   }
 
   @override
@@ -392,26 +446,43 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
                               SizedBox(
                                 height: 46,
                                 child: ElevatedButton.icon(
-                                  onPressed: () {
-                                    final amount =
-                                        double.tryParse(
-                                          _advanceController.text.trim(),
-                                        ) ??
-                                        0;
-                                    if (amount < b.minAdvance) {
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        SnackBar(
-                                          content: Text(
-                                            'Minimum advance is ${formatRupees(b.minAdvance.toInt())}',
+                                  onPressed: _isCreatingOrder
+                                      ? null
+                                      : () {
+                                          final amount =
+                                              double.tryParse(
+                                                _advanceController.text.trim(),
+                                              ) ??
+                                              0;
+                                          if (amount < b.minAdvance) {
+                                            ScaffoldMessenger.of(context).showSnackBar(
+                                              SnackBar(
+                                                content: Text(
+                                                  'Minimum advance is ${formatRupees(b.minAdvance.toInt())}',
+                                                ),
+                                              ),
+                                            );
+                                            return;
+                                          }
+                                          _payNow(
+                                            b,
+                                            amount,
+                                            purpose: 'advance',
+                                          );
+                                        },
+                                  icon: _isCreatingOrder
+                                      ? const SizedBox(
+                                          width: 16,
+                                          height: 16,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                            color: Colors.white,
                                           ),
-                                        ),
-                                      );
-                                      return;
-                                    }
-                                    _payNow(b, amount);
-                                  },
-                                  icon: const Icon(Icons.lock_outline, size: 16),
-                                  label: const Text('Pay now'),
+                                        )
+                                      : const Icon(Icons.lock_outline, size: 16),
+                                  label: Text(
+                                    _isCreatingOrder ? 'Processing…' : 'Pay now',
+                                  ),
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: _payButtonColor,
                                     foregroundColor: Colors.white,
@@ -534,13 +605,26 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
                                 SizedBox(
                                   height: 46,
                                   child: ElevatedButton.icon(
-                                    onPressed: () =>
-                                        _payNow(b, b.effectiveBalance),
-                                    icon: const Icon(
-                                      Icons.lock_outline,
-                                      size: 16,
+                                    onPressed: _isCreatingOrder
+                                        ? null
+                                        : () => _payNow(
+                                              b,
+                                              b.effectiveBalance,
+                                              purpose: 'balance',
+                                            ),
+                                    icon: _isCreatingOrder
+                                        ? const SizedBox(
+                                            width: 16,
+                                            height: 16,
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 2,
+                                              color: Colors.white,
+                                            ),
+                                          )
+                                        : const Icon(Icons.lock_outline, size: 16),
+                                    label: Text(
+                                      _isCreatingOrder ? 'Processing…' : 'Pay now',
                                     ),
-                                    label: const Text('Pay now'),
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: _payButtonColor,
                                       foregroundColor: Colors.white,
@@ -866,3 +950,131 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
     );
   }
 }
+
+class _CancelBookingDialog extends StatefulWidget {
+  final BookingModel booking;
+  final Future<void> Function(String reason) onCancel;
+
+  const _CancelBookingDialog({
+    required this.booking,
+    required this.onCancel,
+  });
+
+  @override
+  State<_CancelBookingDialog> createState() => _CancelBookingDialogState();
+}
+
+class _CancelBookingDialogState extends State<_CancelBookingDialog> {
+  final TextEditingController _reasonController = TextEditingController();
+  bool _isCancelling = false;
+
+  @override
+  void dispose() {
+    _reasonController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      backgroundColor: Colors.white,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      title: const Text('Cancel booking?', style: AppTextStyles.headlineMd),
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Are you sure you want to cancel "${widget.booking.serviceName}"?',
+              style: AppTextStyles.bodyMd,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Please tell us the reason:',
+              style: AppTextStyles.bodySm.copyWith(
+                color: AppColors.textSecondary,
+              ),
+            ),
+            const SizedBox(height: 8),
+            TextField(
+              controller: _reasonController,
+              maxLines: 3,
+              minLines: 2,
+              decoration: InputDecoration(
+                hintText: 'e.g., Change of plans, change of venue…',
+                hintStyle: AppTextStyles.bodySm.copyWith(
+                  color: AppColors.textSecondary,
+                ),
+                contentPadding: const EdgeInsets.all(12),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: const BorderSide(
+                    color: AppColors.borderSubtle,
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: const BorderSide(
+                    color: AppColors.error,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: _isCancelling ? null : () => Navigator.pop(context),
+          child: const Text('Keep booking'),
+        ),
+        ElevatedButton(
+          onPressed: _isCancelling
+              ? null
+              : () async {
+                  final reason = _reasonController.text.trim();
+                  if (reason.isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text(
+                          'Please provide a reason for cancellation',
+                        ),
+                      ),
+                    );
+                    return;
+                  }
+
+                  setState(() => _isCancelling = true);
+                  final navigator = Navigator.of(context);
+                  await widget.onCancel(reason);
+                  if (mounted) {
+                    navigator.pop();
+                  }
+                },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: AppColors.error,
+            foregroundColor: Colors.white,
+            elevation: 0,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+          child: _isCancelling
+              ? const SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: Colors.white,
+                  ),
+                )
+              : const Text('Cancel booking'),
+        ),
+      ],
+    );
+  }
+}
+

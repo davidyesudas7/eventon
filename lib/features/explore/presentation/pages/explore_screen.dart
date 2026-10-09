@@ -36,7 +36,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
 
   String? _selectedCategoryId;
   String? _appliedCategoryId;
-  Map<String, dynamic> _selectedAttributes = {};
+  final Map<String, dynamic> _selectedAttributes = {};
   Map<String, dynamic> _appliedAttributes = {};
 
   // Rotating Hint
@@ -410,7 +410,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                             const SizedBox(height: 16),
                         itemBuilder: (context, index) {
                           final listing = result.items[index];
-                          final quoteCart = ref.watch(quoteCartProvider);
+                          ref.watch(quoteCartProvider);
                           final isAdded = ref
                               .read(quoteCartProvider.notifier)
                               .isAdded(listing.id);
@@ -425,6 +425,11 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                             price: listing.priceFrom != null
                                 ? 'From ₹${listing.priceFrom}'
                                 : null,
+                            distance: listing.distanceMeters != null
+                                ? '${(listing.distanceMeters! / 1000).round()} km away'
+                                : null,
+                            rating: listing.ratingAvg,
+                            ratingBadgeDark: false,
                             hasQuoteButton: !isAdded,
                             hasAddedBadge: isAdded,
                             onQuoteTap: () {

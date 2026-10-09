@@ -2,6 +2,7 @@ import 'package:dartz/dartz.dart';
 
 import '../../../../core/error/failures.dart';
 import '../../data/models/booking_model.dart';
+import '../../data/models/payment_order_model.dart';
 import '../../../listings/data/models/review_model.dart';
 
 abstract class BookingRepository {
@@ -26,6 +27,17 @@ abstract class BookingRepository {
   });
 
   Future<Either<Failure, BookingModel>> disputeBooking({
+    required String bookingId,
+    required String reason,
+  });
+
+  Future<Either<Failure, PaymentOrderModel>> createPaymentOrder({
+    required String bookingId,
+    required String purpose,
+    required double amount,
+  });
+
+  Future<Either<Failure, BookingModel>> cancelBooking({
     required String bookingId,
     required String reason,
   });

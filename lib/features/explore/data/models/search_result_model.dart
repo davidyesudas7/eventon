@@ -11,6 +11,9 @@ class SearchListingModel {
   final String? description;
   final num? priceFrom;
   final Map<String, dynamic>? media;
+  final num? ratingAvg;
+  final int? ratingCount;
+  final num? distanceMeters;
 
   const SearchListingModel({
     required this.id,
@@ -19,6 +22,9 @@ class SearchListingModel {
     this.description,
     this.priceFrom,
     this.media,
+    this.ratingAvg,
+    this.ratingCount,
+    this.distanceMeters,
   });
 
   factory SearchListingModel.fromJson(Map<String, dynamic> json) =>
@@ -38,6 +44,9 @@ class SearchListingModel {
       description: description,
       coverUrl: coverUrl,
       priceFrom: priceFrom,
+      ratingAvg: ratingAvg,
+      ratingCount: ratingCount,
+      distanceMeters: distanceMeters,
     );
   }
 }

@@ -5,7 +5,6 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/widgets/eventon_app_bar.dart';
-import '../../../../core/widgets/circle_icon_button.dart';
 import '../widgets/listing_package_card.dart';
 import '../../../../core/utils/formatters.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -127,7 +126,7 @@ class _ListingDetailsScreenState extends ConsumerState<ListingDetailsScreen> {
               data.vendor?.fullName ??
               'Unknown vendor';
           final categoryName = data.category?.name ?? 'Unknown category';
-          final _addedToQuote = ref
+          final isAddedToQuote = ref
               .watch(quoteCartProvider)
               .any((q) => q.id == widget.listingId);
 
@@ -139,6 +138,8 @@ class _ListingDetailsScreenState extends ConsumerState<ListingDetailsScreen> {
                         .reduce((a, b) => a < b ? a : b)
                   : 0);
 
+          final hasRating = l.ratingAvg != null && l.ratingAvg! > 0;
+
           return Stack(
             children: [
               ListView(
@@ -148,7 +149,7 @@ class _ListingDetailsScreenState extends ConsumerState<ListingDetailsScreen> {
                 children: [
                   _buildHero(
                     l.media?.cover?.url,
-                    _addedToQuote,
+                    isAddedToQuote,
                     () => _toggleQuote(
                       l.title,
                       l.media?.cover?.url,
@@ -160,13 +161,66 @@ class _ListingDetailsScreenState extends ConsumerState<ListingDetailsScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          l.title,
-                          style: AppTextStyles.headlineMd.copyWith(
-                            fontSize: 22,
-                          ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Expanded(
+                              child: Text(
+                                l.title,
+                                style: AppTextStyles.headlineMd.copyWith(
+                                  fontSize: 22,
+                                ),
+                              ),
+                            ),
+                            if (hasRating) ...[
+                              const SizedBox(width: 12),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 4,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFE2F4F0),
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    const Icon(
+                                      Icons.star,
+                                      size: 12,
+                                      color: Color(0xFF0F766E),
+                                    ),
+                                    const SizedBox(width: 3),
+                                    Text(
+                                      l.ratingAvg!.toStringAsFixed(1),
+                                      style: const TextStyle(
+                                        color: Color(0xFF0F766E),
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.bold,
+                                        height: 1.1,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ],
                         ),
-                        const SizedBox(height: 16),
+                        if (hasRating &&
+                            l.ratingCount != null &&
+                            l.ratingCount! > 0) ...[
+                          const SizedBox(height: 4),
+                          Text(
+                            '${l.ratingCount} ${l.ratingCount == 1 ? 'review' : 'reviews'}',
+                            style: AppTextStyles.bodyMd.copyWith(
+                              color: AppColors.textSecondary,
+                            ),
+                          ),
+                        ],
+                        const SizedBox(height: 12),
                         Row(
                           children: [
                             Container(
@@ -194,24 +248,6 @@ class _ListingDetailsScreenState extends ConsumerState<ListingDetailsScreen> {
                                 color: AppColors.textPrimary,
                               ),
                             ),
-                            if (l.ratingCount != null &&
-                                l.ratingCount! > 0) ...[
-                              const SizedBox(width: 12),
-                              Row(
-                                children: [
-                                  const Icon(
-                                    Icons.star,
-                                    color: Color(0xFFFFB800),
-                                    size: 16,
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    '${l.ratingAvg?.toStringAsFixed(1)} (${l.ratingCount})',
-                                    style: AppTextStyles.labelMd,
-                                  ),
-                                ],
-                              ),
-                            ],
                           ],
                         ),
                         const SizedBox(height: 24),
@@ -245,11 +281,11 @@ class _ListingDetailsScreenState extends ConsumerState<ListingDetailsScreen> {
                                     vertical: 8,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: _addedToQuote
+                                    color: isAddedToQuote
                                         ? AppColors.surfaceMintPill
                                         : Colors.white,
                                     border: Border.all(
-                                      color: _addedToQuote
+                                      color: isAddedToQuote
                                           ? AppColors.primary
                                           : AppColors.borderStrong,
                                     ),
@@ -258,19 +294,19 @@ class _ListingDetailsScreenState extends ConsumerState<ListingDetailsScreen> {
                                   child: Row(
                                     children: [
                                       Icon(
-                                        _addedToQuote ? Icons.check : Icons.add,
+                                        isAddedToQuote ? Icons.check : Icons.add,
                                         size: 16,
-                                        color: _addedToQuote
+                                        color: isAddedToQuote
                                             ? AppColors.primary
                                             : AppColors.textPrimary,
                                       ),
                                       const SizedBox(width: 6),
                                       Text(
-                                        _addedToQuote
+                                        isAddedToQuote
                                             ? 'Added'
                                             : 'Add to quote request',
                                         style: AppTextStyles.labelMd.copyWith(
-                                          color: _addedToQuote
+                                          color: isAddedToQuote
                                               ? AppColors.primary
                                               : AppColors.textPrimary,
                                         ),

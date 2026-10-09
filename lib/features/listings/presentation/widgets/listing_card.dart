@@ -13,6 +13,8 @@ class ListingCard extends StatelessWidget {
     this.price,
     this.distance,
     this.imageUrl,
+    this.rating,
+    this.ratingBadgeDark = false,
     this.width,
     this.isVerified = false,
     this.hasAddedBadge = false,
@@ -28,6 +30,8 @@ class ListingCard extends StatelessWidget {
   final String? price;
   final String? distance;
   final String? imageUrl;
+  final num? rating;
+  final bool ratingBadgeDark;
   final double? width;
   final bool isVerified;
   final bool hasAddedBadge;
@@ -120,12 +124,27 @@ class ListingCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    title,
-                    style: AppTextStyles.headlineSm.copyWith(
-                        fontSize: width == null ? 18 : null),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          title,
+                          style: AppTextStyles.headlineSm.copyWith(
+                            fontSize: width == null ? 18 : null,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      if (rating != null && rating! > 0) ...[
+                        const SizedBox(width: 8),
+                        _buildRatingBadge(),
+                      ],
+                    ],
                   ),
-                  if (description != null) ...[
+                  if (description != null && description!.isNotEmpty) ...[
                     const SizedBox(height: 6),
                     Text(
                       description!,
@@ -135,8 +154,8 @@ class ListingCard extends StatelessWidget {
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
-                  ] else ...[
-                    const SizedBox(height: 2),
+                  ] else if (category.isNotEmpty) ...[
+                    const SizedBox(height: 4),
                     Text(
                       category,
                       style: AppTextStyles.labelMd.copyWith(
@@ -174,5 +193,67 @@ class ListingCard extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Widget _buildRatingBadge() {
+    if (ratingBadgeDark) {
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+        decoration: BoxDecoration(
+          color: const Color(0xFF286F63),
+          borderRadius: BorderRadius.circular(6),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Text(
+              rating!.toStringAsFixed(1),
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+                height: 1.1,
+              ),
+            ),
+            const SizedBox(width: 2),
+            const Icon(
+              Icons.star,
+              size: 11,
+              color: Colors.white,
+            ),
+          ],
+        ),
+      );
+    } else {
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+        decoration: BoxDecoration(
+          color: const Color(0xFFE2F4F0),
+          borderRadius: BorderRadius.circular(6),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            const Icon(
+              Icons.star,
+              size: 11,
+              color: Color(0xFF0F766E),
+            ),
+            const SizedBox(width: 3),
+            Text(
+              rating!.toStringAsFixed(1),
+              style: const TextStyle(
+                color: Color(0xFF0F766E),
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+                height: 1.1,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
   }
 }

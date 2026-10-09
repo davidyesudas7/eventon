@@ -15,6 +15,7 @@ import '../../features/chat/data/models/conversation_model.dart';
 import '../../features/chat/data/models/message_model.dart';
 import '../../features/quotes/data/models/quote_request_model.dart';
 import '../../features/bookings/data/models/booking_model.dart';
+import '../../features/bookings/data/models/payment_order_model.dart';
 
 part 'api_client.g.dart';
 
@@ -146,6 +147,17 @@ abstract class ApiClient {
 
   @POST("/bookings/{id}/dispute")
   Future<BookingModel> disputeBooking(
+    @Path("id") String id,
+    @Body() Map<String, dynamic> body,
+  );
+
+  @POST("/payments/orders")
+  Future<PaymentOrderModel> createPaymentOrder(
+    @Body() Map<String, dynamic> body,
+  );
+
+  @POST("/bookings/{id}/cancel")
+  Future<BookingModel> cancelBooking(
     @Path("id") String id,
     @Body() Map<String, dynamic> body,
   );

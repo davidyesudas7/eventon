@@ -1,14 +1,12 @@
 import 'dart:convert';
 import 'package:eventon/features/auth/presentation/providers/auth_providers.dart';
 import 'package:eventon/features/explore/presentation/providers/explore_providers.dart';
-import 'package:eventon/features/quotes/presentation/providers/quote_cart_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../categories/presentation/providers/categories_providers.dart';
-import '../../../categories/domain/entities/category.dart';
 import '../../../categories/domain/entities/occasion.dart';
 import '../../../categories/presentation/widgets/category_grid.dart';
 import '../../../../core/widgets/app_filter_chip.dart';
@@ -304,7 +302,7 @@ class HomeScreen extends ConsumerWidget {
             const SizedBox(height: 24),
             _buildPlanningWeddingBanner(context),
             const SizedBox(height: 32),
-            _buildPopularNearYou(context, ref),
+            const _PopularNearYouSection(),
             const SizedBox(height: 32),
             _buildTrustBadges(),
             const SizedBox(height: 32),
@@ -363,106 +361,6 @@ class HomeScreen extends ConsumerWidget {
       ),
     );
   }
-
-  Widget _buildPopularNearYou(BuildContext context, WidgetRef ref) {
-    final searchAsync = ref.watch(searchProvider(jsonEncode({'limit': 8})));
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              'Popular near you',
-              style: AppTextStyles.headlineSm.copyWith(
-                color: AppColors.textPrimary,
-              ),
-            ),
-            Text(
-              'See all',
-              style: AppTextStyles.labelMd.copyWith(color: AppColors.primary),
-            ),
-          ],
-        ),
-        const SizedBox(height: 12),
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            children: [
-              AppFilterChip(label: 'All', isSelected: true),
-              const SizedBox(width: 8),
-              AppFilterChip(label: 'Top rated'),
-              const SizedBox(width: 8),
-              AppFilterChip(label: 'Under ₹25k'),
-              const SizedBox(width: 8),
-              AppFilterChip(label: 'New'),
-            ],
-          ),
-        ),
-        const SizedBox(height: 16),
-        searchAsync.when(
-          data: (result) => SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: result.items.take(8).map((listing) {
-                final isAdded = ref
-                    .watch(quoteCartProvider)
-                    .any((l) => l.id == listing.id);
-
-                return Padding(
-                  padding: const EdgeInsets.only(right: 16),
-                  child: ListingCard(
-                    id: listing.id,
-                    title: listing.title,
-                    category: '',
-                    description: listing.description,
-                    imageUrl: listing.coverUrl,
-                    price: listing.priceFrom != null
-                        ? 'From ₹${listing.priceFrom}'
-                        : null,
-                    width: 275,
-                    isVerified: true,
-                    hasQuoteButton: !isAdded,
-                    hasAddedBadge: isAdded,
-                    onQuoteTap: () {
-                      final authState = ref.read(authControllerProvider);
-                      if (authState is! AuthStateAuthenticated) {
-                        context.push('/sign-in-mobile');
-                        return;
-                      }
-                      if (isAdded) {
-                        ref
-                            .read(quoteCartProvider.notifier)
-                            .removeQuote(listing.id);
-                      } else {
-                        ref
-                            .read(quoteCartProvider.notifier)
-                            .addQuote(
-                              QuoteItem(
-                                id: listing.id,
-                                title: listing.title,
-                                imageUrl: listing.coverUrl,
-                                price: listing.priceFrom != null
-                                    ? 'From ₹${listing.priceFrom}'
-                                    : null,
-                              ),
-                            );
-                      }
-                    },
-                    onTap: () => context.push('/home/listing/${listing.id}'),
-                  ),
-                );
-              }).toList(),
-            ),
-          ),
-          loading: () => const Center(child: CircularProgressIndicator()),
-          error: (e, s) => Text('Error: $e'),
-        ),
-      ],
-    );
-  }
-
   Widget _buildTrustBadges() {
     return Container(
       padding: const EdgeInsets.all(20),
@@ -596,6 +494,172 @@ class HomeScreen extends ConsumerWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _PopularNearYouSection extends ConsumerStatefulWidget {
+  const _PopularNearYouSection();
+
+  @override
+  ConsumerState<_PopularNearYouSection> createState() =>
+      _PopularNearYouSectionState();
+}
+
+class _PopularNearYouSectionState extends ConsumerState<_PopularNearYouSection> {
+  String _selectedFilter = 'All';
+
+  Map<String, dynamic> _getQueryParams() {
+    switch (_selectedFilter) {
+      case 'Top rated':
+        return {'limit': 8, 'sortBy': 'rating'};
+      case 'Under ₹25k':
+        return {'limit': 8, 'maxPrice': 25000};
+      case 'New':
+        return {'limit': 8, 'sortBy': 'newest'};
+      case 'All':
+      default:
+        return {'limit': 8};
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final queryParams = _getQueryParams();
+    final searchAsync = ref.watch(searchProvider(jsonEncode(queryParams)));
+    final categories = ref.watch(categoriesProvider).asData?.value ?? [];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Popular near you',
+              style: AppTextStyles.headlineSm.copyWith(
+                color: AppColors.textPrimary,
+              ),
+            ),
+            GestureDetector(
+              onTap: () => context.go('/explore'),
+              child: Text(
+                'See all',
+                style: AppTextStyles.labelMd.copyWith(color: AppColors.primary),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: [
+              AppFilterChip(
+                label: 'All',
+                isSelected: _selectedFilter == 'All',
+                onTap: () {
+                  if (_selectedFilter != 'All') {
+                    setState(() => _selectedFilter = 'All');
+                  }
+                },
+              ),
+              const SizedBox(width: 8),
+              AppFilterChip(
+                label: 'Top rated',
+                isSelected: _selectedFilter == 'Top rated',
+                onTap: () {
+                  if (_selectedFilter != 'Top rated') {
+                    setState(() => _selectedFilter = 'Top rated');
+                  }
+                },
+              ),
+              const SizedBox(width: 8),
+              AppFilterChip(
+                label: 'Under ₹25k',
+                isSelected: _selectedFilter == 'Under ₹25k',
+                onTap: () {
+                  if (_selectedFilter != 'Under ₹25k') {
+                    setState(() => _selectedFilter = 'Under ₹25k');
+                  }
+                },
+              ),
+              const SizedBox(width: 8),
+              AppFilterChip(
+                label: 'New',
+                isSelected: _selectedFilter == 'New',
+                onTap: () {
+                  if (_selectedFilter != 'New') {
+                    setState(() => _selectedFilter = 'New');
+                  }
+                },
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 16),
+        searchAsync.when(
+          data: (result) {
+            if (result.items.isEmpty) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 24),
+                child: Center(
+                  child: Text(
+                    'No listings found for this filter',
+                    style: AppTextStyles.bodyMd.copyWith(
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                ),
+              );
+            }
+            return SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: result.items.take(8).map((listing) {
+                  final category = categories
+                      .where((c) => c.id == listing.categoryId)
+                      .firstOrNull;
+                  final categoryName = category?.name ?? '';
+
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 16),
+                    child: ListingCard(
+                      id: listing.id,
+                      title: listing.title,
+                      category: categoryName,
+                      description: null,
+                      imageUrl: listing.coverUrl,
+                      price: listing.priceFrom != null
+                          ? 'From ₹${listing.priceFrom}'
+                          : null,
+                      width: 275,
+                      isVerified: true,
+                      hasQuoteButton: false,
+                      hasAddedBadge: false,
+                      rating: listing.ratingAvg,
+                      ratingBadgeDark: true,
+                      onTap: () =>
+                          context.push('/home/listing/${listing.id}'),
+                    ),
+                  );
+                }).toList(),
+              ),
+            );
+          },
+          loading: () => const SizedBox(
+            height: 240,
+            child: Center(child: CircularProgressIndicator()),
+          ),
+          error: (e, s) => Padding(
+            padding: const EdgeInsets.symmetric(vertical: 20),
+            child: Text(
+              'Error: $e',
+              style: AppTextStyles.bodySm.copyWith(color: AppColors.error),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

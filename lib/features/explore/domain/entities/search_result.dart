@@ -5,6 +5,9 @@ class SearchListing {
   final String? description;
   final String? coverUrl;
   final num? priceFrom;
+  final num? ratingAvg;
+  final int? ratingCount;
+  final num? distanceMeters;
 
   const SearchListing({
     required this.id,
@@ -13,6 +16,9 @@ class SearchListing {
     this.description,
     this.coverUrl,
     this.priceFrom,
+    this.ratingAvg,
+    this.ratingCount,
+    this.distanceMeters,
   });
 }
 

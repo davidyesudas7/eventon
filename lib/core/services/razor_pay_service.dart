@@ -40,17 +40,33 @@ class RazorpayService {
     String? prefillEmail,
     String? prefillContact,
     required String orderId,
+    String? key,
+    String? currency,
+    String? name,
+    String? description,
+    Map<String, dynamic>? notes,
   }) {
-    log(prefillEmail.toString());
-    final options = {
-      'key': dotenv.env['RAZORPAY_KEY'],
-      'amount': (amount * 100).toString(),
-      'name': "Style Story",
-      'description': 'Product Payment',
-      // "order_id": orderId,
-      'prefill': {'contact': prefillContact, 'email': prefillEmail},
-      'notes': {'merchant_order_id': orderId},
+    final razorpayKey = (key != null && key.isNotEmpty)
+        ? key
+        : dotenv.env['RAZORPAY_KEY'];
+
+    final options = <String, dynamic>{
+      'key': razorpayKey,
+      'amount': (amount * 100).toInt(),
+      'name': name ?? "EventOn",
+      'description': description ?? 'Booking Payment',
+      'order_id': orderId,
+      'currency': currency ?? 'INR',
+      'prefill': {
+        if (prefillContact != null && prefillContact.isNotEmpty)
+          'contact': prefillContact,
+        if (prefillEmail != null && prefillEmail.isNotEmpty)
+          'email': prefillEmail,
+      },
     };
+    if (notes != null) {
+      options['notes'] = notes;
+    }
 
     log(options.toString());
     try {
