@@ -11,6 +11,7 @@ VendorProfileModel _$VendorProfileModelFromJson(Map<String, dynamic> json) =>
       id: json['id'] as String,
       fullName: json['fullName'] as String,
       businessName: json['businessName'] as String?,
+      bio: json['bio'] as String?,
       profilePhotoUrl: json['profilePhotoUrl'] as String?,
     );
 
@@ -19,5 +20,6 @@ Map<String, dynamic> _$VendorProfileModelToJson(VendorProfileModel instance) =>
       'id': instance.id,
       'fullName': instance.fullName,
       'businessName': instance.businessName,
+      'bio': instance.bio,
       'profilePhotoUrl': instance.profilePhotoUrl,
     };

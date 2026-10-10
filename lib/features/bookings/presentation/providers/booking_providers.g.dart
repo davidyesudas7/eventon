@@ -80,7 +80,7 @@ final class BookingsNotifierProvider
   BookingsNotifier create() => BookingsNotifier();
 }
 
-String _$bookingsNotifierHash() => r'5d6f13d06f2dfbaa7af7d17eebf8414428f9992c';
+String _$bookingsNotifierHash() => r'fdc40b62d22b6945f48918fd08c81a66597fc7ef';
 
 abstract class _$BookingsNotifier extends $AsyncNotifier<List<BookingModel>> {
   FutureOr<List<BookingModel>> build();
@@ -143,7 +143,7 @@ final class BookingDetailNotifierProvider
 }
 
 String _$bookingDetailNotifierHash() =>
-    r'a08520c2decdb980f2c3f2b620f08cfd1ca94c4e';
+    r'6a9debec5a5e9249b09bf2d8eb5fbbd417b3ab98';
 
 final class BookingDetailNotifierFamily extends $Family
     with
@@ -224,7 +224,7 @@ final class CreateBookingNotifierProvider
 }
 
 String _$createBookingNotifierHash() =>
-    r'2ec43ed61bb8f5ec9cfcf3b07e07431cdbc36922';
+    r'58e098673d456a8c5255df6c905fb44f92ad929f';
 
 abstract class _$CreateBookingNotifier extends $Notifier<bool> {
   bool build();
@@ -277,7 +277,7 @@ final class PayBookingNotifierProvider
 }
 
 String _$payBookingNotifierHash() =>
-    r'61f679cb892f3a7651ec08d715841a28dde6eb69';
+    r'5c35f1886124f6d7278225a278d6227c7abd13d6';
 
 abstract class _$PayBookingNotifier extends $Notifier<bool> {
   bool build();

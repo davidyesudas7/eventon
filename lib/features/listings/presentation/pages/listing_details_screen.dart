@@ -243,10 +243,29 @@ class _ListingDetailsScreenState extends ConsumerState<ListingDetailsScreen> {
                               ),
                             ),
                             const SizedBox(width: 12),
-                            Text(
-                              'By $vendorName',
-                              style: AppTextStyles.bodyMd.copyWith(
-                                color: AppColors.textPrimary,
+                            InkWell(
+                              onTap: () {
+                                final location =
+                                    GoRouterState.of(context).uri.toString();
+                                if (location.startsWith('/explore')) {
+                                  context.push('/explore/vendor/${l.vendorId}');
+                                } else {
+                                  context.push('/home/vendor/${l.vendorId}');
+                                }
+                              },
+                              borderRadius: BorderRadius.circular(4),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 4,
+                                  vertical: 2,
+                                ),
+                                child: Text(
+                                  'By $vendorName',
+                                  style: AppTextStyles.bodyMd.copyWith(
+                                    color: AppColors.primary,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
                               ),
                             ),
                           ],

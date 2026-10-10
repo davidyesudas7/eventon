@@ -7,12 +7,14 @@ class VendorProfileModel {
   final String id;
   final String fullName;
   final String? businessName;
+  final String? bio;
   final String? profilePhotoUrl;
 
   VendorProfileModel({
     required this.id,
     required this.fullName,
     this.businessName,
+    this.bio,
     this.profilePhotoUrl,
   });
 

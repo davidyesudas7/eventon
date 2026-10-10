@@ -38,6 +38,12 @@ abstract class ApiClient {
   @GET("/discovery/search")
   Future<SearchResultModel> search(@Queries() Map<String, dynamic> queries);
 
+  @GET("/listings")
+  Future<List<ListingDetailModel>> getListings({
+    @Query("vendorId") String? vendorId,
+    @Query("categoryId") String? categoryId,
+  });
+
   @GET("/listings/{id}")
   Future<ListingDetailModel> getListing(@Path("id") String id);
 
@@ -47,6 +53,13 @@ abstract class ApiClient {
   @GET("/reviews/listing/{listingId}")
   Future<PaginatedReviewsModel> getListingReviews(
     @Path("listingId") String id, {
+    @Query("page") int page = 1,
+    @Query("limit") int limit = 20,
+  });
+
+  @GET("/reviews/vendor/{vendorId}")
+  Future<PaginatedReviewsModel> getVendorReviews(
+    @Path("vendorId") String vendorId, {
     @Query("page") int page = 1,
     @Query("limit") int limit = 20,
   });

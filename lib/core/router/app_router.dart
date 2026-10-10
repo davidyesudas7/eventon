@@ -25,6 +25,7 @@ import '../../features/quotes/presentation/pages/request_quotes_screen.dart';
 import '../../features/quotes/presentation/pages/quotes_listing_screen.dart';
 import '../../features/quotes/presentation/pages/quotes_detail_screen.dart';
 import '../../features/services/presentation/pages/all_services_screen.dart';
+import '../../features/vendors/presentation/pages/vendor_profile_screen.dart';
 
 part 'app_router.g.dart';
 
@@ -130,6 +131,20 @@ GoRouter goRouter(Ref ref) {
           ),
         ],
       ),
+      GoRoute(
+        path: '/vendors/:id',
+        builder: (context, state) {
+          final id = state.pathParameters['id']!;
+          return VendorProfileScreen(vendorId: id);
+        },
+      ),
+      GoRoute(
+        path: '/vendor/:id',
+        builder: (context, state) {
+          final id = state.pathParameters['id']!;
+          return VendorProfileScreen(vendorId: id);
+        },
+      ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
           return MainScreen(navigationShell: navigationShell);
@@ -159,6 +174,14 @@ GoRouter goRouter(Ref ref) {
                     builder: (context, state) {
                       return ListingDetailsScreen(
                         listingId: state.pathParameters['id']!,
+                      );
+                    },
+                  ),
+                  GoRoute(
+                    path: 'vendor/:id',
+                    builder: (context, state) {
+                      return VendorProfileScreen(
+                        vendorId: state.pathParameters['id']!,
                       );
                     },
                   ),
@@ -193,6 +216,14 @@ GoRouter goRouter(Ref ref) {
                     builder: (context, state) {
                       return ListingDetailsScreen(
                         listingId: state.pathParameters['id']!,
+                      );
+                    },
+                  ),
+                  GoRoute(
+                    path: 'vendor/:id',
+                    builder: (context, state) {
+                      return VendorProfileScreen(
+                        vendorId: state.pathParameters['id']!,
                       );
                     },
                   ),

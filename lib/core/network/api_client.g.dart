@@ -160,6 +160,45 @@ class _ApiClient implements ApiClient {
   }
 
   @override
+  Future<List<ListingDetailModel>> getListings({
+    String? vendorId,
+    String? categoryId,
+  }) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{
+      r'vendorId': vendorId,
+      r'categoryId': categoryId,
+    };
+    queryParameters.removeWhere((k, v) => v == null);
+    final _headers = <String, dynamic>{};
+    const Map<String, dynamic>? _data = null;
+    final _options = _setStreamType<List<ListingDetailModel>>(
+      Options(method: 'GET', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/listings',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    final _result = await _dio.fetch<List<dynamic>>(_options);
+    late List<ListingDetailModel> _value;
+    try {
+      _value = _result.data!
+          .map(
+            (dynamic i) =>
+                ListingDetailModel.fromJson(i as Map<String, dynamic>),
+          )
+          .toList();
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options, response: _result);
+      rethrow;
+    }
+    return _value;
+  }
+
+  @override
   Future<ListingDetailModel> getListing(String id) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
@@ -228,6 +267,37 @@ class _ApiClient implements ApiClient {
           .compose(
             _dio.options,
             '/reviews/listing/${id}',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late PaginatedReviewsModel _value;
+    try {
+      _value = PaginatedReviewsModel.fromJson(_result.data!);
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options, response: _result);
+      rethrow;
+    }
+    return _value;
+  }
+
+  @override
+  Future<PaginatedReviewsModel> getVendorReviews(
+    String vendorId, {
+    int page = 1,
+    int limit = 20,
+  }) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{r'page': page, r'limit': limit};
+    final _headers = <String, dynamic>{};
+    const Map<String, dynamic>? _data = null;
+    final _options = _setStreamType<PaginatedReviewsModel>(
+      Options(method: 'GET', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/reviews/vendor/${vendorId}',
             queryParameters: queryParameters,
             data: _data,
           )
@@ -421,10 +491,7 @@ class _ApiClient implements ApiClient {
   }
 
   @override
-  Future<MessageModel> acceptQuote(
-    String id,
-    String messageId,
-  ) async {
+  Future<MessageModel> acceptQuote(String id, String messageId) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
@@ -451,10 +518,7 @@ class _ApiClient implements ApiClient {
   }
 
   @override
-  Future<MessageModel> rejectQuote(
-    String id,
-    String messageId,
-  ) async {
+  Future<MessageModel> rejectQuote(String id, String messageId) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
@@ -907,7 +971,10 @@ class _ApiClient implements ApiClient {
   }
 
   @override
-  Future<BookingModel> disputeBooking(String id, Map<String, dynamic> body) async {
+  Future<BookingModel> disputeBooking(
+    String id,
+    Map<String, dynamic> body,
+  ) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
@@ -936,7 +1003,8 @@ class _ApiClient implements ApiClient {
 
   @override
   Future<PaymentOrderModel> createPaymentOrder(
-      Map<String, dynamic> body) async {
+    Map<String, dynamic> body,
+  ) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};

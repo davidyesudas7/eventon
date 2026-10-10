@@ -302,7 +302,7 @@ final class ChatDetailNotifierProvider
 }
 
 String _$chatDetailNotifierHash() =>
-    r'09080d263d18d4dec96f1ef71f034923f8da1b58';
+    r'daae7b9535f75bbfd63cc97a4cc25239af747dba';
 
 final class ChatDetailNotifierFamily extends $Family
     with
@@ -384,7 +384,7 @@ final class CreateConversationNotifierProvider
 }
 
 String _$createConversationNotifierHash() =>
-    r'f17e27c057c45eef3259be279286e8971ada9e90';
+    r'e578dede0adc3211bc47469eb9c142a3ad4c3646';
 
 abstract class _$CreateConversationNotifier extends $Notifier<bool> {
   bool build();
