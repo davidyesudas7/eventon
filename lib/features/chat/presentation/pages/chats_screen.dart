@@ -130,9 +130,11 @@ class ChatItemWidget extends ConsumerWidget {
               children: [
                 listingState.when(
                   data: (listing) => Text(
-                    listing.title ?? 'Unknown Listing',
+                    listing.title.isEmpty ? 'Unknown Listing' : listing.title,
                     style: AppTextStyles.bodyLg.copyWith(
-                      fontWeight: FontWeight.w500,
+                      fontWeight: conversation.unreadCount > 0
+                          ? FontWeight.bold
+                          : FontWeight.w500,
                     ),
                   ),
                   loading: () => Text(
@@ -142,7 +144,7 @@ class ChatItemWidget extends ConsumerWidget {
                       color: AppColors.textSecondary,
                     ),
                   ),
-                  error: (_, __) => Text(
+                  error: (_, _) => Text(
                     'Unknown',
                     style: AppTextStyles.bodyLg.copyWith(
                       fontWeight: FontWeight.w500,
@@ -153,7 +155,12 @@ class ChatItemWidget extends ConsumerWidget {
                 Text(
                   conversation.lastMessagePreview ?? 'No messages yet',
                   style: AppTextStyles.bodyMd.copyWith(
-                    color: AppColors.textSecondary,
+                    color: conversation.unreadCount > 0
+                        ? AppColors.textPrimary
+                        : AppColors.textSecondary,
+                    fontWeight: conversation.unreadCount > 0
+                        ? FontWeight.w600
+                        : FontWeight.normal,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -162,13 +169,47 @@ class ChatItemWidget extends ConsumerWidget {
             ),
           ),
           const SizedBox(width: 8),
-          if (conversation.lastMessageAt != null)
-            Text(
-              _formatTime(conversation.lastMessageAt!),
-              style: AppTextStyles.labelSm.copyWith(
-                color: AppColors.textSecondary,
-              ),
-            ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (conversation.lastMessageAt != null)
+                Text(
+                  _formatTime(conversation.lastMessageAt!),
+                  style: AppTextStyles.labelSm.copyWith(
+                    color: conversation.unreadCount > 0
+                        ? AppColors.primary
+                        : AppColors.textSecondary,
+                    fontWeight: conversation.unreadCount > 0
+                        ? FontWeight.bold
+                        : FontWeight.normal,
+                  ),
+                ),
+              if (conversation.unreadCount > 0) ...[
+                const SizedBox(height: 6),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  constraints: const BoxConstraints(minWidth: 20),
+                  alignment: Alignment.center,
+                  child: Text(
+                    conversation.unreadCount > 99
+                        ? '99+'
+                        : '${conversation.unreadCount}',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                      height: 1.2,
+                    ),
+                  ),
+                ),
+              ],
+            ],
+          ),
         ],
       ),
     );

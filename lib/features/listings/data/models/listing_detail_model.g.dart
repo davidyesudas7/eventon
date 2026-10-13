@@ -20,10 +20,22 @@ Map<String, dynamic> _$ListingMediaModelToJson(ListingMediaModel instance) =>
     <String, dynamic>{'cover': instance.cover, 'gallery': instance.gallery};
 
 MediaAssetModel _$MediaAssetModelFromJson(Map<String, dynamic> json) =>
-    MediaAssetModel(url: json['url'] as String);
+    MediaAssetModel(
+      url: json['url'] as String,
+      type: json['type'] as String? ?? 'image',
+      thumbnailUrl: json['thumbnailUrl'] as String?,
+      caption: json['caption'] as String?,
+      order: (json['order'] as num?)?.toInt() ?? 0,
+    );
 
 Map<String, dynamic> _$MediaAssetModelToJson(MediaAssetModel instance) =>
-    <String, dynamic>{'url': instance.url};
+    <String, dynamic>{
+      'url': instance.url,
+      'type': instance.type,
+      'thumbnailUrl': instance.thumbnailUrl,
+      'caption': instance.caption,
+      'order': instance.order,
+    };
 
 ListingDetailModel _$ListingDetailModelFromJson(Map<String, dynamic> json) =>
     ListingDetailModel(
@@ -36,6 +48,9 @@ ListingDetailModel _$ListingDetailModelFromJson(Map<String, dynamic> json) =>
       media: json['media'] == null
           ? null
           : ListingMediaModel.fromJson(json['media'] as Map<String, dynamic>),
+      gallery: (json['gallery'] as List<dynamic>?)
+          ?.map((e) => MediaAssetModel.fromJson(e as Map<String, dynamic>))
+          .toList(),
       ratingAvg: (json['ratingAvg'] as num?)?.toDouble(),
       ratingCount: (json['ratingCount'] as num?)?.toInt(),
       priceFrom: json['priceFrom'] as num?,
@@ -50,6 +65,7 @@ Map<String, dynamic> _$ListingDetailModelToJson(ListingDetailModel instance) =>
       'description': instance.description,
       'attributes': instance.attributes,
       'media': instance.media,
+      'gallery': instance.gallery,
       'ratingAvg': instance.ratingAvg,
       'ratingCount': instance.ratingCount,
       'priceFrom': instance.priceFrom,

@@ -67,6 +67,21 @@ class LocationHistoryRepository {
     await prefs.setString(_currentLocationKey, jsonEncode(location.toJson()));
   }
 
+  static const String _preferredRadiusKey = 'preferred_radius_km';
+
+  Future<int?> getPreferredRadius() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (!prefs.containsKey(_preferredRadiusKey)) return 10;
+    final val = prefs.getInt(_preferredRadiusKey);
+    if (val == -1) return null; // -1 represents Any distance
+    return val;
+  }
+
+  Future<void> savePreferredRadius(int? radius) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt(_preferredRadiusKey, radius ?? -1);
+  }
+
   Future<void> clearCurrentSelectedLocation() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_currentLocationKey);

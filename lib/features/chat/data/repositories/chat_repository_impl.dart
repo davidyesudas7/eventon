@@ -98,4 +98,16 @@ class ChatRepositoryImpl implements ChatRepository {
       );
     }
   }
+
+  @override
+  Future<Either<Failure, void>> markAsRead(String conversationId) async {
+    try {
+      await apiClient.markConversationAsRead(conversationId);
+      return const Right(null);
+    } catch (e) {
+      return Left(
+        handleApiError(e, defaultMessage: 'Failed to mark conversation as read'),
+      );
+    }
+  }
 }

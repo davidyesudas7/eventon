@@ -14,6 +14,9 @@ import '../providers/listing_details_providers.dart';
 import '../widgets/listing_review_card.dart';
 import '../../../../features/chat/presentation/providers/chat_providers.dart';
 import '../../../../core/widgets/inline_error_banner.dart';
+import '../../../../core/widgets/circle_icon_button.dart';
+import '../../data/models/listing_detail_model.dart';
+import 'listing_gallery_screen.dart';
 
 class ListingDetailsScreen extends ConsumerStatefulWidget {
   const ListingDetailsScreen({super.key, required this.listingId});
@@ -140,6 +143,10 @@ class _ListingDetailsScreenState extends ConsumerState<ListingDetailsScreen> {
                   : 0);
 
           final hasRating = l.ratingAvg != null && l.ratingAvg! > 0;
+          final galleryItems = l.allGalleryItems;
+          final allMedia = galleryItems.isNotEmpty
+              ? galleryItems
+              : (l.media?.cover != null ? [l.media!.cover!] : <MediaAssetModel>[]);
 
           return Stack(
             children: [
@@ -156,7 +163,16 @@ class _ListingDetailsScreenState extends ConsumerState<ListingDetailsScreen> {
                       l.media?.cover?.url,
                       startingPrice.toInt(),
                     ),
+                    onTapCover: allMedia.isNotEmpty
+                        ? () => _openGallery(
+                              allMedia,
+                              initialIndex: 0,
+                              title: l.title,
+                            )
+                        : null,
                   ),
+                  if (galleryItems.isNotEmpty)
+                    _buildGalleryStrip(l, galleryItems),
                   Padding(
                     padding: const EdgeInsets.all(20),
                     child: Column(
@@ -572,35 +588,174 @@ class _ListingDetailsScreenState extends ConsumerState<ListingDetailsScreen> {
     );
   }
 
+  void _openGallery(List<MediaAssetModel> items, {int initialIndex = 0, String? title}) {
+    if (items.isEmpty) return;
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => ListingGalleryScreen(
+          items: items,
+          initialIndex: initialIndex,
+          title: title,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildGalleryStrip(ListingDetailModel l, List<MediaAssetModel> items) {
+    return Container(
+      margin: const EdgeInsets.only(top: 14, bottom: 4),
+      height: 78,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        itemCount: items.length,
+        separatorBuilder: (_, _) => const SizedBox(width: 10),
+        itemBuilder: (context, index) {
+          final item = items[index];
+          return GestureDetector(
+            onTap: () => _openGallery(items, initialIndex: index, title: l.title),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Container(
+                width: 78,
+                height: 78,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF1F5F9),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: AppColors.borderSubtle, width: 1),
+                ),
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    if (item.thumbnailUrl != null)
+                      Image.network(
+                        item.thumbnailUrl!,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) => const Center(
+                          child: Icon(
+                            Icons.image_not_supported_outlined,
+                            size: 22,
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return Container(
+                            color: const Color(0xFFF1F5F9),
+                            child: const Center(
+                              child: SizedBox(
+                                width: 18,
+                                height: 18,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: AppColors.primary,
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      )
+                    else if (item.isVideo)
+                      Container(
+                        color: const Color(0xFF1E293B),
+                        child: const Center(
+                          child: Icon(
+                            Icons.videocam_rounded,
+                            color: Colors.white70,
+                            size: 24,
+                          ),
+                        ),
+                      )
+                    else
+                      Image.network(
+                        item.url,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) => const Center(
+                          child: Icon(
+                            Icons.image_not_supported_outlined,
+                            size: 22,
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return Container(
+                            color: const Color(0xFFF1F5F9),
+                            child: const Center(
+                              child: SizedBox(
+                                width: 18,
+                                height: 18,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: AppColors.primary,
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    if (item.isVideo)
+                      Container(
+                        color: Colors.black.withValues(alpha: 0.25),
+                        child: Center(
+                          child: Container(
+                            width: 28,
+                            height: 28,
+                            decoration: BoxDecoration(
+                              color: Colors.black.withValues(alpha: 0.6),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.play_arrow_rounded,
+                              color: Colors.white,
+                              size: 20,
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
   Widget _buildHero(
     String? imageUrl,
     bool isAdded,
-    VoidCallback onToggleQuote,
-  ) {
-    return Stack(
-      children: [
-        if (imageUrl != null)
-          Image.network(
-            imageUrl,
-            height: 290,
-            width: double.infinity,
-            fit: BoxFit.cover,
-          )
-        else
-          Container(
-            height: 290,
-            color: const Color(0xFFE2E8F0),
-            width: double.infinity,
+    VoidCallback onToggleQuote, {
+    VoidCallback? onTapCover,
+  }) {
+    return GestureDetector(
+      onTap: onTapCover,
+      child: Stack(
+        children: [
+          if (imageUrl != null)
+            Image.network(
+              imageUrl,
+              height: 290,
+              width: double.infinity,
+              fit: BoxFit.cover,
+            )
+          else
+            Container(
+              height: 290,
+              color: const Color(0xFFE2E8F0),
+              width: double.infinity,
+            ),
+          Positioned(
+            top: 16,
+            left: 16,
+            child: CircleIconButton(
+              icon: Icons.arrow_back,
+              onTap: () => context.pop(),
+            ),
           ),
-        // Positioned(
-        //   top: 16,
-        //   left: 16,
-        //   child: CircleIconButton(
-        //     icon: Icons.arrow_back,
-        //     onTap: () => context.pop(),
-        //   ),
-        // ),
-      ],
+        ],
+      ),
     );
   }
 }

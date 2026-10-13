@@ -102,8 +102,8 @@ abstract class ApiClient {
     @Path("messageId") String messageId,
   );
 
-  // @PATCH("/conversations/{id}/read")
-  // Future<void> markConversationAsRead(@Path("id") String id);
+  @PATCH("/conversations/{id}/read")
+  Future<void> markConversationAsRead(@Path("id") String id);
 
   @POST("/auth/login")
   Future<AuthResponseModel> login(@Body() LoginDto dto);

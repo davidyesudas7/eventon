@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/services/location_service.dart';
+import '../../data/repositories/location_history_repository.dart';
 import '../providers/location_search_provider.dart';
 import '../../domain/entities/saved_location.dart';
 
@@ -20,17 +21,30 @@ class _ExploreLocationScreenState extends ConsumerState<ExploreLocationScreen> {
   final TextEditingController _searchController = TextEditingController();
   int? _selectedRadiusKm;
   bool _isFetchingLocation = false;
+  bool _userInteractedWithRadius = false;
 
   @override
   void initState() {
     super.initState();
-    // Initialize radius from current location if it exists, otherwise default to 10
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final currentLoc = ref.read(exploreLocationProvider);
-      setState(() {
-        _selectedRadiusKm = currentLoc?.radiusKm ?? 10;
-      });
-    });
+    _initRadius();
+  }
+
+  Future<void> _initRadius() async {
+    final currentLoc = ref.read(exploreLocationProvider);
+    if (currentLoc != null) {
+      if (mounted && !_userInteractedWithRadius) {
+        setState(() {
+          _selectedRadiusKm = currentLoc.radiusKm;
+        });
+      }
+    } else {
+      final preferred = await ref.read(locationHistoryRepositoryProvider).getPreferredRadius();
+      if (mounted && !_userInteractedWithRadius) {
+        setState(() {
+          _selectedRadiusKm = preferred;
+        });
+      }
+    }
   }
 
   @override
@@ -40,9 +54,12 @@ class _ExploreLocationScreenState extends ConsumerState<ExploreLocationScreen> {
   }
 
   void _onRadiusSelected(int? radius) {
+    _userInteractedWithRadius = true;
     setState(() {
       _selectedRadiusKm = radius;
     });
+
+    ref.read(locationHistoryRepositoryProvider).savePreferredRadius(radius);
 
     // If there is already a location selected, apply the radius change immediately
     final currentLocation = ref.read(exploreLocationProvider);
@@ -86,6 +103,7 @@ class _ExploreLocationScreenState extends ConsumerState<ExploreLocationScreen> {
       debugPrint('📍 LONGITUDE: ${location.longitude}');
       debugPrint('📍 RADIUS: ${location.radiusKm} km');
 
+      ref.read(locationHistoryRepositoryProvider).savePreferredRadius(_selectedRadiusKm);
       ref.read(exploreLocationProvider.notifier).setLocation(location);
       if (mounted) context.pop();
     }
@@ -93,6 +111,14 @@ class _ExploreLocationScreenState extends ConsumerState<ExploreLocationScreen> {
 
   @override
   Widget build(BuildContext context) {
+    ref.listen<SavedLocation?>(exploreLocationProvider, (prev, next) {
+      if (!_userInteractedWithRadius && next != null) {
+        setState(() {
+          _selectedRadiusKm = next.radiusKm;
+        });
+      }
+    });
+
     final state = ref.watch(locationSearchControllerProvider);
     final notifier = ref.read(locationSearchControllerProvider.notifier);
 
@@ -209,6 +235,7 @@ class _ExploreLocationScreenState extends ConsumerState<ExploreLocationScreen> {
                     longitude: position.longitude,
                     radiusKm: _selectedRadiusKm,
                   );
+                  ref.read(locationHistoryRepositoryProvider).savePreferredRadius(_selectedRadiusKm);
                   // Set to provider but DON'T save to history
                   ref.read(exploreLocationProvider.notifier).setLocation(locationData);
                   if (context.mounted) context.pop();
@@ -278,7 +305,7 @@ class _ExploreLocationScreenState extends ConsumerState<ExploreLocationScreen> {
                 ? _buildRecentLocations(state.recentLocations)
                 : ListView.separated(
                     itemCount: state.suggestions.length,
-                    separatorBuilder: (_, __) =>
+                    separatorBuilder: (_, _) =>
                         const Divider(height: 1, color: AppColors.borderSubtle),
                     itemBuilder: (context, index) {
                       final suggestion = state.suggestions[index];

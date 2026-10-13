@@ -1,8 +1,13 @@
+import 'dart:async';
+import 'package:flutter/foundation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../../core/error/error_handler.dart';
 import '../../../../core/error/failures.dart';
 import '../../../../core/network/api_providers.dart';
 import '../../../../core/services/socket_service.dart';
+import '../../../auth/presentation/providers/auth_providers.dart';
 import '../../../listings/data/models/listing_detail_model.dart';
 import '../../data/models/conversation_model.dart';
 import '../../data/models/message_model.dart';
@@ -10,6 +15,29 @@ import '../../data/repositories/chat_repository_impl.dart';
 import '../../domain/repositories/chat_repository.dart';
 
 part 'chat_providers.g.dart';
+
+/// Tracks the ID of the conversation currently open on screen (if any)
+class ActiveChatNotifier extends Notifier<String?> {
+  @override
+  String? build() => null;
+
+  void setActive(String? id) => state = id;
+}
+
+final activeChatConversationIdProvider =
+    NotifierProvider<ActiveChatNotifier, String?>(ActiveChatNotifier.new);
+
+/// Sum of unread messages across all active conversations
+final totalUnreadMessagesCountProvider = Provider<int>((ref) {
+  final conversationsAsync = ref.watch(conversationsProvider);
+  return conversationsAsync.maybeWhen(
+    data: (conversations) => conversations.fold<int>(
+      0,
+      (sum, c) => sum + (c.unreadCount > 0 ? c.unreadCount : 0),
+    ),
+    orElse: () => 0,
+  );
+});
 
 @riverpod
 Future<ConversationModel> conversationDetail(Ref ref, String id) async {
@@ -41,6 +69,38 @@ class ConversationsNotifier extends _$ConversationsNotifier {
       (conversations) => conversations,
     );
   }
+
+  void setConversations(List<ConversationModel> list) {
+    state = AsyncValue.data(list);
+  }
+
+  Future<void> markAsRead(String conversationId) async {
+    final current = state.asData?.value;
+    if (current != null) {
+      final index = current.indexWhere((c) => c.id == conversationId);
+      if (index != -1 && current[index].unreadCount > 0) {
+        final old = current[index];
+        final updated = ConversationModel(
+          id: old.id,
+          customerId: old.customerId,
+          vendorId: old.vendorId,
+          listingId: old.listingId,
+          eventDate: old.eventDate,
+          bookingId: old.bookingId,
+          lastMessageAt: old.lastMessageAt,
+          lastMessagePreview: old.lastMessagePreview,
+          unreadCount: 0,
+          participantName: old.participantName,
+          participantImage: old.participantImage,
+        );
+        final list = List<ConversationModel>.from(current);
+        list[index] = updated;
+        state = AsyncValue.data(list);
+      }
+    }
+    // Also send markAsRead to backend
+    await ref.read(chatRepositoryProvider).markAsRead(conversationId);
+  }
 }
 
 @riverpod
@@ -49,13 +109,15 @@ class ChatDetailNotifier extends _$ChatDetailNotifier {
   FutureOr<List<MessageModel>> build(String conversationId) async {
     final socketService = ref.watch(socketServiceProvider);
 
-    // 1. Connect to socket with auth token and join conversation room
+    // 1. Connect or ensure conversation room joined
     final token = await ref.read(tokenStorageProvider).getAccessToken();
     if (token != null) {
       socketService.connect(
         token: token,
         conversationId: conversationId,
       );
+    } else {
+      socketService.joinConversation(conversationId);
     }
 
     // 2. Listen to socket message event with deduplication
@@ -69,16 +131,17 @@ class ChatDetailNotifier extends _$ChatDetailNotifier {
             return;
           }
           state = AsyncValue.data([...currentState, newMessage]);
+          // Mark as read immediately while viewing this chat
+          ref.read(conversationsProvider.notifier).markAsRead(conversationId);
         }
       } catch (e) {
         // Catch parsing error if payload format differs
       }
     });
 
-    // 3. Lifecycle: Cancel listener and disconnect socket on dispose
+    // 3. Lifecycle: Cancel listener on dispose (do NOT disconnect socket globally)
     ref.onDispose(() {
       subscription.cancel();
-      socketService.disconnect();
     });
 
     // 4. Initial load of messages via REST API
@@ -156,8 +219,9 @@ class CreateConversationNotifier extends _$CreateConversationNotifier {
         'listingId': listingId,
         'eventDate': eventDate.toUtc().toIso8601String(),
       });
-      // Invalidate the conversations list so the new chat shows up in the Chats tab
+      // Invalidate the conversations list and join room
       ref.invalidate(conversationsProvider);
+      ref.read(socketServiceProvider).joinConversation(conversation.id);
       state = false;
       return conversation;
     } catch (e) {
@@ -167,3 +231,104 @@ class CreateConversationNotifier extends _$CreateConversationNotifier {
     }
   }
 }
+
+/// Service that keeps the socket and conversations synced globally
+class ChatSyncService {
+  final Ref ref;
+  StreamSubscription? _socketSub;
+
+  ChatSyncService(this.ref) {
+    _init();
+  }
+
+  void _init() {
+    ref.listen<AuthState>(authControllerProvider, (prev, next) {
+      if (next is AuthStateAuthenticated) {
+        _sync();
+      } else {
+        _cleanup();
+      }
+    }, fireImmediately: true);
+  }
+
+  Future<void> _sync() async {
+    final token = await ref.read(tokenStorageProvider).getAccessToken();
+    if (token == null) return;
+
+    final socketService = ref.read(socketServiceProvider);
+    socketService.connect(token: token);
+
+    // Fetch initial conversations and join their rooms
+    try {
+      final conversations = await ref.read(conversationsProvider.future);
+      for (final c in conversations) {
+        socketService.joinConversation(c.id);
+      }
+    } catch (e) {
+      debugPrint('[ChatSyncService] Error fetching conversations: $e');
+    }
+
+    _socketSub?.cancel();
+    _socketSub = socketService.messageStream.listen((data) {
+      _handleIncomingMessage(data);
+    });
+  }
+
+  void _handleIncomingMessage(Map<String, dynamic> data) {
+    try {
+      final msg = MessageModel.fromJson(data);
+      final currentList = ref.read(conversationsProvider).asData?.value;
+      if (currentList != null) {
+        final index = currentList.indexWhere((c) => c.id == msg.conversationId);
+        final activeChatId = ref.read(activeChatConversationIdProvider);
+        final isChatActive = activeChatId == msg.conversationId;
+
+        if (index != -1) {
+          final old = currentList[index];
+          final updated = ConversationModel(
+            id: old.id,
+            customerId: old.customerId,
+            vendorId: old.vendorId,
+            listingId: old.listingId,
+            eventDate: old.eventDate,
+            bookingId: old.bookingId,
+            lastMessageAt: msg.createdAt,
+            lastMessagePreview: msg.text,
+            unreadCount: isChatActive ? 0 : (old.unreadCount + 1),
+            participantName: old.participantName,
+            participantImage: old.participantImage,
+          );
+          final updatedList = List<ConversationModel>.from(currentList);
+          updatedList.removeAt(index);
+          updatedList.insert(0, updated);
+          ref.read(conversationsProvider.notifier).setConversations(updatedList);
+        } else {
+          // New conversation room came in, refresh list and join
+          ref.invalidate(conversationsProvider);
+          ref.read(socketServiceProvider).joinConversation(msg.conversationId);
+        }
+      } else {
+        ref.invalidate(conversationsProvider);
+      }
+    } catch (e) {
+      ref.invalidate(conversationsProvider);
+    }
+  }
+
+  void _cleanup() {
+    _socketSub?.cancel();
+    _socketSub = null;
+    ref.read(socketServiceProvider).disconnect();
+  }
+
+  void dispose() {
+    _cleanup();
+  }
+}
+
+/// Global provider keeping the socket and conversations active
+final chatSyncProvider = Provider<ChatSyncService>((ref) {
+  final service = ChatSyncService(ref);
+  ref.onDispose(service.dispose);
+  return service;
+});

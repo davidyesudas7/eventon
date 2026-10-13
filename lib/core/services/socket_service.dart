@@ -9,15 +9,26 @@ part 'socket_service.g.dart';
 class SocketService {
   io.Socket? _socket;
   final _messageController = StreamController<Map<String, dynamic>>.broadcast();
+  final Set<String> _joinedConversations = {};
 
   Stream<Map<String, dynamic>> get messageStream => _messageController.stream;
   bool get isConnected => _socket?.connected ?? false;
 
   void connect({
     required String token,
-    required String conversationId,
+    String? conversationId,
   }) {
-    // Disconnect any existing connection before starting a new one
+    if (conversationId != null) {
+      _joinedConversations.add(conversationId);
+    }
+
+    if (_socket != null && _socket!.connected) {
+      if (conversationId != null) {
+        joinConversation(conversationId);
+      }
+      return;
+    }
+
     disconnect();
 
     final rawUrl = dotenv.env['SOCKET_URL'] ??
@@ -35,11 +46,13 @@ class SocketService {
           .build(),
     );
 
-    // 2. Room Joining: Listen for connect event and immediately emit joinConversation
+    // 2. Room Joining: Listen for connect event and immediately emit joinConversation for all joined conversations
     _socket?.onConnect((_) {
       debugPrint(
-          '[SocketService] Connected. Emitting joinConversation: $conversationId');
-      _socket?.emit('joinConversation', {'conversationId': conversationId});
+          '[SocketService] Connected. Emitting joinConversation for ${_joinedConversations.length} conversations');
+      for (final id in _joinedConversations) {
+        _socket?.emit('joinConversation', {'conversationId': id});
+      }
     });
 
     // 3. Message Listener: Listen for 'message' event
@@ -68,12 +81,22 @@ class SocketService {
   }
 
   void joinConversation(String conversationId) {
+    _joinedConversations.add(conversationId);
     if (_socket?.connected == true) {
+      debugPrint('[SocketService] Emitting joinConversation: $conversationId');
       _socket?.emit('joinConversation', {'conversationId': conversationId});
     }
   }
 
+  void leaveConversation(String conversationId) {
+    _joinedConversations.remove(conversationId);
+    if (_socket?.connected == true) {
+      _socket?.emit('leaveConversation', {'conversationId': conversationId});
+    }
+  }
+
   void disconnect() {
+    _joinedConversations.clear();
     _socket?.disconnect();
     _socket?.dispose();
     _socket = null;
@@ -85,7 +108,7 @@ class SocketService {
   }
 }
 
-@riverpod
+@Riverpod(keepAlive: true)
 SocketService socketService(Ref ref) {
   final service = SocketService();
 

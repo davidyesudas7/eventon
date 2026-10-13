@@ -37,10 +37,25 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
     });
   }
 
+  late final ActiveChatNotifier _activeChatNotifier;
+
+  @override
+  void initState() {
+    super.initState();
+    _activeChatNotifier = ref.read(activeChatConversationIdProvider.notifier);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _activeChatNotifier.setActive(widget.conversationId);
+        ref.read(conversationsProvider.notifier).markAsRead(widget.conversationId);
+      }
+    });
+  }
+
   @override
   void dispose() {
     _messageController.dispose();
     _scrollController.dispose();
+    Future.microtask(() => _activeChatNotifier.setActive(null));
     super.dispose();
   }
 

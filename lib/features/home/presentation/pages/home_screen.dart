@@ -13,12 +13,16 @@ import '../../../../core/widgets/app_filter_chip.dart';
 import '../../../listings/presentation/widgets/listing_card.dart';
 import '../../../profile/presentation/providers/home_location_provider.dart';
 import '../widgets/home_search_bar.dart';
+import '../../../chat/presentation/providers/chat_providers.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Ensure socket and conversation API are active when entering home screen
+    ref.watch(chatSyncProvider);
+
     return Scaffold(
       backgroundColor: AppColors.surfaceBase,
       body: CustomScrollView(
@@ -39,7 +43,7 @@ class HomeScreen extends ConsumerWidget {
           SliverToBoxAdapter(
             child: Container(
               color: const Color(0xFF0D2226),
-              padding: const EdgeInsets.only(left: 20, right: 20, bottom: 40),
+              padding: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
               child: _buildOccasionSection(ref),
             ),
           ),
@@ -361,6 +365,7 @@ class HomeScreen extends ConsumerWidget {
       ),
     );
   }
+
   Widget _buildTrustBadges() {
     return Container(
       padding: const EdgeInsets.all(20),
@@ -506,7 +511,8 @@ class _PopularNearYouSection extends ConsumerStatefulWidget {
       _PopularNearYouSectionState();
 }
 
-class _PopularNearYouSectionState extends ConsumerState<_PopularNearYouSection> {
+class _PopularNearYouSectionState
+    extends ConsumerState<_PopularNearYouSection> {
   String _selectedFilter = 'All';
 
   Map<String, dynamic> _getQueryParams() {
@@ -639,8 +645,7 @@ class _PopularNearYouSectionState extends ConsumerState<_PopularNearYouSection> 
                       hasAddedBadge: false,
                       rating: listing.ratingAvg,
                       ratingBadgeDark: true,
-                      onTap: () =>
-                          context.push('/home/listing/${listing.id}'),
+                      onTap: () => context.push('/home/listing/${listing.id}'),
                     ),
                   );
                 }).toList(),

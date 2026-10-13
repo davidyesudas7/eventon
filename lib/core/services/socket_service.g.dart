@@ -21,7 +21,7 @@ final class SocketServiceProvider
         argument: null,
         retry: null,
         name: r'socketServiceProvider',
-        isAutoDispose: true,
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );

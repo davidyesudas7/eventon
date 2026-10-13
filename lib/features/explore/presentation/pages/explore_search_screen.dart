@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../categories/presentation/providers/categories_providers.dart';
 import '../providers/explore_providers.dart';
+import '../providers/location_search_provider.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
@@ -14,23 +15,6 @@ class _SearchCategory {
   final String label;
   final IconData icon;
 }
-
-const _categories = [
-  _SearchCategory('Bridal makeup & styling', Icons.auto_awesome_outlined),
-  _SearchCategory('Bridal wear & costumes', Icons.checkroom_outlined),
-  _SearchCategory('Cakes & desserts', Icons.cake_outlined),
-  _SearchCategory('Catering', Icons.room_service_outlined),
-  _SearchCategory('DJ & entertainment', Icons.headphones_outlined),
-  _SearchCategory('Decoration & stage', Icons.celebration_outlined),
-  _SearchCategory('Event & wedding planners', Icons.event_available_outlined),
-  _SearchCategory('Invitations & printing', Icons.mail_outline),
-  _SearchCategory("Kids' party entertainment", Icons.child_care_outlined),
-  _SearchCategory('Mehendi artists', Icons.back_hand_outlined),
-  _SearchCategory('Pandal, tent & furniture', Icons.festival_outlined),
-  _SearchCategory('Photography & videography', Icons.camera_alt_outlined),
-  _SearchCategory('Travel & transport', Icons.directions_car_outlined),
-  _SearchCategory('Venues', Icons.location_city_outlined),
-];
 
 /// Search sub-screen of Explore (`/explore/search`).
 ///
@@ -86,6 +70,7 @@ class _ExploreSearchScreenState extends ConsumerState<ExploreSearchScreen> {
   Widget build(BuildContext context) {
     final q = _query.toLowerCase();
 
+    final location = ref.watch(exploreLocationProvider);
     final categoriesAsync = ref.watch(categoriesProvider);
     final List<_SearchCategory> matches = [];
     if (q.isNotEmpty && categoriesAsync.hasValue) {
@@ -170,35 +155,43 @@ class _ExploreSearchScreenState extends ConsumerState<ExploreSearchScreen> {
           // Location chip
           Align(
             alignment: Alignment.centerLeft,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(999),
-                border: Border.all(color: AppColors.borderStrong),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(
-                    Icons.location_on_outlined,
-                    color: AppColors.textSecondary,
-                    size: 16,
-                  ),
-                  const SizedBox(width: 6),
-                  Text(
-                    'Current location · 25 km',
-                    style: AppTextStyles.bodyMd.copyWith(
-                      color: AppColors.textPrimary,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(999),
+              onTap: () {
+                context.push('/explore/location');
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(999),
+                  border: Border.all(color: AppColors.borderStrong),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(
+                      Icons.location_on_outlined,
+                      color: AppColors.textSecondary,
+                      size: 16,
                     ),
-                  ),
-                  const SizedBox(width: 4),
-                  const Icon(
-                    Icons.keyboard_arrow_down,
-                    color: AppColors.textSecondary,
-                    size: 16,
-                  ),
-                ],
+                    const SizedBox(width: 6),
+                    Text(
+                      location != null
+                          ? '${location.name}${location.radiusKm != null ? ' · ${location.radiusKm} km' : ''}'
+                          : 'Anywhere',
+                      style: AppTextStyles.bodyMd.copyWith(
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    const Icon(
+                      Icons.keyboard_arrow_down,
+                      color: AppColors.textSecondary,
+                      size: 16,
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
