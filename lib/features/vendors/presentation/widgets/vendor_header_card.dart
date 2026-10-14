@@ -31,14 +31,14 @@ class VendorHeaderCard extends StatelessWidget {
             child: Container(
               width: 72,
               height: 72,
-              color: const Color(0xFFE2EDEA),
+              color: AppColors.surfaceMintPill,
               child: profile.profilePhotoUrl != null &&
                       profile.profilePhotoUrl!.trim().isNotEmpty
                   ? Image.network(
                       profile.profilePhotoUrl!,
                       fit: BoxFit.cover,
                       errorBuilder: (context, error, stackTrace) =>
-                          Container(color: const Color(0xFFE2EDEA)),
+                          Container(color: AppColors.surfaceMintPill),
                     )
                   : null,
             ),
@@ -86,13 +86,13 @@ class VendorHeaderCard extends StatelessWidget {
                       const Icon(
                         Icons.star,
                         size: 14,
-                        color: Color(0xFF0F766E),
+                        color: AppColors.primary,
                       ),
                       const SizedBox(width: 3),
                       Text(
                         effectiveRatingAvg.toStringAsFixed(1),
                         style: const TextStyle(
-                          color: Color(0xFF0F766E),
+                          color: AppColors.primary,
                           fontWeight: FontWeight.w700,
                           fontSize: 14,
                         ),

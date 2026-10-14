@@ -14,7 +14,6 @@ import '../providers/listing_details_providers.dart';
 import '../widgets/listing_review_card.dart';
 import '../../../../features/chat/presentation/providers/chat_providers.dart';
 import '../../../../core/widgets/inline_error_banner.dart';
-import '../../../../core/widgets/circle_icon_button.dart';
 import '../../data/models/listing_detail_model.dart';
 import 'listing_gallery_screen.dart';
 
@@ -74,7 +73,7 @@ class _ListingDetailsScreenState extends ConsumerState<ListingDetailsScreen> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.surfaceWhite,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -88,7 +87,7 @@ class _ListingDetailsScreenState extends ConsumerState<ListingDetailsScreen> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.surfaceWhite,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -101,7 +100,7 @@ class _ListingDetailsScreenState extends ConsumerState<ListingDetailsScreen> {
     final asyncData = ref.watch(listingDetailsProvider(widget.listingId));
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.surfaceWhite,
       appBar: const EventOnAppBar(),
       body: asyncData.when(
         loading: () => const Center(
@@ -146,7 +145,9 @@ class _ListingDetailsScreenState extends ConsumerState<ListingDetailsScreen> {
           final galleryItems = l.allGalleryItems;
           final allMedia = galleryItems.isNotEmpty
               ? galleryItems
-              : (l.media?.cover != null ? [l.media!.cover!] : <MediaAssetModel>[]);
+              : (l.media?.cover != null
+                    ? [l.media!.cover!]
+                    : <MediaAssetModel>[]);
 
           return Stack(
             children: [
@@ -165,10 +166,10 @@ class _ListingDetailsScreenState extends ConsumerState<ListingDetailsScreen> {
                     ),
                     onTapCover: allMedia.isNotEmpty
                         ? () => _openGallery(
-                              allMedia,
-                              initialIndex: 0,
-                              title: l.title,
-                            )
+                            allMedia,
+                            initialIndex: 0,
+                            title: l.title,
+                          )
                         : null,
                   ),
                   if (galleryItems.isNotEmpty)
@@ -198,7 +199,7 @@ class _ListingDetailsScreenState extends ConsumerState<ListingDetailsScreen> {
                                   vertical: 4,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFFE2F4F0),
+                                  color: AppColors.surfaceMintPill,
                                   borderRadius: BorderRadius.circular(6),
                                 ),
                                 child: Row(
@@ -208,13 +209,13 @@ class _ListingDetailsScreenState extends ConsumerState<ListingDetailsScreen> {
                                     const Icon(
                                       Icons.star,
                                       size: 12,
-                                      color: Color(0xFF0F766E),
+                                      color: AppColors.primary,
                                     ),
                                     const SizedBox(width: 3),
                                     Text(
                                       l.ratingAvg!.toStringAsFixed(1),
                                       style: const TextStyle(
-                                        color: Color(0xFF0F766E),
+                                        color: AppColors.primary,
                                         fontSize: 13,
                                         fontWeight: FontWeight.bold,
                                         height: 1.1,
@@ -261,8 +262,9 @@ class _ListingDetailsScreenState extends ConsumerState<ListingDetailsScreen> {
                             const SizedBox(width: 12),
                             InkWell(
                               onTap: () {
-                                final location =
-                                    GoRouterState.of(context).uri.toString();
+                                final location = GoRouterState.of(
+                                  context,
+                                ).uri.toString();
                                 if (location.startsWith('/explore')) {
                                   context.push('/explore/vendor/${l.vendorId}');
                                 } else {
@@ -330,7 +332,9 @@ class _ListingDetailsScreenState extends ConsumerState<ListingDetailsScreen> {
                                   child: Row(
                                     children: [
                                       Icon(
-                                        isAddedToQuote ? Icons.check : Icons.add,
+                                        isAddedToQuote
+                                            ? Icons.check
+                                            : Icons.add,
                                         size: 16,
                                         color: isAddedToQuote
                                             ? AppColors.primary
@@ -560,7 +564,7 @@ class _ListingDetailsScreenState extends ConsumerState<ListingDetailsScreen> {
                         ElevatedButton(
                           onPressed: _messageBusiness,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF155E56),
+                            backgroundColor: AppColors.primary,
                             foregroundColor: Colors.white,
                             elevation: 0,
                             padding: const EdgeInsets.symmetric(
@@ -588,7 +592,11 @@ class _ListingDetailsScreenState extends ConsumerState<ListingDetailsScreen> {
     );
   }
 
-  void _openGallery(List<MediaAssetModel> items, {int initialIndex = 0, String? title}) {
+  void _openGallery(
+    List<MediaAssetModel> items, {
+    int initialIndex = 0,
+    String? title,
+  }) {
     if (items.isEmpty) return;
     Navigator.of(context).push(
       MaterialPageRoute(
@@ -613,14 +621,15 @@ class _ListingDetailsScreenState extends ConsumerState<ListingDetailsScreen> {
         itemBuilder: (context, index) {
           final item = items[index];
           return GestureDetector(
-            onTap: () => _openGallery(items, initialIndex: index, title: l.title),
+            onTap: () =>
+                _openGallery(items, initialIndex: index, title: l.title),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(12),
               child: Container(
                 width: 78,
                 height: 78,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF1F5F9),
+                  color: AppColors.surfaceMuted,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(color: AppColors.borderSubtle, width: 1),
                 ),
@@ -631,17 +640,18 @@ class _ListingDetailsScreenState extends ConsumerState<ListingDetailsScreen> {
                       Image.network(
                         item.thumbnailUrl!,
                         fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) => const Center(
-                          child: Icon(
-                            Icons.image_not_supported_outlined,
-                            size: 22,
-                            color: AppColors.textSecondary,
-                          ),
-                        ),
+                        errorBuilder: (context, error, stackTrace) =>
+                            const Center(
+                              child: Icon(
+                                Icons.image_not_supported_outlined,
+                                size: 22,
+                                color: AppColors.textSecondary,
+                              ),
+                            ),
                         loadingBuilder: (context, child, loadingProgress) {
                           if (loadingProgress == null) return child;
                           return Container(
-                            color: const Color(0xFFF1F5F9),
+                            color: AppColors.surfaceMuted,
                             child: const Center(
                               child: SizedBox(
                                 width: 18,
@@ -657,7 +667,7 @@ class _ListingDetailsScreenState extends ConsumerState<ListingDetailsScreen> {
                       )
                     else if (item.isVideo)
                       Container(
-                        color: const Color(0xFF1E293B),
+                        color: AppColors.dividerDark,
                         child: const Center(
                           child: Icon(
                             Icons.videocam_rounded,
@@ -670,17 +680,18 @@ class _ListingDetailsScreenState extends ConsumerState<ListingDetailsScreen> {
                       Image.network(
                         item.url,
                         fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) => const Center(
-                          child: Icon(
-                            Icons.image_not_supported_outlined,
-                            size: 22,
-                            color: AppColors.textSecondary,
-                          ),
-                        ),
+                        errorBuilder: (context, error, stackTrace) =>
+                            const Center(
+                              child: Icon(
+                                Icons.image_not_supported_outlined,
+                                size: 22,
+                                color: AppColors.textSecondary,
+                              ),
+                            ),
                         loadingBuilder: (context, child, loadingProgress) {
                           if (loadingProgress == null) return child;
                           return Container(
-                            color: const Color(0xFFF1F5F9),
+                            color: AppColors.surfaceMuted,
                             child: const Center(
                               child: SizedBox(
                                 width: 18,
@@ -731,31 +742,18 @@ class _ListingDetailsScreenState extends ConsumerState<ListingDetailsScreen> {
   }) {
     return GestureDetector(
       onTap: onTapCover,
-      child: Stack(
-        children: [
-          if (imageUrl != null)
-            Image.network(
+      child: (imageUrl != null)
+          ? Image.network(
               imageUrl,
               height: 290,
               width: double.infinity,
               fit: BoxFit.cover,
             )
-          else
-            Container(
+          : Container(
               height: 290,
-              color: const Color(0xFFE2E8F0),
+              color: AppColors.borderSubtle,
               width: double.infinity,
             ),
-          Positioned(
-            top: 16,
-            left: 16,
-            child: CircleIconButton(
-              icon: Icons.arrow_back,
-              onTap: () => context.pop(),
-            ),
-          ),
-        ],
-      ),
     );
   }
 }
@@ -925,7 +923,8 @@ class _MessageBusinessSheet extends ConsumerStatefulWidget {
   const _MessageBusinessSheet({required this.listingId});
 
   @override
-  ConsumerState<_MessageBusinessSheet> createState() => _MessageBusinessSheetState();
+  ConsumerState<_MessageBusinessSheet> createState() =>
+      _MessageBusinessSheetState();
 }
 
 class _MessageBusinessSheetState extends ConsumerState<_MessageBusinessSheet> {
@@ -939,8 +938,11 @@ class _MessageBusinessSheetState extends ConsumerState<_MessageBusinessSheet> {
     }
     setState(() => _errorMessage = null);
     final notifier = ref.read(createConversationProvider.notifier);
-    final conversation = await notifier.createConversation(widget.listingId, _selectedDate!);
-        
+    final conversation = await notifier.createConversation(
+      widget.listingId,
+      _selectedDate!,
+    );
+
     if (conversation != null && mounted) {
       Navigator.pop(context); // Close sheet
       context.push('/chats/${conversation.id}'); // Go to chat screen
@@ -987,7 +989,9 @@ class _MessageBusinessSheetState extends ConsumerState<_MessageBusinessSheet> {
           const SizedBox(height: 8),
           Text(
             "This starts a chat with the business about that date.",
-            style: AppTextStyles.bodyMd.copyWith(color: AppColors.textSecondary),
+            style: AppTextStyles.bodyMd.copyWith(
+              color: AppColors.textSecondary,
+            ),
           ),
           const SizedBox(height: 16),
           InkWell(
@@ -1047,7 +1051,7 @@ class _MessageBusinessSheetState extends ConsumerState<_MessageBusinessSheet> {
                   ? null
                   : _startConversation,
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF155E56),
+                backgroundColor: AppColors.primary,
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(

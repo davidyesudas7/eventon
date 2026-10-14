@@ -361,7 +361,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                                   }
                                 },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF15272A),
+                            backgroundColor: AppColors.primary,
                             foregroundColor: Colors.white,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8),
@@ -494,7 +494,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                     vertical: 14,
                   ),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF13222A), // Dark slate
+                    color: AppColors.textPrimary,
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: const [
                       BoxShadow(
@@ -545,7 +545,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
 
   Widget _buildFiltersDrawer(BuildContext context) {
     return Drawer(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.surfaceWhite,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.horizontal(left: Radius.circular(16)),
       ),
@@ -828,7 +828,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                     Navigator.pop(context);
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF15272A),
+                    backgroundColor: AppColors.primary,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),

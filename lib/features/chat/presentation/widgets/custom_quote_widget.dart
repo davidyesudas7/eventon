@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
+import '../../../../core/theme/app_colors.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-
-import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../data/models/message_model.dart';
 import '../providers/chat_providers.dart';
@@ -114,9 +113,9 @@ class _CustomQuoteWidgetState extends ConsumerState<CustomQuoteWidget> {
         ),
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.surfaceWhite,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: const Color(0xFFE5E7EB)),
+          border: Border.all(color: AppColors.chatQuoteBorder),
           boxShadow: [
             BoxShadow(
               color: const Color(0x0A000000),
@@ -133,7 +132,7 @@ class _CustomQuoteWidgetState extends ConsumerState<CustomQuoteWidget> {
             Text(
               'CUSTOM QUOTE · $eventDateStr',
               style: AppTextStyles.labelSm.copyWith(
-                color: const Color(0xFF6B7280),
+                color: AppColors.chatQuoteLabel,
                 fontWeight: FontWeight.w600,
                 letterSpacing: 0.8,
               ),
@@ -144,7 +143,7 @@ class _CustomQuoteWidgetState extends ConsumerState<CustomQuoteWidget> {
             Text(
               description,
               style: AppTextStyles.bodyMd.copyWith(
-                color: const Color(0xFF4B5563),
+                color: AppColors.chatQuoteValue,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -160,7 +159,7 @@ class _CustomQuoteWidgetState extends ConsumerState<CustomQuoteWidget> {
                   style: const TextStyle(
                     fontSize: 26,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF15272A),
+                    color: AppColors.textPrimary,
                     letterSpacing: -0.5,
                   ),
                 ),
@@ -169,7 +168,7 @@ class _CustomQuoteWidgetState extends ConsumerState<CustomQuoteWidget> {
                   'total',
                   style: TextStyle(
                     fontSize: 13,
-                    color: Color(0xFF6B7280),
+                    color: AppColors.chatQuoteLabel,
                     fontWeight: FontWeight.w400,
                   ),
                 ),
@@ -188,12 +187,12 @@ class _CustomQuoteWidgetState extends ConsumerState<CustomQuoteWidget> {
                           ? null
                           : () => _handleResponse(false),
                       style: OutlinedButton.styleFrom(
-                        side: const BorderSide(color: Color(0xFFE5E7EB)),
+                        side: const BorderSide(color: AppColors.chatQuoteBorder),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
                         padding: const EdgeInsets.symmetric(vertical: 12),
-                        backgroundColor: Colors.white,
+                        backgroundColor: AppColors.surfaceWhite,
                       ),
                       child: _isDeclining
                           ? const SizedBox(
@@ -204,7 +203,7 @@ class _CustomQuoteWidgetState extends ConsumerState<CustomQuoteWidget> {
                           : const Text(
                               'Decline',
                               style: TextStyle(
-                                color: Color(0xFF1F2937),
+                                color: AppColors.chatQuoteTitle,
                                 fontWeight: FontWeight.w600,
                                 fontSize: 14,
                               ),
@@ -220,7 +219,7 @@ class _CustomQuoteWidgetState extends ConsumerState<CustomQuoteWidget> {
                           ? null
                           : () => _handleResponse(true),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF155E56),
+                        backgroundColor: AppColors.primary,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
@@ -233,13 +232,13 @@ class _CustomQuoteWidgetState extends ConsumerState<CustomQuoteWidget> {
                               width: 18,
                               child: CircularProgressIndicator(
                                 strokeWidth: 2,
-                                color: Colors.white,
+                                color: AppColors.surfaceWhite,
                               ),
                             )
                           : const Text(
                               'Accept quote',
                               style: TextStyle(
-                                color: Colors.white,
+                                color: AppColors.surfaceWhite,
                                 fontWeight: FontWeight.w600,
                                 fontSize: 14,
                               ),
@@ -256,7 +255,7 @@ class _CustomQuoteWidgetState extends ConsumerState<CustomQuoteWidget> {
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
-                      color: Color(0xFF6B7280),
+                      color: AppColors.chatQuoteLabel,
                       letterSpacing: 0.8,
                     ),
                   ),
@@ -274,14 +273,14 @@ class _CustomQuoteWidgetState extends ConsumerState<CustomQuoteWidget> {
                             style: TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w600,
-                              color: Color(0xFF155E56),
+                              color: AppColors.primary,
                             ),
                           ),
                           SizedBox(width: 4),
                           Icon(
                             Icons.arrow_right_alt,
                             size: 18,
-                            color: Color(0xFF155E56),
+                            color: AppColors.primary,
                           ),
                         ],
                       ),
@@ -295,7 +294,7 @@ class _CustomQuoteWidgetState extends ConsumerState<CustomQuoteWidget> {
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
-                  color: Color(0xFF6B7280),
+                  color: AppColors.chatQuoteLabel,
                   letterSpacing: 0.8,
                 ),
               ),
@@ -305,7 +304,7 @@ class _CustomQuoteWidgetState extends ConsumerState<CustomQuoteWidget> {
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
-                  color: Color(0xFF6B7280),
+                  color: AppColors.chatQuoteLabel,
                   letterSpacing: 0.8,
                 ),
               ),

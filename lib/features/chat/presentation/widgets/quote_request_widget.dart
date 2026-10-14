@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 
 class QuoteRequestWidget extends StatelessWidget {
@@ -17,8 +18,8 @@ class QuoteRequestWidget extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border.all(color: const Color(0xFF6B8A88)), // Dark teal border
+        color: AppColors.surfaceWhite,
+        border: Border.all(color: AppColors.borderStrong),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -27,7 +28,7 @@ class QuoteRequestWidget extends StatelessWidget {
           Text(
             'QUOTE REQUEST · 2 BUSINESSES ASKED',
             style: AppTextStyles.labelSm.copyWith(
-              color: const Color(0xFF6B8A88),
+              color: AppColors.textSecondary,
               fontWeight: FontWeight.w600,
               letterSpacing: 1.0,
             ),
@@ -36,7 +37,7 @@ class QuoteRequestWidget extends StatelessWidget {
           Text(
             'Event date',
             style: AppTextStyles.labelSm.copyWith(
-              color: const Color(0xFF6B8A88),
+              color: AppColors.textSecondary,
             ),
           ),
           const SizedBox(height: 4),
@@ -50,7 +51,7 @@ class QuoteRequestWidget extends StatelessWidget {
           Text(
             'Guests',
             style: AppTextStyles.labelSm.copyWith(
-              color: const Color(0xFF6B8A88),
+              color: AppColors.textSecondary,
             ),
           ),
           const SizedBox(height: 4),
@@ -77,14 +78,14 @@ class QuoteRequestWidget extends StatelessWidget {
                   Text(
                     "Compare every business's quote",
                     style: AppTextStyles.bodyMd.copyWith(
-                      color: const Color(0xFF15272A),
+                      color: AppColors.textPrimary,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
                   const SizedBox(width: 4),
                   const Icon(
                     Icons.arrow_right_alt,
-                    color: Color(0xFF15272A),
+                    color: AppColors.textPrimary,
                     size: 20,
                   ),
                 ],

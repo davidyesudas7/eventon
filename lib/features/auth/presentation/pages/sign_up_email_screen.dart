@@ -102,9 +102,9 @@ class _SignUpEmailScreenState extends ConsumerState<SignUpEmailScreen> {
             ),
           ],
         ),
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.surfaceWhite,
         elevation: 0,
-        surfaceTintColor: Colors.transparent,
+        surfaceTintColor: AppColors.transparent,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
           onPressed: () {
@@ -146,7 +146,7 @@ class _SignUpEmailScreenState extends ConsumerState<SignUpEmailScreen> {
                     child: Text(
                       'go back and use your phone',
                       style: AppTextStyles.bodyLg.copyWith(
-                        color: const Color(0xFF4B5563),
+                        color: AppColors.textSecondary,
                         decoration: TextDecoration.underline,
                       ),
                     ),
@@ -174,7 +174,7 @@ class _SignUpEmailScreenState extends ConsumerState<SignUpEmailScreen> {
                 decoration: InputDecoration(
                   hintText: 'Enter your full name',
                   filled: true,
-                  fillColor: Colors.white,
+                  fillColor: AppColors.surfaceWhite,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(16),
                     borderSide: const BorderSide(color: AppColors.borderStrong),
@@ -200,7 +200,7 @@ class _SignUpEmailScreenState extends ConsumerState<SignUpEmailScreen> {
                 decoration: InputDecoration(
                   hintText: 'Enter your email',
                   filled: true,
-                  fillColor: Colors.white,
+                  fillColor: AppColors.surfaceWhite,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(16),
                     borderSide: const BorderSide(color: AppColors.borderStrong),
@@ -243,7 +243,7 @@ class _SignUpEmailScreenState extends ConsumerState<SignUpEmailScreen> {
                     },
                   ),
                   filled: true,
-                  fillColor: Colors.white,
+                  fillColor: AppColors.surfaceWhite,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(16),
                     borderSide: const BorderSide(color: AppColors.borderStrong),
@@ -267,19 +267,19 @@ class _SignUpEmailScreenState extends ConsumerState<SignUpEmailScreen> {
                 child: ElevatedButton(
                   onPressed: _isLoading ? null : _handleSignUp,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF18252D),
+                    backgroundColor: AppColors.primary,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                     ),
                   ),
                   child: _isLoading
-                      ? const CircularProgressIndicator(color: Colors.white)
+                      ? const CircularProgressIndicator(color: AppColors.onPrimary)
                       : const Text(
                           'Create account',
                           style: TextStyle(
                             fontSize: 17,
                             fontWeight: FontWeight.w600,
-                            color: Colors.white,
+                            color: AppColors.onPrimary,
                           ),
                         ),
                 ),

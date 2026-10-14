@@ -145,7 +145,7 @@ class VendorListingCard extends StatelessWidget {
                             vertical: 3,
                           ),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFE2F4F0),
+                            color: AppColors.surfaceMintPill,
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: Row(
@@ -154,13 +154,13 @@ class VendorListingCard extends StatelessWidget {
                               const Icon(
                                 Icons.star,
                                 size: 11,
-                                color: Color(0xFF0F766E),
+                                color: AppColors.primary,
                               ),
                               const SizedBox(width: 3),
                               Text(
                                 listing.ratingAvg!.toStringAsFixed(1),
                                 style: const TextStyle(
-                                  color: Color(0xFF0F766E),
+                                  color: AppColors.primary,
                                   fontSize: 12,
                                   fontWeight: FontWeight.bold,
                                   height: 1.1,

@@ -44,6 +44,9 @@ class AuthInterceptor extends QueuedInterceptor {
         path.contains('/auth/logout');
     log("the api response is ${response?.data}");
     if (response?.statusCode == 401 && !isAuthPath) {
+      final hadToken = (await tokenStorage.getAccessToken()) != null ||
+          (await tokenStorage.getRefreshToken()) != null;
+
       final refreshToken = await tokenStorage.getRefreshToken();
       if (refreshToken != null && refreshToken.isNotEmpty) {
         try {
@@ -76,9 +79,11 @@ class AuthInterceptor extends QueuedInterceptor {
         }
       }
 
-      // If refresh token missing or refresh failed -> force logout
+      // If refresh token missing or refresh failed -> force logout only if user was previously logged in
       await tokenStorage.clearTokens();
-      onUnauthorized?.call();
+      if (hadToken) {
+        onUnauthorized?.call();
+      }
     }
 
     return handler.next(err);

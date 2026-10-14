@@ -267,7 +267,7 @@ class _ListingGalleryScreenState extends State<ListingGalleryScreen> {
                                       )
                                     else if (item.isVideo)
                                       Container(
-                                        color: const Color(0xFF1E293B),
+                                        color: AppColors.dividerDark,
                                         child: const Center(
                                           child: Icon(Icons.videocam_rounded, color: Colors.white70, size: 20),
                                         ),

@@ -14,9 +14,9 @@ class QuotesListingScreen extends ConsumerWidget {
     final quoteRequestsAsync = ref.watch(quoteRequestsProvider);
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.surfaceWhite,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.surfaceWhite,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
@@ -25,7 +25,7 @@ class QuotesListingScreen extends ConsumerWidget {
         title: const Text(
           'EventOn',
           style: TextStyle(
-            color: Color(0xFF155E56),
+            color: AppColors.primary,
             fontWeight: FontWeight.bold,
             fontSize: 20,
           ),
@@ -56,7 +56,7 @@ class QuotesListingScreen extends ConsumerWidget {
                   child: Text(
                     'New request',
                     style: AppTextStyles.labelMd.copyWith(
-                      color: const Color(0xFF155E56),
+                      color: AppColors.primary,
                     ),
                   ),
                 ),

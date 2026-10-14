@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../theme/app_colors.dart';
 import '../theme/app_text_styles.dart';
 
 /// An inline banner widget for displaying error messages directly above
@@ -31,10 +32,10 @@ class InlineErrorBanner extends StatelessWidget {
         margin: margin,
         padding: padding,
         decoration: BoxDecoration(
-          color: const Color(0xFFFEF2F2), // Soft blush red
+          color: AppColors.errorBg,
           borderRadius: BorderRadius.circular(10),
           border: Border.all(
-            color: const Color(0xFFFCA5A5), // Subtle red border
+            color: AppColors.errorBorder,
             width: 1,
           ),
         ),
@@ -45,7 +46,7 @@ class InlineErrorBanner extends StatelessWidget {
               padding: EdgeInsets.only(top: 2),
               child: Icon(
                 Icons.error_outline_rounded,
-                color: Color(0xFFDC2626),
+                color: AppColors.errorIcon,
                 size: 18,
               ),
             ),
@@ -54,7 +55,7 @@ class InlineErrorBanner extends StatelessWidget {
               child: Text(
                 text,
                 style: AppTextStyles.bodySm.copyWith(
-                  color: const Color(0xFF991B1B),
+                  color: AppColors.errorText,
                   fontWeight: FontWeight.w500,
                   height: 1.35,
                 ),
@@ -69,7 +70,7 @@ class InlineErrorBanner extends StatelessWidget {
                   padding: EdgeInsets.all(2),
                   child: Icon(
                     Icons.close_rounded,
-                    color: Color(0xFFDC2626),
+                    color: AppColors.errorIcon,
                     size: 16,
                   ),
                 ),

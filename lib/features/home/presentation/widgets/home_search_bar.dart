@@ -67,7 +67,7 @@ class _HomeSearchBarState extends ConsumerState<HomeSearchBar> {
     });
 
     return Container(
-      color: const Color(0xFF0D2226), // Seamless blend with AppBar
+      color: AppColors.transparent,
       padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
       child: Hero(
         tag: 'home_search_bar',
@@ -80,19 +80,26 @@ class _HomeSearchBarState extends ConsumerState<HomeSearchBar> {
             child: Container(
               height: 48,
               decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: AppColors.borderStrong),
+                color: AppColors.surfaceWhite,
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(color: AppColors.borderSubtle),
+                boxShadow: const [
+                  BoxShadow(
+                    color: AppColors.shadowSubtle,
+                    blurRadius: 8,
+                    offset: Offset(0, 2),
+                  ),
+                ],
               ),
               child: Row(
                 children: [
-                  const SizedBox(width: 12),
+                  const SizedBox(width: 16),
                   const Icon(
                     Icons.search,
-                    color: AppColors.textMuted,
-                    size: 20,
+                    color: AppColors.textSecondary,
+                    size: 22,
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: 10),
                   TypewriterHint(
                     prefix: 'Search \'',
                     texts: _hintCategories,

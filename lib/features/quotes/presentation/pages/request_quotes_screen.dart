@@ -128,9 +128,9 @@ class _RequestQuotesScreenState extends ConsumerState<RequestQuotesScreen> {
     final quoteItems = ref.watch(quoteCartProvider);
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.surfaceWhite,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.surfaceWhite,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
@@ -139,7 +139,7 @@ class _RequestQuotesScreenState extends ConsumerState<RequestQuotesScreen> {
         title: const Text(
           'EventOn',
           style: TextStyle(
-            color: Color(0xFF155E56),
+            color: AppColors.primary,
             fontWeight: FontWeight.bold,
             fontSize: 20,
           ),
@@ -243,7 +243,7 @@ class _RequestQuotesScreenState extends ConsumerState<RequestQuotesScreen> {
                       '+ Add more businesses',
                       style: AppTextStyles.labelMd.copyWith(
                         fontWeight: FontWeight.w600,
-                        color: const Color(0xFF155E56),
+                        color: AppColors.primary,
                       ),
                     ),
                   ),
@@ -317,7 +317,7 @@ class _RequestQuotesScreenState extends ConsumerState<RequestQuotesScreen> {
               ElevatedButton(
                 onPressed: _isSubmitting ? null : _sendQuoteRequest,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF155E56),
+                  backgroundColor: AppColors.primary,
                   foregroundColor: Colors.white,
                   minimumSize: const Size(double.infinity, 56),
                   shape: RoundedRectangleBorder(

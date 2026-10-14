@@ -14,14 +14,8 @@ class EventOnLogo extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text(
-          'Event',
-          style: baseStyle.copyWith(color: AppColors.textPrimary),
-        ),
-        Text(
-          'On',
-          style: baseStyle.copyWith(color: AppColors.primary),
-        ),
+        Text('EVENT', style: baseStyle.copyWith(color: AppColors.textPrimary)),
+        Text('ON', style: baseStyle.copyWith(color: AppColors.primary)),
       ],
     );
   }

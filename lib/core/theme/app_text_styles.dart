@@ -15,10 +15,10 @@ class AppTextStyles {
 
   static const TextStyle headlineLg = TextStyle(
     fontFamily: fontFamily,
-    fontSize: 24,
+    fontSize: 26,
     fontWeight: FontWeight.w700,
-    height: 32 / 24,
-    letterSpacing: -0.015 * 24,
+    height: 32 / 26,
+    letterSpacing: -0.015 * 26,
     color: AppColors.textPrimary,
   );
 

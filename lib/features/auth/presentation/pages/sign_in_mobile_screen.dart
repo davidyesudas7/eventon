@@ -160,7 +160,7 @@ class _SignInMobileScreenState extends ConsumerState<SignInMobileScreen> {
         _handleClose();
       },
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.surfaceWhite,
         body: SafeArea(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
@@ -182,7 +182,7 @@ class _SignInMobileScreenState extends ConsumerState<SignInMobileScreen> {
                         Text(
                           'On',
                           style: AppTextStyles.headlineLg.copyWith(
-                            color: const Color(0xFF14B8A6),
+                            color: AppColors.primary,
                           ),
                         ),
                       ],
@@ -221,7 +221,7 @@ class _SignInMobileScreenState extends ConsumerState<SignInMobileScreen> {
                   decoration: BoxDecoration(
                     border: Border.all(color: AppColors.borderStrong),
                     borderRadius: BorderRadius.circular(12),
-                    color: Colors.white,
+                    color: AppColors.surfaceWhite,
                   ),
                   child: Row(
                     children: [
@@ -269,20 +269,20 @@ class _SignInMobileScreenState extends ConsumerState<SignInMobileScreen> {
                   child: ElevatedButton(
                     onPressed: _isLoading ? null : _handlePhoneContinue,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF142328),
+                      backgroundColor: AppColors.primary,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
                       elevation: 0,
                     ),
                     child: _isLoading
-                        ? const CircularProgressIndicator(color: Colors.white)
+                        ? const CircularProgressIndicator(color: AppColors.onPrimary)
                         : const Text(
                             'Continue',
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w500,
-                              color: Colors.white,
+                              color: AppColors.onPrimary,
                             ),
                           ),
                   ),
@@ -325,12 +325,12 @@ class _SignInMobileScreenState extends ConsumerState<SignInMobileScreen> {
                     icon: const Icon(
                       Icons.g_mobiledata,
                       size: 32,
-                      color: Colors.blue,
+                      color: AppColors.link,
                     ),
                     label: const Text(
                       'Continue with Google',
                       style: TextStyle(
-                        color: Colors.black87,
+                        color: AppColors.textPrimary,
                         fontWeight: FontWeight.w500,
                       ),
                     ),

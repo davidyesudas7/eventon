@@ -44,7 +44,7 @@ class CategoryListCard extends StatelessWidget {
                     Text(
                       category.name,
                       style: AppTextStyles.headlineSm.copyWith(
-                        color: const Color(0xFF1F2428),
+                        color: AppColors.occasionTitle,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -53,7 +53,7 @@ class CategoryListCard extends StatelessWidget {
                     Text(
                       category.description,
                       style: AppTextStyles.bodySm.copyWith(
-                        color: const Color(0xFF6A737D),
+                        color: AppColors.occasionSubtitle,
                         height: 1.3,
                       ),
                       maxLines: 2,
@@ -65,7 +65,7 @@ class CategoryListCard extends StatelessWidget {
               const SizedBox(width: 8),
               const Icon(
                 Icons.chevron_right,
-                color: Color(0xFFADB5BD),
+                color: AppColors.occasionMeta,
                 size: 20,
               ),
             ],

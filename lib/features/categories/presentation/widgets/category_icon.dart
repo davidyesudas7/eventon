@@ -1,4 +1,6 @@
+
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 
 class CategoryIcon extends StatelessWidget {
   final String? iconName;
@@ -17,15 +19,18 @@ class CategoryIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (iconUrl != null && iconUrl!.isNotEmpty) {
-      return Image.network(
+      return SvgPicture.network(
         iconUrl!,
         width: size,
         height: size,
-        color: color,
-        errorBuilder: (context, error, stackTrace) => _buildIcon(),
+        // colorFilter: color != null
+        //     ? ColorFilter.mode(color!, BlendMode.srcIn)
+        //     : null,
+        errorBuilder: (context, error, stackTrace) => Icon(Icons.error),
       );
+    } else {
+      return _buildIcon();
     }
-    return _buildIcon();
   }
 
   Widget _buildIcon() {

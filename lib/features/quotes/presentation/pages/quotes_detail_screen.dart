@@ -22,11 +22,13 @@ class _QuotesDetailScreenState extends ConsumerState<QuotesDetailScreen> {
     setState(() => _isClosing = true);
     final repo = ref.read(quotesRepositoryProvider);
     final res = await repo.closeQuoteRequest(widget.id);
-    
+
     if (mounted) {
       setState(() => _isClosing = false);
       res.fold(
-        (l) => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l.message))),
+        (l) => ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(l.message))),
         (r) {
           setState(() => _showCloseConfirmation = false);
           ref.invalidate(quoteRequestDetailProvider(widget.id));
@@ -41,9 +43,9 @@ class _QuotesDetailScreenState extends ConsumerState<QuotesDetailScreen> {
     final detailAsync = ref.watch(quoteRequestDetailProvider(widget.id));
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.surfaceWhite,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.surfaceWhite,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
@@ -52,7 +54,7 @@ class _QuotesDetailScreenState extends ConsumerState<QuotesDetailScreen> {
         title: const Text(
           'EventOn',
           style: TextStyle(
-            color: Color(0xFF155E56),
+            color: AppColors.primary,
             fontWeight: FontWeight.bold,
             fontSize: 20,
           ),
@@ -62,7 +64,14 @@ class _QuotesDetailScreenState extends ConsumerState<QuotesDetailScreen> {
       ),
       body: detailAsync.when(
         data: (item) {
-          int quotedCount = item.vendors.where((v) => v.state == 'quoted' || v.status == 'quoted' || v.latestQuote != null).length;
+          int quotedCount = item.vendors
+              .where(
+                (v) =>
+                    v.state == 'quoted' ||
+                    v.status == 'quoted' ||
+                    v.latestQuote != null,
+              )
+              .length;
           int totalCount = item.vendors.length;
 
           return RefreshIndicator(
@@ -76,20 +85,6 @@ class _QuotesDetailScreenState extends ConsumerState<QuotesDetailScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  GestureDetector(
-                    onTap: () => context.pop(),
-                    child: Row(
-                      children: [
-                        const Icon(Icons.arrow_back, size: 16, color: AppColors.textSecondary),
-                        const SizedBox(width: 4),
-                        Text(
-                          'Back',
-                          style: AppTextStyles.labelMd.copyWith(color: AppColors.textSecondary),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 16),
                   Container(
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
@@ -104,22 +99,29 @@ class _QuotesDetailScreenState extends ConsumerState<QuotesDetailScreen> {
                           children: [
                             Text(
                               'Your quote request',
-                              style: AppTextStyles.headlineMd.copyWith(fontSize: 18),
+                              style: AppTextStyles.headlineMd.copyWith(
+                                fontSize: 18,
+                              ),
                             ),
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 4,
+                              ),
                               decoration: BoxDecoration(
                                 color: item.status?.toLowerCase() == 'closed'
                                     ? AppColors.surfaceMuted
-                                    : const Color(0xFFE5F1EF),
+                                    : AppColors.surfaceMintSubtle,
                                 borderRadius: BorderRadius.circular(16),
                               ),
                               child: Text(
-                                item.status?.toLowerCase() == 'closed' ? 'Closed' : (item.status ?? 'Open'),
+                                item.status?.toLowerCase() == 'closed'
+                                    ? 'Closed'
+                                    : (item.status ?? 'Open'),
                                 style: AppTextStyles.labelSm.copyWith(
                                   color: item.status?.toLowerCase() == 'closed'
                                       ? AppColors.textSecondary
-                                      : const Color(0xFF155E56),
+                                      : AppColors.primary,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
@@ -129,20 +131,34 @@ class _QuotesDetailScreenState extends ConsumerState<QuotesDetailScreen> {
                         const SizedBox(height: 16),
                         Row(
                           children: [
-                            const Icon(Icons.calendar_today, size: 16, color: AppColors.textSecondary),
+                            const Icon(
+                              Icons.calendar_today,
+                              size: 16,
+                              color: AppColors.textSecondary,
+                            ),
                             const SizedBox(width: 8),
                             Text(
                               item.eventDate != null
-                                  ? DateFormat('EEE, d MMMM yyyy').format(item.eventDate!)
+                                  ? DateFormat(
+                                      'EEE, d MMMM yyyy',
+                                    ).format(item.eventDate!)
                                   : 'No date',
-                              style: AppTextStyles.bodyMd.copyWith(color: AppColors.textSecondary),
+                              style: AppTextStyles.bodyMd.copyWith(
+                                color: AppColors.textSecondary,
+                              ),
                             ),
                             const SizedBox(width: 16),
-                            const Icon(Icons.group_outlined, size: 16, color: AppColors.textSecondary),
+                            const Icon(
+                              Icons.group_outlined,
+                              size: 16,
+                              color: AppColors.textSecondary,
+                            ),
                             const SizedBox(width: 8),
                             Text(
                               '${item.guestCount ?? 0} guests',
-                              style: AppTextStyles.bodyMd.copyWith(color: AppColors.textSecondary),
+                              style: AppTextStyles.bodyMd.copyWith(
+                                color: AppColors.textSecondary,
+                              ),
                             ),
                           ],
                         ),
@@ -154,7 +170,9 @@ class _QuotesDetailScreenState extends ConsumerState<QuotesDetailScreen> {
                         const SizedBox(height: 16),
                         Text(
                           '$quotedCount of $totalCount businesses have quoted so far.',
-                          style: AppTextStyles.labelMd.copyWith(color: AppColors.textSecondary),
+                          style: AppTextStyles.labelMd.copyWith(
+                            color: AppColors.textSecondary,
+                          ),
                         ),
                       ],
                     ),
@@ -162,12 +180,17 @@ class _QuotesDetailScreenState extends ConsumerState<QuotesDetailScreen> {
                   const SizedBox(height: 24),
                   ...item.vendors.map((vendor) {
                     String displayState = 'Waiting for a quote';
-                    if (vendor.state == 'quoted' || vendor.status == 'quoted' || vendor.latestQuote != null) {
+                    if (vendor.state == 'quoted' ||
+                        vendor.status == 'quoted' ||
+                        vendor.latestQuote != null) {
                       displayState = 'Quoted';
                     } else if (vendor.state == 'awaiting_quote') {
                       displayState = 'Waiting for a quote';
                     } else {
-                      displayState = vendor.state ?? vendor.status ?? 'Waiting for a quote';
+                      displayState =
+                          vendor.state ??
+                          vendor.status ??
+                          'Waiting for a quote';
                     }
 
                     return Container(
@@ -202,7 +225,8 @@ class _QuotesDetailScreenState extends ConsumerState<QuotesDetailScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Expanded(
@@ -219,7 +243,7 @@ class _QuotesDetailScreenState extends ConsumerState<QuotesDetailScreen> {
                                         vertical: 4,
                                       ),
                                       decoration: BoxDecoration(
-                                        color: const Color(0xFFE5E7EB),
+                                        color: AppColors.chatQuoteBorder,
                                         borderRadius: BorderRadius.circular(12),
                                       ),
                                       child: Text(
@@ -235,7 +259,7 @@ class _QuotesDetailScreenState extends ConsumerState<QuotesDetailScreen> {
                                 Text(
                                   vendor.subtitle ?? 'Provider',
                                   style: AppTextStyles.labelMd.copyWith(
-                                    color: const Color(0xFF3279A8),
+                                    color: AppColors.link,
                                   ),
                                 ),
                                 const SizedBox(height: 12),
@@ -244,22 +268,39 @@ class _QuotesDetailScreenState extends ConsumerState<QuotesDetailScreen> {
                                   child: OutlinedButton.icon(
                                     onPressed: () {
                                       if (vendor.conversationId != null) {
-                                        context.push('/chats/${vendor.conversationId}');
+                                        context.push(
+                                          '/chats/${vendor.conversationId}',
+                                        );
                                       } else {
-                                        ScaffoldMessenger.of(context).showSnackBar(
-                                          const SnackBar(content: Text('Chat not available yet.')),
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
+                                          const SnackBar(
+                                            content: Text(
+                                              'Chat not available yet.',
+                                            ),
+                                          ),
                                         );
                                       }
                                     },
-                                    icon: const Icon(Icons.chat_bubble_outline, size: 18),
+                                    icon: const Icon(
+                                      Icons.chat_bubble_outline,
+                                      size: 18,
+                                    ),
                                     label: const Text('Chat'),
                                     style: OutlinedButton.styleFrom(
                                       foregroundColor: AppColors.textPrimary,
-                                      side: const BorderSide(color: AppColors.borderSubtle),
+                                      side: const BorderSide(
+                                        color: AppColors.borderSubtle,
+                                      ),
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(8),
                                       ),
-                                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                      backgroundColor: AppColors.surfaceWhite,
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 12,
+                                        vertical: 8,
+                                      ),
                                       minimumSize: const Size(0, 36),
                                     ),
                                   ),
@@ -309,7 +350,9 @@ class _QuotesDetailScreenState extends ConsumerState<QuotesDetailScreen> {
                           children: [
                             Text(
                               'Close it? Any quote you have not answered is declined, and businesses who have not quoted are told you are done.',
-                              style: AppTextStyles.bodyMd.copyWith(color: AppColors.textPrimary),
+                              style: AppTextStyles.bodyMd.copyWith(
+                                color: AppColors.textPrimary,
+                              ),
                             ),
                             const SizedBox(height: 20),
                             Row(
@@ -323,11 +366,15 @@ class _QuotesDetailScreenState extends ConsumerState<QuotesDetailScreen> {
                                     },
                                     style: OutlinedButton.styleFrom(
                                       foregroundColor: AppColors.textPrimary,
-                                      side: const BorderSide(color: AppColors.borderStrong),
+                                      side: const BorderSide(
+                                        color: AppColors.borderStrong,
+                                      ),
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(8),
                                       ),
-                                      padding: const EdgeInsets.symmetric(vertical: 16),
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 16,
+                                      ),
                                     ),
                                     child: const Text('Keep open'),
                                   ),
@@ -335,22 +382,29 @@ class _QuotesDetailScreenState extends ConsumerState<QuotesDetailScreen> {
                                 const SizedBox(width: 16),
                                 Expanded(
                                   child: ElevatedButton(
-                                    onPressed: _isClosing ? null : _closeRequest,
+                                    onPressed: _isClosing
+                                        ? null
+                                        : _closeRequest,
                                     style: ElevatedButton.styleFrom(
-                                      backgroundColor: const Color(0xFF132329),
+                                      backgroundColor: AppColors.primary,
                                       foregroundColor: Colors.white,
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(8),
                                       ),
-                                      padding: const EdgeInsets.symmetric(vertical: 16),
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 16,
+                                      ),
                                     ),
-                                    child: _isClosing 
-                                      ? const SizedBox(
-                                          width: 20, 
-                                          height: 20, 
-                                          child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)
-                                        )
-                                      : const Text('Close request'),
+                                    child: _isClosing
+                                        ? const SizedBox(
+                                            width: 20,
+                                            height: 20,
+                                            child: CircularProgressIndicator(
+                                              color: Colors.white,
+                                              strokeWidth: 2,
+                                            ),
+                                          )
+                                        : const Text('Close request'),
                                   ),
                                 ),
                               ],

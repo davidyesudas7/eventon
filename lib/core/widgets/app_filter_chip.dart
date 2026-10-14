@@ -24,7 +24,7 @@ class AppFilterChip extends StatelessWidget {
         ? (variant == FilterChipVariant.dark
             ? AppColors.ink
             : AppColors.surfaceMintPill)
-        : Colors.white;
+        : AppColors.surfaceBase;
 
     final borderColor = isSelected
         ? (variant == FilterChipVariant.dark
@@ -34,8 +34,8 @@ class AppFilterChip extends StatelessWidget {
 
     final textColor = isSelected
         ? (variant == FilterChipVariant.dark
-            ? Colors.white
-            : const Color(0xFF164850))
+            ? AppColors.onPrimary
+            : AppColors.brandDeep)
         : AppColors.textPrimary; // or textSecondary
 
     return Material(

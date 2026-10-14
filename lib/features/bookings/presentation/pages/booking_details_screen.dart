@@ -44,7 +44,7 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
   String? _reviewError;
   String? _disputeError;
 
-  static const _payButtonColor = Color(0xFF155E56);
+  static const _payButtonColor = AppColors.primary;
 
   @override
   void initState() {
@@ -298,7 +298,7 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
     final isPaying = ref.watch(payBookingProvider);
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.surfaceWhite,
       appBar: const EventOnAppBar(fallbackLocation: '/bookings'),
       body: GestureDetector(
         onTap: () => FocusScope.of(context).unfocus(),
@@ -311,7 +311,7 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(Icons.error_outline, size: 48, color: Colors.red),
+                const Icon(Icons.error_outline, size: 48, color: AppColors.error),
                 const SizedBox(height: 16),
                 Text('Failed to load booking', style: AppTextStyles.headlineSm),
                 const SizedBox(height: 16),
@@ -514,7 +514,7 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
                                           height: 16,
                                           child: CircularProgressIndicator(
                                             strokeWidth: 2,
-                                            color: Colors.white,
+                                            color: AppColors.onPrimary,
                                           ),
                                         )
                                       : const Icon(Icons.lock_outline, size: 16),
@@ -523,7 +523,7 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
                                   ),
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: _payButtonColor,
-                                    foregroundColor: Colors.white,
+                                    foregroundColor: AppColors.onPrimary,
                                     elevation: 0,
                                     padding: const EdgeInsets.symmetric(
                                       horizontal: 22,
@@ -666,7 +666,7 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
                                             height: 16,
                                             child: CircularProgressIndicator(
                                               strokeWidth: 2,
-                                              color: Colors.white,
+                                              color: AppColors.onPrimary,
                                             ),
                                           )
                                         : const Icon(Icons.lock_outline, size: 16),
@@ -675,7 +675,7 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
                                     ),
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: _payButtonColor,
-                                      foregroundColor: Colors.white,
+                                      foregroundColor: AppColors.onPrimary,
                                       elevation: 0,
                                       padding: const EdgeInsets.symmetric(
                                         horizontal: 22,
@@ -711,7 +711,7 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
                     Text(
                       'This booking is under review by our team.',
                       style: AppTextStyles.bodyMd.copyWith(
-                        color: const Color(0xFF475569),
+                        color: AppColors.textSecondary,
                       ),
                     ),
                   ] else if (isCompleted) ...[
@@ -723,10 +723,10 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
                           vertical: 12,
                         ),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFF1F5F9),
+                          color: AppColors.surfaceMuted,
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
-                            color: const Color(0xFFE2E8F0),
+                            color: AppColors.borderSubtle,
                           ),
                         ),
                         child: Row(
@@ -735,14 +735,14 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
                             const Icon(
                               Icons.verified_outlined,
                               size: 18,
-                              color: Color(0xFF155E56),
+                              color: AppColors.primary,
                             ),
                             const SizedBox(width: 8),
                             Expanded(
                               child: Text(
                                 'Dispute resolved: ${b.disputeResolution ?? 'Resolved by our team'}',
                                 style: AppTextStyles.bodySm.copyWith(
-                                  color: const Color(0xFF334155),
+                                  color: AppColors.textPrimary,
                                 ),
                               ),
                             ),
@@ -779,7 +779,7 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
                                           ? Icons.star_rounded
                                           : Icons.star_outline_rounded,
                                       size: 28,
-                                      color: const Color(0xFF155E56),
+                                      color: AppColors.primary,
                                     ),
                                   ),
                                 );
@@ -805,7 +805,7 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
                                 focusedBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
                                   borderSide: const BorderSide(
-                                    color: Color(0xFF155E56),
+                                    color: AppColors.primary,
                                   ),
                                 ),
                               ),
@@ -829,8 +829,8 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
                                     ? null
                                     : () => _submitReview(b),
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xFF155E56),
-                                  foregroundColor: Colors.white,
+                                  backgroundColor: AppColors.primary,
+                                  foregroundColor: AppColors.onPrimary,
                                   elevation: 0,
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(12),
@@ -844,8 +844,8 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
                                         width: 20,
                                         height: 20,
                                         child: CircularProgressIndicator(
-                                          strokeWidth: 2,
-                                          color: Colors.white,
+                                              strokeWidth: 2,
+                                              color: AppColors.onPrimary,
                                         ),
                                       )
                                     : const Text('Submit review'),
@@ -861,7 +861,7 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
                           const Icon(
                             Icons.check_circle_rounded,
                             size: 18,
-                            color: Color(0xFF155E56),
+                            color: AppColors.primary,
                           ),
                           const SizedBox(width: 8),
                           Text(
@@ -887,9 +887,9 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
                           child: Text(
                             'Report an issue with this booking',
                             style: AppTextStyles.bodySm.copyWith(
-                              color: const Color(0xFF475569),
+                              color: AppColors.textSecondary,
                               decoration: TextDecoration.underline,
-                              decorationColor: const Color(0xFF94A3B8),
+                              decorationColor: AppColors.textMuted,
                             ),
                           ),
                         ),
@@ -968,8 +968,8 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
                                         ? null
                                         : () => _submitDispute(b),
                                     style: ElevatedButton.styleFrom(
-                                      backgroundColor: const Color(0xFFC2410C),
-                                      foregroundColor: Colors.white,
+                                      backgroundColor: AppColors.cancelBg,
+                                      foregroundColor: AppColors.onPrimary,
                                       elevation: 0,
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(8),
@@ -981,7 +981,7 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
                                             height: 18,
                                             child: CircularProgressIndicator(
                                               strokeWidth: 2,
-                                              color: Colors.white,
+                                              color: AppColors.onPrimary,
                                             ),
                                           )
                                         : const Text('Submit report'),
@@ -1004,7 +1004,7 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
                         child: Text(
                           'Cancel booking',
                           style: AppTextStyles.bodyMd.copyWith(
-                            color: const Color(0xFFC2410C),
+                            color: AppColors.cancelBg,
                           ),
                         ),
                       ),
@@ -1057,7 +1057,7 @@ class _CancelBookingDialogState extends State<_CancelBookingDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.surfaceWhite,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
       ),
@@ -1149,7 +1149,7 @@ class _CancelBookingDialogState extends State<_CancelBookingDialog> {
                 },
           style: ElevatedButton.styleFrom(
             backgroundColor: AppColors.error,
-            foregroundColor: Colors.white,
+            foregroundColor: AppColors.onPrimary,
             elevation: 0,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8),
@@ -1161,7 +1161,7 @@ class _CancelBookingDialogState extends State<_CancelBookingDialog> {
                   height: 16,
                   child: CircularProgressIndicator(
                     strokeWidth: 2,
-                    color: Colors.white,
+                    color: AppColors.onPrimary,
                   ),
                 )
               : const Text('Cancel booking'),

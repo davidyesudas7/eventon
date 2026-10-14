@@ -49,7 +49,7 @@ class ListingReviewCard extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        const Icon(Icons.star, color: Color(0xFFFFB800), size: 16),
+                        const Icon(Icons.star, color: AppColors.starRating, size: 16),
                         const SizedBox(width: 4),
                         Text(
                           review.rating.toString(),

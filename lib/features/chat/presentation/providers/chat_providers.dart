@@ -29,6 +29,10 @@ final activeChatConversationIdProvider =
 
 /// Sum of unread messages across all active conversations
 final totalUnreadMessagesCountProvider = Provider<int>((ref) {
+  final authState = ref.watch(authControllerProvider);
+  if (authState is! AuthStateAuthenticated) {
+    return 0;
+  }
   final conversationsAsync = ref.watch(conversationsProvider);
   return conversationsAsync.maybeWhen(
     data: (conversations) => conversations.fold<int>(
@@ -58,14 +62,34 @@ ChatRepository chatRepository(Ref ref) {
 class ConversationsNotifier extends _$ConversationsNotifier {
   @override
   FutureOr<List<ConversationModel>> build() async {
+    final authState = ref.watch(authControllerProvider);
+    if (authState is! AuthStateAuthenticated) {
+      return [];
+    }
+
+    final token = await ref.watch(tokenStorageProvider).getAccessToken();
+    if (token == null || token.isEmpty) {
+      return [];
+    }
+
     return _fetchConversations();
   }
 
   Future<List<ConversationModel>> _fetchConversations() async {
+    final authState = ref.read(authControllerProvider);
+    if (authState is! AuthStateAuthenticated) {
+      return [];
+    }
+
+    final token = await ref.read(tokenStorageProvider).getAccessToken();
+    if (token == null || token.isEmpty) {
+      return [];
+    }
+
     final repository = ref.watch(chatRepositoryProvider);
     final result = await repository.getConversations();
     return result.fold(
-      (failure) => throw Exception(failure.message),
+      (failure) => [],
       (conversations) => conversations,
     );
   }
@@ -252,8 +276,11 @@ class ChatSyncService {
   }
 
   Future<void> _sync() async {
+    final authState = ref.read(authControllerProvider);
+    if (authState is! AuthStateAuthenticated) return;
+
     final token = await ref.read(tokenStorageProvider).getAccessToken();
-    if (token == null) return;
+    if (token == null || token.isEmpty) return;
 
     final socketService = ref.read(socketServiceProvider);
     socketService.connect(token: token);

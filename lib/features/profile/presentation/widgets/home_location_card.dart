@@ -167,160 +167,151 @@ class _HomeLocationCardState extends ConsumerState<HomeLocationCard> {
             ),
           ],
 
+          const SizedBox(height: 16),
+          Text(
+            'Panchayat, municipality or corporation (Kerala only)',
+            style: AppTextStyles.bodyMd.copyWith(color: AppColors.textPrimary),
+          ),
+          const SizedBox(height: 6),
 
-            const SizedBox(height: 16),
-            Text(
-              'Panchayat, municipality or corporation (Kerala only)',
-              style: AppTextStyles.bodyMd.copyWith(
-                color: AppColors.textPrimary,
+          if (!_isEditingLsg && _currentLsgDetails != null)
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              decoration: BoxDecoration(
+                border: Border.all(color: AppColors.borderStrong),
+                borderRadius: BorderRadius.circular(12),
+                color: Colors.white,
               ),
-            ),
-            const SizedBox(height: 6),
-
-            if (!_isEditingLsg && _currentLsgDetails != null)
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 14,
-                ),
-                decoration: BoxDecoration(
-                  border: Border.all(color: AppColors.borderStrong),
-                  borderRadius: BorderRadius.circular(12),
-                  color: Colors.white,
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Text(
-                        'Already set on your account.',
-                        style: AppTextStyles.bodyMd.copyWith(
-                          color: AppColors.textSecondary,
-                        ),
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          _isEditingLsg = true;
-                          _lsgController.text = _currentLsgDetails!.name;
-                          _onLsgChanged(_lsgController.text);
-                        });
-                      },
-                      child: Text(
-                        'Change',
-                        style: AppTextStyles.labelMd.copyWith(
-                          color: AppColors.primary,
-                          fontWeight: FontWeight.w600,
-                          decoration: TextDecoration.underline,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              )
-            else
-              Column(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  TextField(
-                    controller: _lsgController,
-                    onChanged: _onLsgChanged,
-                    decoration: InputDecoration(
-                      hintText: 'Start typing your panchayat\'s name...',
-                      suffixIcon: _isSearchingLsg
-                          ? const Padding(
-                              padding: EdgeInsets.all(12.0),
-                              child: SizedBox(
-                                width: 16,
-                                height: 16,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                ),
-                              ),
-                            )
-                          : null,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(
-                          color: AppColors.borderStrong,
-                        ),
+                  Expanded(
+                    child: Text(
+                      'Already set on your account.',
+                      style: AppTextStyles.bodyMd.copyWith(
+                        color: AppColors.textSecondary,
                       ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(
-                          color: AppColors.borderStrong,
-                        ),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(
-                          color: AppColors.primary,
-                          width: 1.5,
-                        ),
-                      ),
-                      fillColor: Colors.white,
-                      filled: true,
                     ),
                   ),
-                  if (_lsgSuggestions.isNotEmpty && _isEditingLsg)
-                    Container(
-                      margin: const EdgeInsets.only(top: 4),
-                      decoration: BoxDecoration(
-                        border: Border.all(color: AppColors.borderStrong),
-                        borderRadius: BorderRadius.circular(12),
-                        color: Colors.white,
-                      ),
-                      child: ListView.separated(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount: _lsgSuggestions.length,
-                        separatorBuilder: (context, index) => const Divider(
-                          height: 1,
-                          color: AppColors.borderSubtle,
-                        ),
-                        itemBuilder: (context, index) {
-                          final lsg = _lsgSuggestions[index];
-                          return InkWell(
-                            onTap: () {
-                              setState(() {
-                                _currentLsgDetails = lsg;
-                                _isEditingLsg = false;
-                                _lsgSuggestions = [];
-                                FocusScope.of(context).unfocus();
-                              });
-                            },
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 12,
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    lsg.name,
-                                    style: AppTextStyles.bodyLg.copyWith(
-                                      color: AppColors.textPrimary,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 2),
-                                  Text(
-                                    '${lsg.type == 'grama_panchayat' ? 'Grama panchayat' : 'Municipality'}, ${lsg.district}',
-                                    style: AppTextStyles.labelMd.copyWith(
-                                      color: AppColors.textSecondary,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          );
-                        },
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _isEditingLsg = true;
+                        _lsgController.text = _currentLsgDetails!.name;
+                        _onLsgChanged(_lsgController.text);
+                      });
+                    },
+                    child: Text(
+                      'Change',
+                      style: AppTextStyles.labelMd.copyWith(
+                        color: AppColors.primary,
+                        fontWeight: FontWeight.w600,
+                        decoration: TextDecoration.underline,
                       ),
                     ),
+                  ),
                 ],
               ),
-
+            )
+          else
+            Column(
+              children: [
+                TextField(
+                  controller: _lsgController,
+                  onChanged: _onLsgChanged,
+                  decoration: InputDecoration(
+                    hintText: 'Start typing your panchayat\'s name...',
+                    suffixIcon: _isSearchingLsg
+                        ? const Padding(
+                            padding: EdgeInsets.all(12.0),
+                            child: SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            ),
+                          )
+                        : null,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(
+                        color: AppColors.borderStrong,
+                      ),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(
+                        color: AppColors.borderStrong,
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(
+                        color: AppColors.primary,
+                        width: 1.5,
+                      ),
+                    ),
+                    fillColor: Colors.white,
+                    filled: true,
+                  ),
+                ),
+                if (_lsgSuggestions.isNotEmpty && _isEditingLsg)
+                  Container(
+                    margin: const EdgeInsets.only(top: 4),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: AppColors.borderStrong),
+                      borderRadius: BorderRadius.circular(12),
+                      color: Colors.white,
+                    ),
+                    child: ListView.separated(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: _lsgSuggestions.length,
+                      separatorBuilder: (context, index) => const Divider(
+                        height: 1,
+                        color: AppColors.borderSubtle,
+                      ),
+                      itemBuilder: (context, index) {
+                        final lsg = _lsgSuggestions[index];
+                        return InkWell(
+                          onTap: () {
+                            setState(() {
+                              _currentLsgDetails = lsg;
+                              _isEditingLsg = false;
+                              _lsgSuggestions = [];
+                              FocusScope.of(context).unfocus();
+                            });
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 12,
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  lsg.name,
+                                  style: AppTextStyles.bodyLg.copyWith(
+                                    color: AppColors.textPrimary,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  '${lsg.type == 'grama_panchayat' ? 'Grama panchayat' : 'Municipality'}, ${lsg.district}',
+                                  style: AppTextStyles.labelMd.copyWith(
+                                    color: AppColors.textSecondary,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+              ],
+            ),
 
           const SizedBox(height: 20),
           SizedBox(
@@ -328,33 +319,28 @@ class _HomeLocationCardState extends ConsumerState<HomeLocationCard> {
             height: 52,
             child: ElevatedButton(
               onPressed: () async {
-                      if (_currentPincodeDetails == null) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Please enter a valid pincode first.'),
-                          ),
-                        );
-                        return;
-                      }
-                      
-                      await ref
-                          .read(homeLocationStateProvider.notifier)
-                          .saveLocation(
-                            _currentPincodeDetails!,
-                            _currentLsgDetails,
-                          );
-                      if (context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Home location saved successfully!'),
-                          ),
-                        );
-                      }
-                    },
+                if (_currentPincodeDetails == null) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Please enter a valid pincode first.'),
+                    ),
+                  );
+                  return;
+                }
+
+                await ref
+                    .read(homeLocationStateProvider.notifier)
+                    .saveLocation(_currentPincodeDetails!, _currentLsgDetails);
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Home location saved successfully!'),
+                    ),
+                  );
+                }
+              },
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(
-                  0xFF134E4A,
-                ), // Dark teal to match screenshot
+                backgroundColor: AppColors.primary,
                 disabledBackgroundColor: Colors.grey[300],
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),

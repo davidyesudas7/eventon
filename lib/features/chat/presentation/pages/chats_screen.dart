@@ -1,8 +1,10 @@
+import 'package:eventon/core/widgets/eventon_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
+import '../../../auth/presentation/providers/auth_providers.dart';
 import '../../data/models/conversation_model.dart';
 import '../providers/chat_providers.dart';
 
@@ -11,39 +13,90 @@ class ChatsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final authState = ref.watch(authControllerProvider);
+    if (authState is! AuthStateAuthenticated) {
+      return Scaffold(
+        backgroundColor: AppColors.surfaceWhite,
+        appBar: AppBar(
+          backgroundColor: AppColors.surfaceWhite,
+          elevation: 0,
+          titleSpacing: 0,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
+            onPressed: () {
+              if (context.canPop()) {
+                context.pop();
+              } else {
+                context.go('/home');
+              }
+            },
+          ),
+          title: Text(
+            'EventOn',
+            style: AppTextStyles.headlineSm.copyWith(
+              color: AppColors.primary,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          bottom: PreferredSize(
+            preferredSize: const Size.fromHeight(1),
+            child: Container(color: AppColors.borderSubtle, height: 1),
+          ),
+        ),
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(
+                  Icons.chat_bubble_outline_rounded,
+                  size: 64,
+                  color: AppColors.textSecondary,
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'Sign in to view messages',
+                  style: AppTextStyles.headlineSm.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Log in to chat with vendors and manage your inquiries.',
+                  textAlign: TextAlign.center,
+                  style: AppTextStyles.bodyMd.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                ElevatedButton(
+                  onPressed: () => context.push('/sign-in-mobile'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: AppColors.onPrimary,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 32,
+                      vertical: 12,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(24),
+                    ),
+                  ),
+                  child: const Text('Log In'),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
     final conversationsState = ref.watch(conversationsProvider);
 
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        titleSpacing: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
-          onPressed: () {
-            if (context.canPop()) {
-              context.pop();
-            } else {
-              context.go('/home');
-            }
-          },
-        ),
-        title: Text(
-          'EventOn',
-          style: AppTextStyles.headlineSm.copyWith(
-            color: AppColors.primary,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(1),
-          child: Container(
-            color: AppColors.borderSubtle,
-            height: 1,
-          ),
-        ),
-      ),
+      backgroundColor: AppColors.surfaceWhite,
+      appBar: EventOnAppBar(showBack: false),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -110,13 +163,15 @@ class ChatsScreen extends ConsumerWidget {
 
 class ChatItemWidget extends ConsumerWidget {
   final ConversationModel conversation;
-  
+
   const ChatItemWidget({super.key, required this.conversation});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final listingState = ref.watch(listingDetailProvider(conversation.listingId));
-    
+    final listingState = ref.watch(
+      listingDetailProvider(conversation.listingId),
+    );
+
     return InkWell(
       onTap: () {
         context.push('/chats/${conversation.id}');
@@ -188,7 +243,10 @@ class ChatItemWidget extends ConsumerWidget {
               if (conversation.unreadCount > 0) ...[
                 const SizedBox(height: 6),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 7,
+                    vertical: 2,
+                  ),
                   decoration: BoxDecoration(
                     color: AppColors.primary,
                     borderRadius: BorderRadius.circular(12),

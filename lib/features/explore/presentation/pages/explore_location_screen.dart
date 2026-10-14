@@ -123,9 +123,9 @@ class _ExploreLocationScreenState extends ConsumerState<ExploreLocationScreen> {
     final notifier = ref.read(locationSearchControllerProvider.notifier);
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.surfaceWhite,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.surfaceWhite,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
@@ -342,8 +342,8 @@ class _ExploreLocationScreenState extends ConsumerState<ExploreLocationScreen> {
         label: Text(label),
         selected: isSelected,
         onSelected: (_) => _onRadiusSelected(radius),
-        backgroundColor: Colors.white,
-        selectedColor: const Color(0xFFE5EEED),
+        backgroundColor: AppColors.surfaceWhite,
+        selectedColor: AppColors.chipSelected,
         checkmarkColor: AppColors.primary,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),

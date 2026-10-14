@@ -136,9 +136,9 @@ class _SignInEmailScreenState extends ConsumerState<SignInEmailScreen> {
             ),
           ],
         ),
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.surfaceWhite,
         elevation: 0,
-        surfaceTintColor: Colors.transparent,
+        surfaceTintColor: AppColors.transparent,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
           onPressed: _handleBack,
@@ -176,7 +176,7 @@ class _SignInEmailScreenState extends ConsumerState<SignInEmailScreen> {
                 decoration: InputDecoration(
                   hintText: 'Enter your email',
                   filled: true,
-                  fillColor: Colors.white,
+                  fillColor: AppColors.surfaceWhite,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: const BorderSide(color: AppColors.borderStrong),
@@ -239,7 +239,7 @@ class _SignInEmailScreenState extends ConsumerState<SignInEmailScreen> {
                     },
                   ),
                   filled: true,
-                  fillColor: Colors.white,
+                  fillColor: AppColors.surfaceWhite,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: const BorderSide(color: AppColors.borderStrong),
@@ -263,19 +263,19 @@ class _SignInEmailScreenState extends ConsumerState<SignInEmailScreen> {
                 child: ElevatedButton(
                   onPressed: _isLoading ? null : _handleSignIn,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF142328),
+                    backgroundColor: AppColors.primary,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
                   child: _isLoading
-                      ? const CircularProgressIndicator(color: Colors.white)
+                      ? const CircularProgressIndicator(color: AppColors.onPrimary)
                       : const Text(
                           'Sign in',
                           style: TextStyle(
                             fontSize: 17,
                             fontWeight: FontWeight.w600,
-                            color: Colors.white,
+                            color: AppColors.onPrimary,
                           ),
                         ),
                 ),

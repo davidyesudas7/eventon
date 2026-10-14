@@ -48,15 +48,17 @@ class _BookingsScreenState extends ConsumerState<BookingsScreen> {
     final asyncData = ref.watch(bookingsProvider);
 
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: const EventOnAppBar(),
+      backgroundColor: AppColors.surfaceWhite,
+      appBar: const EventOnAppBar(showBack: false),
       body: asyncData.when(
-        loading: () => const Center(child: CircularProgressIndicator(color: AppColors.primary)),
+        loading: () => const Center(
+          child: CircularProgressIndicator(color: AppColors.primary),
+        ),
         error: (err, stack) => Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.error_outline, size: 48, color: Colors.red),
+              const Icon(Icons.error_outline, size: 48, color: AppColors.error),
               const SizedBox(height: 16),
               Text('Failed to load bookings', style: AppTextStyles.headlineSm),
               const SizedBox(height: 16),

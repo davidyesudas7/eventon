@@ -46,7 +46,9 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         _activeChatNotifier.setActive(widget.conversationId);
-        ref.read(conversationsProvider.notifier).markAsRead(widget.conversationId);
+        ref
+            .read(conversationsProvider.notifier)
+            .markAsRead(widget.conversationId);
       }
     });
   }
@@ -78,9 +80,9 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
     );
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.surfaceWhite,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.surfaceWhite,
         elevation: 0,
         titleSpacing: 0,
         leading: IconButton(
@@ -169,7 +171,7 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
                           ),
                           decoration: BoxDecoration(
                             color: isMe
-                                ? const Color(0xFFE5F1EF)
+                                ? AppColors.surfaceMintSubtle
                                 : AppColors.surfaceMuted,
                             borderRadius: BorderRadius.circular(12),
                           ),
@@ -177,7 +179,7 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
                             message.text ?? '',
                             style: AppTextStyles.bodyMd.copyWith(
                               color: isMe
-                                  ? const Color(0xFF15272A)
+                                  ? AppColors.primary
                                   : AppColors.textPrimary,
                             ),
                           ),
@@ -202,7 +204,7 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: const BoxDecoration(
-                color: Colors.white,
+                color: AppColors.surfaceWhite,
                 border: Border(top: BorderSide(color: AppColors.borderSubtle)),
               ),
               child: Row(
@@ -260,12 +262,12 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
                       width: 44,
                       height: 44,
                       decoration: const BoxDecoration(
-                        color: Color(0xFF15272A), // Dark teal
+                        color: AppColors.primary,
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(
                         Icons.arrow_upward,
-                        color: Colors.white,
+                        color: AppColors.surfaceWhite,
                         size: 20,
                       ),
                     ),

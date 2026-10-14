@@ -24,7 +24,7 @@ class VendorReviewItem extends StatelessWidget {
               const Icon(
                 Icons.star,
                 size: 14,
-                color: Color(0xFF0F766E),
+                color: AppColors.primary,
               ),
               const SizedBox(width: 4),
               Text(
@@ -32,7 +32,7 @@ class VendorReviewItem extends StatelessWidget {
                     ? review.rating.toInt().toString()
                     : review.rating.toString(),
                 style: const TextStyle(
-                  color: Color(0xFF0F766E),
+                  color: AppColors.primary,
                   fontWeight: FontWeight.w700,
                   fontSize: 15,
                 ),
