@@ -658,7 +658,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                     vertical: 14,
                   ),
                   decoration: BoxDecoration(
-                    color: AppColors.surfaceElevated,
+                    color: AppColors.surfaceDark,
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: const [
                       BoxShadow(
@@ -690,7 +690,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                           const SizedBox(width: 6),
                           const Icon(
                             Icons.arrow_forward,
-                            color: AppColors.surfaceWhite,
+                            color: AppColors.surfaceWhite70,
                             size: 18,
                           ),
                         ],

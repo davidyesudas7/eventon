@@ -1,3 +1,4 @@
+import 'package:eventon/core/widgets/eventon_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -15,24 +16,7 @@ class QuotesListingScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: AppColors.surfaceWhite,
-      appBar: AppBar(
-        backgroundColor: AppColors.surfaceWhite,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
-          onPressed: () => context.pop(),
-        ),
-        title: const Text(
-          'EventOn',
-          style: TextStyle(
-            color: AppColors.primary,
-            fontWeight: FontWeight.bold,
-            fontSize: 20,
-          ),
-        ),
-        centerTitle: false,
-        titleSpacing: 0,
-      ),
+      appBar: EventOnAppBar(),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -81,8 +65,16 @@ class QuotesListingScreen extends ConsumerWidget {
                         const Divider(height: 1, color: AppColors.borderSubtle),
                     itemBuilder: (context, index) {
                       final item = result[index];
-                      int quotedCount = item.quotesReceived ?? 
-                          item.vendors.where((v) => v.state == 'quoted' || v.status == 'quoted' || v.latestQuote != null).length;
+                      int quotedCount =
+                          item.quotesReceived ??
+                          item.vendors
+                              .where(
+                                (v) =>
+                                    v.state == 'quoted' ||
+                                    v.status == 'quoted' ||
+                                    v.latestQuote != null,
+                              )
+                              .length;
                       int totalCount = item.vendorsAsked ?? item.vendors.length;
 
                       return InkWell(
