@@ -10,6 +10,8 @@ class SocketService {
   io.Socket? _socket;
   final _messageController = StreamController<Map<String, dynamic>>.broadcast();
   final Set<String> _joinedConversations = {};
+  String? _currentToken;
+  bool _isConnecting = false;
 
   Stream<Map<String, dynamic>> get messageStream => _messageController.stream;
   bool get isConnected => _socket?.connected ?? false;
@@ -22,19 +24,27 @@ class SocketService {
       _joinedConversations.add(conversationId);
     }
 
-    if (_socket != null && _socket!.connected) {
-      if (conversationId != null) {
-        joinConversation(conversationId);
+    if (_socket != null && _currentToken == token) {
+      if (_socket!.connected) {
+        if (conversationId != null) {
+          joinConversation(conversationId);
+        }
+        return;
       }
-      return;
+      if (_isConnecting) {
+        return;
+      }
     }
 
-    disconnect();
+    _currentToken = token;
+    _isConnecting = true;
+    disconnect(clearRooms: false);
 
     final rawUrl = dotenv.env['SOCKET_URL'] ??
         dotenv.env['BASE_URL'] ??
+        dotenv.env['BASE_URL '] ??
         'https://api.eventongo.in';
-    final socketUrl = rawUrl.replaceAll(RegExp(r'/+$'), '');
+    final socketUrl = rawUrl.trim().replaceAll(RegExp(r'/+$'), '');
 
     // 1. Connection Options: Connect using ONLY websocket transport and pass auth token
     _socket = io.io(
@@ -43,15 +53,22 @@ class SocketService {
           .setTransports(['websocket'])
           .disableAutoConnect()
           .setAuth({'token': token})
+          .setExtraHeaders({'Authorization': 'Bearer $token'})
+          .enableReconnection()
           .build(),
     );
 
     // 2. Room Joining: Listen for connect event and immediately emit joinConversation for all joined conversations
     _socket?.onConnect((_) {
+      _isConnecting = false;
       debugPrint(
           '[SocketService] Connected. Emitting joinConversation for ${_joinedConversations.length} conversations');
       for (final id in _joinedConversations) {
-        _socket?.emit('joinConversation', {'conversationId': id});
+        try {
+          _socket?.emit('joinConversation', {'conversationId': id});
+        } catch (e) {
+          debugPrint('[SocketService] Error emitting onConnect joinConversation: $e');
+        }
       }
     });
 
@@ -66,44 +83,72 @@ class SocketService {
     });
 
     _socket?.onDisconnect((_) {
+      _isConnecting = false;
       debugPrint('[SocketService] Disconnected');
     });
 
     _socket?.onConnectError((err) {
+      _isConnecting = false;
       debugPrint('[SocketService] Connect error: $err');
     });
 
     _socket?.onError((err) {
+      _isConnecting = false;
       debugPrint('[SocketService] Error: $err');
     });
 
-    _socket?.connect();
+    try {
+      _socket?.connect();
+    } catch (e) {
+      _isConnecting = false;
+      debugPrint('[SocketService] Socket connect call exception: $e');
+    }
   }
 
   void joinConversation(String conversationId) {
     _joinedConversations.add(conversationId);
     if (_socket?.connected == true) {
-      debugPrint('[SocketService] Emitting joinConversation: $conversationId');
-      _socket?.emit('joinConversation', {'conversationId': conversationId});
+      try {
+        debugPrint('[SocketService] Emitting joinConversation: $conversationId');
+        _socket?.emit('joinConversation', {'conversationId': conversationId});
+      } catch (e) {
+        debugPrint('[SocketService] Error emitting joinConversation: $e');
+      }
     }
   }
 
   void leaveConversation(String conversationId) {
     _joinedConversations.remove(conversationId);
     if (_socket?.connected == true) {
-      _socket?.emit('leaveConversation', {'conversationId': conversationId});
+      try {
+        _socket?.emit('leaveConversation', {'conversationId': conversationId});
+      } catch (e) {
+        debugPrint('[SocketService] Error emitting leaveConversation: $e');
+      }
     }
   }
 
-  void disconnect() {
-    _joinedConversations.clear();
-    _socket?.disconnect();
-    _socket?.dispose();
-    _socket = null;
+  void disconnect({bool clearRooms = true}) {
+    if (clearRooms) {
+      _joinedConversations.clear();
+      _currentToken = null;
+    }
+    _isConnecting = false;
+    try {
+      if (_socket != null) {
+        _socket?.clearListeners();
+        _socket?.disconnect();
+        _socket?.dispose();
+      }
+    } catch (e) {
+      debugPrint('[SocketService] Disconnect handled gracefully: $e');
+    } finally {
+      _socket = null;
+    }
   }
 
   void dispose() {
-    disconnect();
+    disconnect(clearRooms: true);
     _messageController.close();
   }
 }

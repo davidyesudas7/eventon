@@ -9,7 +9,7 @@ class HomeTrustBadges extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      color: AppColors.trustBadgeBg,
+      color: AppColors.surfaceDark,
       padding: const EdgeInsets.symmetric(vertical: 36, horizontal: 20),
       child: Row(
         children: [
@@ -20,7 +20,7 @@ class HomeTrustBadges extends StatelessWidget {
                   width: 48,
                   height: 48,
                   decoration: const BoxDecoration(
-                    color: AppColors.surfaceWhite,
+                    color: AppColors.surfaceMuted,
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(
@@ -57,7 +57,7 @@ class HomeTrustBadges extends StatelessWidget {
                   width: 48,
                   height: 48,
                   decoration: const BoxDecoration(
-                    color: AppColors.surfaceWhite,
+                    color: AppColors.surfaceMuted,
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(

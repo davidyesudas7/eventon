@@ -6,6 +6,7 @@ class AppTheme {
   static ThemeData get lightTheme {
     return ThemeData(
       useMaterial3: true,
+      brightness: Brightness.dark,
       colorScheme: ColorScheme.fromSeed(
         seedColor: AppColors.primary,
         primary: AppColors.primary,
@@ -13,7 +14,7 @@ class AppTheme {
         tertiary: AppColors.tertiary,
         surface: AppColors.surfaceBase,
         error: AppColors.error,
-        brightness: Brightness.light,
+        brightness: Brightness.dark,
       ),
       scaffoldBackgroundColor: AppColors.surfaceBase,
       fontFamily: AppTextStyles.fontFamily,
@@ -29,11 +30,17 @@ class AppTheme {
         labelMedium: AppTextStyles.labelMd,
         labelSmall: AppTextStyles.labelSm,
       ),
+      appBarTheme: const AppBarTheme(
+        backgroundColor: AppColors.surfaceBase,
+        surfaceTintColor: AppColors.transparent,
+        elevation: 0,
+        iconTheme: IconThemeData(color: AppColors.textPrimary),
+      ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primary,
-          foregroundColor: AppColors.surfaceBase,
-          textStyle: AppTextStyles.labelLg,
+          foregroundColor: AppColors.onPrimary,
+          textStyle: AppTextStyles.labelLg.copyWith(fontWeight: FontWeight.w700),
           minimumSize: const Size(64, 48),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(9999),
@@ -44,8 +51,8 @@ class AppTheme {
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.primary,
-          side: const BorderSide(color: AppColors.surfaceMintSubtle),
-          backgroundColor: AppColors.surfaceMintPill,
+          side: const BorderSide(color: AppColors.borderSubtle),
+          backgroundColor: AppColors.surfaceElevated,
           textStyle: AppTextStyles.labelLg,
           minimumSize: const Size(64, 48),
           shape: RoundedRectangleBorder(
@@ -55,7 +62,7 @@ class AppTheme {
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: AppColors.surfaceBase,
+        fillColor: AppColors.surfaceElevated,
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 16,
           vertical: 14,
@@ -75,13 +82,13 @@ class AppTheme {
         ),
       ),
       cardTheme: CardThemeData(
-        color: AppColors.surfaceBase,
+        color: AppColors.surfaceElevated,
         surfaceTintColor: AppColors.transparent,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
           side: const BorderSide(color: AppColors.borderSubtle),
         ),
-        elevation: 1,
+        elevation: 0,
         margin: EdgeInsets.zero,
       ),
       dividerTheme: const DividerThemeData(

@@ -44,7 +44,7 @@ class ProfileScreen extends ConsumerWidget {
               decoration: BoxDecoration(
                 border: Border.all(color: AppColors.borderSubtle),
                 borderRadius: BorderRadius.circular(16),
-                color: Colors.white,
+                color: AppColors.surfaceElevated,
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -79,7 +79,7 @@ class ProfileScreen extends ConsumerWidget {
                 decoration: BoxDecoration(
                   border: Border.all(color: AppColors.borderSubtle),
                   borderRadius: BorderRadius.circular(16),
-                  color: Colors.white,
+                  color: AppColors.surfaceElevated,
                 ),
                 child: Text('My bookings', style: AppTextStyles.labelLg),
               ),
@@ -102,7 +102,7 @@ class ProfileScreen extends ConsumerWidget {
                 decoration: BoxDecoration(
                   border: Border.all(color: AppColors.borderSubtle),
                   borderRadius: BorderRadius.circular(16),
-                  color: Colors.white,
+                  color: AppColors.surfaceElevated,
                 ),
                 child: Text(
                   'Log out',

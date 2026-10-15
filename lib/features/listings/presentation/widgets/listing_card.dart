@@ -46,13 +46,13 @@ class ListingCard extends StatelessWidget {
       child: Container(
         width: width,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.surfaceElevated,
           borderRadius: BorderRadius.circular(width == null ? 16 : 24),
           border: Border.all(color: AppColors.borderSubtle),
           boxShadow: width != null
               ? const [
                   BoxShadow(
-                    color: Colors.black12,
+                    color: AppColors.shadowSubtle,
                     blurRadius: 4,
                     offset: Offset(0, 2),
                   ),
@@ -65,7 +65,7 @@ class ListingCard extends StatelessWidget {
             Container(
               height: width != null ? 176 : 180,
               decoration: BoxDecoration(
-                color: Colors.grey[200],
+                color: AppColors.surfaceMuted,
                 image: imageUrl != null 
                     ? DecorationImage(
                         image: NetworkImage(imageUrl!), 
@@ -85,8 +85,8 @@ class ListingCard extends StatelessWidget {
                       child: PillBadge(
                         label: 'Verified',
                         icon: Icons.verified,
-                        backgroundColor: Colors.white,
-                        foregroundColor: AppColors.textPrimary, // Icon uses AppColors.success directly in original, let's just approximate, or pass custom widget
+                        backgroundColor: AppColors.surfaceElevated,
+                        foregroundColor: AppColors.textPrimary,
                       ),
                     ),
                   if (hasAddedBadge)
@@ -109,9 +109,9 @@ class ListingCard extends StatelessWidget {
                       right: 12,
                       child: GestureDetector(
                         onTap: onQuoteTap,
-                        child: PillBadge(
+                        child: const PillBadge(
                           label: '+ Quote',
-                          backgroundColor: Colors.white.withValues(alpha: 0.95),
+                          backgroundColor: AppColors.surfaceElevated,
                           foregroundColor: AppColors.textPrimary,
                         ),
                       ),

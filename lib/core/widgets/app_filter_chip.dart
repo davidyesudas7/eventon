@@ -20,23 +20,9 @@ class AppFilterChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bgColor = isSelected
-        ? (variant == FilterChipVariant.dark
-            ? AppColors.ink
-            : AppColors.surfaceMintPill)
-        : AppColors.surfaceBase;
-
-    final borderColor = isSelected
-        ? (variant == FilterChipVariant.dark
-            ? AppColors.ink
-            : AppColors.primary)
-        : AppColors.borderStrong; // or AppColors.borderSubtle
-
-    final textColor = isSelected
-        ? (variant == FilterChipVariant.dark
-            ? AppColors.onPrimary
-            : AppColors.brandDeep)
-        : AppColors.textPrimary; // or textSecondary
+    final bgColor = isSelected ? AppColors.primary : AppColors.surfaceElevated;
+    final borderColor = isSelected ? AppColors.primary : AppColors.borderSubtle;
+    final textColor = isSelected ? AppColors.onPrimary : AppColors.textSecondary;
 
     return Material(
       color: bgColor,
@@ -50,7 +36,7 @@ class AppFilterChip extends StatelessWidget {
             label,
             style: AppTextStyles.labelMd.copyWith(
               color: textColor,
-              fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+              fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
             ),
           ),
         ),

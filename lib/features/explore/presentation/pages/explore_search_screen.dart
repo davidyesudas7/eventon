@@ -87,7 +87,7 @@ class _ExploreSearchScreenState extends ConsumerState<ExploreSearchScreen> {
         : null;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.surfaceBase,
       appBar: EventOnAppBar(onBack: _close),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
@@ -118,7 +118,7 @@ class _ExploreSearchScreenState extends ConsumerState<ExploreSearchScreen> {
               cursorColor: AppColors.primary,
               decoration: InputDecoration(
                 filled: true,
-                fillColor: Colors.white,
+                fillColor: AppColors.surfaceElevated,
                 contentPadding: const EdgeInsets.symmetric(vertical: 14),
                 prefixIcon: const Icon(
                   Icons.search,
@@ -161,9 +161,12 @@ class _ExploreSearchScreenState extends ConsumerState<ExploreSearchScreen> {
                 context.push('/explore/location');
               },
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: AppColors.surfaceElevated,
                   borderRadius: BorderRadius.circular(999),
                   border: Border.all(color: AppColors.borderStrong),
                 ),
@@ -242,7 +245,12 @@ class _ExploreSearchScreenState extends ConsumerState<ExploreSearchScreen> {
             ),
             for (final listing in searchAsync.value!.items)
               InkWell(
-                onTap: () => context.push('/explore/listing/${listing.id}'),
+                onTap: () async {
+                  await context.push('/explore/listing/${listing.id}');
+                  if (context.mounted) {
+                    _close();
+                  }
+                },
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 12),
                   child: Row(

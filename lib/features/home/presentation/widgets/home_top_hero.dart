@@ -110,7 +110,7 @@ class HomeTopHero extends ConsumerWidget {
             ShaderMask(
               blendMode: BlendMode.srcIn,
               shaderCallback: (bounds) => const LinearGradient(
-                colors: [Colors.purple, Colors.blue],
+                colors: AppColors.goldGradient,
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ).createShader(Rect.fromLTWH(0, 0, bounds.width, bounds.height)),

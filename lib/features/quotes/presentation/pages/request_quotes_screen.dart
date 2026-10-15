@@ -100,8 +100,9 @@ class _RequestQuotesScreenState extends ConsumerState<RequestQuotesScreen> {
     });
 
     try {
-      final result =
-          await ref.read(quotesRepositoryProvider).createQuoteRequest(body);
+      final result = await ref
+          .read(quotesRepositoryProvider)
+          .createQuoteRequest(body);
       if (!mounted) return;
       setState(() => _isSubmitting = false);
 
@@ -295,7 +296,7 @@ class _RequestQuotesScreenState extends ConsumerState<RequestQuotesScreen> {
         Container(
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColors.surfaceElevated,
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withValues(alpha: 0.05),

@@ -166,8 +166,34 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
     final result = await context.push<String>('/explore/search', extra: value);
     _openingSearch = false;
     if (!mounted) return;
-    // Clearing in the search screen returns null -> back to an empty bar.
-    _searchController.text = result ?? '';
+
+    // Check if returned term corresponds to a category name
+    final categories = ref.read(categoriesProvider).asData?.value;
+    String? matchedCatId;
+    if (result != null && result.isNotEmpty && categories != null) {
+      for (final cat in categories) {
+        if (cat.name.toLowerCase() == result.trim().toLowerCase()) {
+          matchedCatId = cat.id;
+          break;
+        }
+      }
+    }
+
+    setState(() {
+      if (matchedCatId != null) {
+        // Clear search field and apply the selected category filter
+        _searchController.clear();
+        _selectedCategoryId = matchedCatId;
+        _appliedCategoryId = matchedCatId;
+      } else if (result != null && result.isNotEmpty) {
+        _searchController.text = result;
+        _selectedCategoryId = null;
+        _appliedCategoryId = null;
+      } else {
+        // Listing selected or backed out -> clear search field
+        _searchController.clear();
+      }
+    });
   }
 
   @override
@@ -177,7 +203,18 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
 
     final Map<String, dynamic> queries = {};
     if (_searchController.text.isNotEmpty) {
-      queries['q'] = _searchController.text;
+      final isCategoryMatch =
+          _appliedCategoryId != null &&
+          categoriesAsync.asData?.value.any(
+                (c) =>
+                    c.id == _appliedCategoryId &&
+                    c.name.toLowerCase() ==
+                        _searchController.text.toLowerCase(),
+              ) ==
+              true;
+      if (!isCategoryMatch) {
+        queries['q'] = _searchController.text;
+      }
     }
     if (_appliedCategoryId != null) {
       queries['categoryId'] = _appliedCategoryId;
@@ -279,22 +316,44 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                                       ),
                                     TextField(
                                       controller: _searchController,
+                                      style: AppTextStyles.bodyMd.copyWith(
+                                        color: AppColors.textPrimary,
+                                      ),
+                                      cursorColor: AppColors.primary,
                                       onChanged: (val) {
                                         setState(
                                           () {},
                                         ); // trigger rebuild to hide hint
                                         _onSearchChanged(val);
                                       },
-                                      decoration: const InputDecoration(
+                                      decoration: InputDecoration(
                                         border: InputBorder.none,
                                         enabledBorder: InputBorder.none,
                                         focusedBorder: InputBorder.none,
                                         filled: false,
-                                        prefixIcon: Icon(
+                                        prefixIcon: const Icon(
                                           Icons.search,
                                           color: AppColors.textMuted,
                                           size: 20,
                                         ),
+                                        suffixIcon:
+                                            _searchController.text.isNotEmpty
+                                            ? IconButton(
+                                                icon: const Icon(
+                                                  Icons.close,
+                                                  color:
+                                                      AppColors.textSecondary,
+                                                  size: 18,
+                                                ),
+                                                onPressed: () {
+                                                  setState(() {
+                                                    _searchController.clear();
+                                                    _selectedCategoryId = null;
+                                                    _appliedCategoryId = null;
+                                                  });
+                                                },
+                                              )
+                                            : null,
                                       ),
                                     ),
                                   ],
@@ -599,7 +658,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                     vertical: 14,
                   ),
                   decoration: BoxDecoration(
-                    color: AppColors.textPrimary,
+                    color: AppColors.surfaceElevated,
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: const [
                       BoxShadow(
@@ -624,7 +683,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                           Text(
                             'Request quotes',
                             style: AppTextStyles.labelLg.copyWith(
-                              color: AppColors.surfaceWhite,
+                              color: AppColors.textPrimary,
                               fontWeight: FontWeight.bold,
                             ),
                           ),

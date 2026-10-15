@@ -1,3 +1,5 @@
+import 'dart:async';
+import 'dart:ui';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -7,23 +9,59 @@ import 'core/router/app_router.dart';
 import 'firebase_options.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  try {
-    await dotenv.load(fileName: ".env");
-  } catch (e) {
-    debugPrint('DotEnv initialization warning: $e');
-  }
+  runZonedGuarded(() async {
+    WidgetsFlutterBinding.ensureInitialized();
 
-  try {
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
-  } catch (e) {
-    // Log exception if Firebase config files are not yet fully supplied
-    debugPrint('Firebase initialization warning: $e');
-  }
+    // Catch framework-level errors
+    FlutterError.onError = (FlutterErrorDetails details) {
+      final errStr = details.exception.toString();
+      if (errStr.contains('WebSocketConnectionClosed') ||
+          errStr.contains('Connection Closed') ||
+          errStr.contains('SocketException')) {
+        debugPrint('[Network] Handled Flutter socket error: ${details.exception}');
+        return;
+      }
+      FlutterError.presentError(details);
+    };
 
-  runApp(const ProviderScope(child: MyApp()));
+    // Catch isolate/platform-level asynchronous errors
+    PlatformDispatcher.instance.onError = (error, stack) {
+      final errStr = error.toString();
+      if (errStr.contains('WebSocketConnectionClosed') ||
+          errStr.contains('Connection Closed') ||
+          errStr.contains('SocketException')) {
+        debugPrint('[Network] Handled platform socket error: $error');
+        return true;
+      }
+      return false;
+    };
+
+    try {
+      await dotenv.load(fileName: ".env");
+    } catch (e) {
+      debugPrint('DotEnv initialization warning: $e');
+    }
+
+    try {
+      await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      );
+    } catch (e) {
+      // Log exception if Firebase config files are not yet fully supplied
+      debugPrint('Firebase initialization warning: $e');
+    }
+
+    runApp(const ProviderScope(child: MyApp()));
+  }, (error, stack) {
+    final errStr = error.toString();
+    if (errStr.contains('WebSocketConnectionClosed') ||
+        errStr.contains('Connection Closed') ||
+        errStr.contains('SocketException')) {
+      debugPrint('[Network] Handled zoned socket error: $error');
+      return;
+    }
+    debugPrint('[Network] Uncaught zone error: $error\n$stack');
+  });
 }
 
 class MyApp extends ConsumerWidget {

@@ -17,7 +17,7 @@ class HomePartnerCTA extends StatelessWidget {
           Text(
             'Run an event business?',
             style: AppTextStyles.headlineSm.copyWith(
-              color: AppColors.surfaceWhite,
+              color: Colors.white,
               fontWeight: FontWeight.w800,
             ),
             textAlign: TextAlign.center,
@@ -26,14 +26,14 @@ class HomePartnerCTA extends StatelessWidget {
           Text(
             'List it on EventOn — it\'s free to join',
             style: AppTextStyles.bodyMd.copyWith(
-              color: AppColors.surfaceWhite,
+              color: AppColors.textSecondary,
               fontWeight: FontWeight.w500,
             ),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 20),
           Material(
-            color: AppColors.surfaceWhite,
+            color: AppColors.primary,
             borderRadius: BorderRadius.circular(24),
             child: InkWell(
               onTap: () {},
@@ -46,7 +46,7 @@ class HomePartnerCTA extends StatelessWidget {
                 child: Text(
                   'Join now',
                   style: AppTextStyles.labelLg.copyWith(
-                    color: AppColors.partnerCtaBg,
+                    color: AppColors.onPrimary,
                     fontWeight: FontWeight.w700,
                   ),
                 ),

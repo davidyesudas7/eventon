@@ -22,7 +22,7 @@ class OutlinedCard extends StatelessWidget {
 
     if (onTap != null) {
       return Material(
-        color: Colors.white,
+        color: AppColors.surfaceElevated,
         shape: RoundedRectangleBorder(
           borderRadius: borderRadius,
           side: const BorderSide(color: AppColors.borderSubtle),
@@ -30,10 +30,7 @@ class OutlinedCard extends StatelessWidget {
         child: InkWell(
           borderRadius: borderRadius,
           onTap: onTap,
-          child: Padding(
-            padding: padding,
-            child: child,
-          ),
+          child: Padding(padding: padding, child: child),
         ),
       );
     }
@@ -42,7 +39,7 @@ class OutlinedCard extends StatelessWidget {
       width: double.infinity,
       padding: padding,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surfaceElevated,
         borderRadius: borderRadius,
         border: border,
       ),

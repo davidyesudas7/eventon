@@ -80,7 +80,7 @@ class _HomeSearchBarState extends ConsumerState<HomeSearchBar> {
             child: Container(
               height: 48,
               decoration: BoxDecoration(
-                color: AppColors.surfaceWhite,
+                color: AppColors.surfaceElevated,
                 borderRadius: BorderRadius.circular(24),
                 border: Border.all(color: AppColors.borderSubtle),
                 boxShadow: const [

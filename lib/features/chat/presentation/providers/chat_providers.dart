@@ -136,10 +136,14 @@ class ChatDetailNotifier extends _$ChatDetailNotifier {
     // 1. Connect or ensure conversation room joined
     final token = await ref.read(tokenStorageProvider).getAccessToken();
     if (token != null) {
-      socketService.connect(
-        token: token,
-        conversationId: conversationId,
-      );
+      if (!socketService.isConnected) {
+        socketService.connect(
+          token: token,
+          conversationId: conversationId,
+        );
+      } else {
+        socketService.joinConversation(conversationId);
+      }
     } else {
       socketService.joinConversation(conversationId);
     }

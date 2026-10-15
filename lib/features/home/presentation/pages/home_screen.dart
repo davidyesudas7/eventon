@@ -3,10 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
-import '../../../auth/presentation/providers/auth_providers.dart';
 import '../../../categories/presentation/providers/categories_providers.dart';
 import '../../../categories/presentation/widgets/category_grid.dart';
-import '../../../chat/presentation/providers/chat_providers.dart';
 import '../widgets/home_hero_gradient.dart';
 import '../widgets/home_occasions_section.dart';
 import '../widgets/home_partner_cta.dart';
@@ -21,12 +19,6 @@ class HomeScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Ensure socket and conversation API are active when entering home screen (for logged-in users only)
-    final authState = ref.watch(authControllerProvider);
-    if (authState is AuthStateAuthenticated) {
-      ref.watch(chatSyncProvider);
-    }
-
     return Scaffold(
       backgroundColor: AppColors.surfaceBase,
       body: CustomScrollView(
@@ -81,10 +73,10 @@ class HomeScreen extends ConsumerWidget {
       color: AppColors.heroBanner, // Extends the dark hero background behind the radius
       child: Container(
         decoration: const BoxDecoration(
-          color: AppColors.surfaceBase,
+          color: AppColors.surfaceDark,
           borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(20),
-            topRight: Radius.circular(20),
+            topLeft: Radius.circular(24),
+            topRight: Radius.circular(24),
           ),
         ),
         child: Column(

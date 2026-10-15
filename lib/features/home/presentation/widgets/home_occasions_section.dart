@@ -104,14 +104,14 @@ class _OccasionCard extends StatelessWidget {
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: AppTextStyles.labelLg.copyWith(
-                      color: AppColors.onPrimary,
+                      color: Colors.white,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   Text(
                     '${occasion.categoryCount} services',
                     style: AppTextStyles.labelSm.copyWith(
-                      color: AppColors.surfaceMintSubtle,
+                      color: const Color(0xFFC5C9D3),
                     ),
                   ),
                 ],

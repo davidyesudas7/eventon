@@ -84,7 +84,7 @@ class HomeWeddingBanner extends ConsumerWidget {
                   Text(
                     headlineText,
                     style: AppTextStyles.headlineMd.copyWith(
-                      color: AppColors.surfaceWhite,
+                      color: Colors.white,
                       fontWeight: FontWeight.w800,
                       height: 1.25,
                     ),
@@ -93,7 +93,7 @@ class HomeWeddingBanner extends ConsumerWidget {
                   ),
                   const SizedBox(height: 16),
                   Material(
-                    color: AppColors.surfaceWhite,
+                    color: AppColors.primary,
                     borderRadius: BorderRadius.circular(24),
                     child: InkWell(
                       onTap: () => context.push('/home/occasion/$slug'),
@@ -106,7 +106,7 @@ class HomeWeddingBanner extends ConsumerWidget {
                         child: Text(
                           buttonText,
                           style: AppTextStyles.labelLg.copyWith(
-                            color: AppColors.primary,
+                            color: AppColors.onPrimary,
                             fontWeight: FontWeight.w700,
                           ),
                         ),

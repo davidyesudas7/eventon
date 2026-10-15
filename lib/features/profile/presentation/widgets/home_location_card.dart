@@ -104,7 +104,7 @@ class _HomeLocationCardState extends ConsumerState<HomeLocationCard> {
       decoration: BoxDecoration(
         border: Border.all(color: AppColors.borderSubtle),
         borderRadius: BorderRadius.circular(16),
-        color: Colors.white,
+        color: AppColors.surfaceElevated,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -153,7 +153,7 @@ class _HomeLocationCardState extends ConsumerState<HomeLocationCard> {
                   width: 1.5,
                 ),
               ),
-              fillColor: Colors.white,
+              fillColor: AppColors.surfaceElevated,
               filled: true,
             ),
           ),
@@ -180,7 +180,7 @@ class _HomeLocationCardState extends ConsumerState<HomeLocationCard> {
               decoration: BoxDecoration(
                 border: Border.all(color: AppColors.borderStrong),
                 borderRadius: BorderRadius.circular(12),
-                color: Colors.white,
+                color: AppColors.surfaceElevated,
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -250,7 +250,7 @@ class _HomeLocationCardState extends ConsumerState<HomeLocationCard> {
                         width: 1.5,
                       ),
                     ),
-                    fillColor: Colors.white,
+                    fillColor: AppColors.surfaceElevated,
                     filled: true,
                   ),
                 ),
@@ -260,7 +260,7 @@ class _HomeLocationCardState extends ConsumerState<HomeLocationCard> {
                     decoration: BoxDecoration(
                       border: Border.all(color: AppColors.borderStrong),
                       borderRadius: BorderRadius.circular(12),
-                      color: Colors.white,
+                      color: AppColors.surfaceElevated,
                     ),
                     child: ListView.separated(
                       shrinkWrap: true,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/eventon_app_bar.dart';
 import '../providers/categories_providers.dart';
 import '../widgets/category_grid.dart';
@@ -12,7 +13,7 @@ class AllServicesScreen extends ConsumerWidget {
     final categoriesAsync = ref.watch(categoriesProvider);
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.surfaceBase,
       appBar: const EventOnAppBar(
         title: 'All services',
       ),

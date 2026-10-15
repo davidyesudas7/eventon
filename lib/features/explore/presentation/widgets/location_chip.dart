@@ -3,11 +3,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 
 class LocationChip extends StatelessWidget {
-  const LocationChip({
-    super.key,
-    required this.label,
-    this.onTap,
-  });
+  const LocationChip({super.key, required this.label, this.onTap});
 
   final String label;
   final VoidCallback? onTap;
@@ -19,7 +15,7 @@ class LocationChip extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.surfaceElevated,
           borderRadius: BorderRadius.circular(999),
           border: Border.all(color: AppColors.borderStrong),
           boxShadow: const [

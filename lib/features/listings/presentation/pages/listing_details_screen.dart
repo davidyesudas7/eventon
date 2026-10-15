@@ -321,7 +321,7 @@ class _ListingDetailsScreenState extends ConsumerState<ListingDetailsScreen> {
                                   decoration: BoxDecoration(
                                     color: isAddedToQuote
                                         ? AppColors.surfaceMintPill
-                                        : Colors.white,
+                                        : AppColors.surfaceElevated,
                                     border: Border.all(
                                       color: isAddedToQuote
                                           ? AppColors.primary
@@ -537,8 +537,8 @@ class _ListingDetailsScreenState extends ConsumerState<ListingDetailsScreen> {
                     horizontal: 20,
                     vertical: 16,
                   ),
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
+                  decoration: BoxDecoration(
+                    color: AppColors.surfaceElevated,
                     border: Border(
                       top: BorderSide(color: AppColors.borderSubtle),
                     ),
