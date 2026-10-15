@@ -232,10 +232,7 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
       _isSubmittingDispute = true;
     });
     final repo = ref.read(bookingRepositoryProvider);
-    final result = await repo.disputeBooking(
-      bookingId: b.id,
-      reason: reason,
-    );
+    final result = await repo.disputeBooking(bookingId: b.id, reason: reason);
     if (!mounted) return;
     setState(() => _isSubmittingDispute = false);
 
@@ -272,21 +269,16 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
             reason: reason,
           );
 
-          return result.fold(
-            (failure) => failure.message,
-            (_) {
-              if (mounted) {
-                ref.read(bookingDetailProvider(widget.id).notifier).refresh();
-                ref.read(bookingsProvider.notifier).refresh();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Booking cancelled successfully'),
-                  ),
-                );
-              }
-              return null;
-            },
-          );
+          return result.fold((failure) => failure.message, (_) {
+            if (mounted) {
+              ref.read(bookingDetailProvider(widget.id).notifier).refresh();
+              ref.read(bookingsProvider.notifier).refresh();
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Booking cancelled successfully')),
+              );
+            }
+            return null;
+          });
         },
       ),
     );
@@ -311,7 +303,11 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(Icons.error_outline, size: 48, color: AppColors.error),
+                const Icon(
+                  Icons.error_outline,
+                  size: 48,
+                  color: AppColors.error,
+                ),
                 const SizedBox(height: 16),
                 Text('Failed to load booking', style: AppTextStyles.headlineSm),
                 const SizedBox(height: 16),
@@ -330,8 +326,7 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
             final isInProgress = b.isInProgress;
             final isCompleted = b.isCompleted;
             final isDisputed = b.isDisputed;
-            final canCancel =
-                (isAwaitingAdvance || isConfirmed) && !isDisputed;
+            final canCancel = (isAwaitingAdvance || isConfirmed) && !isDisputed;
 
             final serviceName = b.serviceName;
             final dateStr = b.eventDate != null
@@ -497,9 +492,10 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
                                               ) ??
                                               0;
                                           if (amount < b.minAdvance) {
-                                            setState(() =>
-                                                _advancePaymentError =
-                                                    'Minimum advance is ${formatRupees(b.minAdvance.toInt())}');
+                                            setState(
+                                              () => _advancePaymentError =
+                                                  'Minimum advance is ${formatRupees(b.minAdvance.toInt())}',
+                                            );
                                             return;
                                           }
                                           _payNow(
@@ -517,9 +513,14 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
                                             color: AppColors.onPrimary,
                                           ),
                                         )
-                                      : const Icon(Icons.lock_outline, size: 16),
+                                      : const Icon(
+                                          Icons.lock_outline,
+                                          size: 16,
+                                        ),
                                   label: Text(
-                                    _isCreatingOrder ? 'Processing…' : 'Pay now',
+                                    _isCreatingOrder
+                                        ? 'Processing…'
+                                        : 'Pay now',
                                   ),
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: _payButtonColor,
@@ -546,7 +547,10 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('Advance captured', style: AppTextStyles.labelLg),
+                          Text(
+                            'Advance captured',
+                            style: AppTextStyles.labelLg,
+                          ),
                           const SizedBox(height: 8),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -565,7 +569,10 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text('Remaining balance', style: AppTextStyles.bodyMd),
+                              Text(
+                                'Remaining balance',
+                                style: AppTextStyles.bodyMd,
+                              ),
                               Text(
                                 formatRupees(b.effectiveBalance.toInt()),
                                 style: AppTextStyles.bodyMd,
@@ -629,19 +636,17 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
                                       isDense: true,
                                       contentPadding:
                                           const EdgeInsets.symmetric(
-                                        horizontal: 16,
-                                        vertical: 12,
-                                      ),
+                                            horizontal: 16,
+                                            vertical: 12,
+                                          ),
                                       enabledBorder: OutlineInputBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(12),
+                                        borderRadius: BorderRadius.circular(12),
                                         borderSide: const BorderSide(
                                           color: AppColors.borderSubtle,
                                         ),
                                       ),
                                       focusedBorder: OutlineInputBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(12),
+                                        borderRadius: BorderRadius.circular(12),
                                         borderSide: const BorderSide(
                                           color: AppColors.borderSubtle,
                                         ),
@@ -656,10 +661,10 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
                                     onPressed: _isCreatingOrder
                                         ? null
                                         : () => _payNow(
-                                              b,
-                                              b.effectiveBalance,
-                                              purpose: 'balance',
-                                            ),
+                                            b,
+                                            b.effectiveBalance,
+                                            purpose: 'balance',
+                                          ),
                                     icon: _isCreatingOrder
                                         ? const SizedBox(
                                             width: 16,
@@ -669,9 +674,14 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
                                               color: AppColors.onPrimary,
                                             ),
                                           )
-                                        : const Icon(Icons.lock_outline, size: 16),
+                                        : const Icon(
+                                            Icons.lock_outline,
+                                            size: 16,
+                                          ),
                                     label: Text(
-                                      _isCreatingOrder ? 'Processing…' : 'Pay now',
+                                      _isCreatingOrder
+                                          ? 'Processing…'
+                                          : 'Pay now',
                                     ),
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: _payButtonColor,
@@ -697,7 +707,10 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('Payment status', style: AppTextStyles.labelLg),
+                            Text(
+                              'Payment status',
+                              style: AppTextStyles.labelLg,
+                            ),
                             const SizedBox(height: 8),
                             Text(
                               'Balance is settled. The event is in progress.',
@@ -725,9 +738,7 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
                         decoration: BoxDecoration(
                           color: AppColors.surfaceMuted,
                           borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: AppColors.borderSubtle,
-                          ),
+                          border: Border.all(color: AppColors.borderSubtle),
                         ),
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -844,8 +855,8 @@ class _BookingDetailsScreenState extends ConsumerState<BookingDetailsScreen> {
                                         width: 20,
                                         height: 20,
                                         child: CircularProgressIndicator(
-                                              strokeWidth: 2,
-                                              color: AppColors.onPrimary,
+                                          strokeWidth: 2,
+                                          color: AppColors.onPrimary,
                                         ),
                                       )
                                     : const Text('Submit review'),
@@ -1024,10 +1035,7 @@ class _CancelBookingDialog extends StatefulWidget {
   final BookingModel booking;
   final Future<String?> Function(String reason) onCancel;
 
-  const _CancelBookingDialog({
-    required this.booking,
-    required this.onCancel,
-  });
+  const _CancelBookingDialog({required this.booking, required this.onCancel});
 
   @override
   State<_CancelBookingDialog> createState() => _CancelBookingDialogState();
@@ -1058,10 +1066,8 @@ class _CancelBookingDialogState extends State<_CancelBookingDialog> {
   Widget build(BuildContext context) {
     return AlertDialog(
       backgroundColor: AppColors.surfaceWhite,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
-      title: const Text('Cancel booking?', style: AppTextStyles.headlineMd),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      title: Text('Cancel booking?', style: AppTextStyles.headlineMd),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -1091,15 +1097,11 @@ class _CancelBookingDialogState extends State<_CancelBookingDialog> {
                 contentPadding: const EdgeInsets.all(12),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
-                  borderSide: const BorderSide(
-                    color: AppColors.borderSubtle,
-                  ),
+                  borderSide: const BorderSide(color: AppColors.borderSubtle),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
-                  borderSide: const BorderSide(
-                    color: AppColors.error,
-                  ),
+                  borderSide: const BorderSide(color: AppColors.error),
                 ),
               ),
             ),
@@ -1125,8 +1127,10 @@ class _CancelBookingDialogState extends State<_CancelBookingDialog> {
               : () async {
                   final reason = _reasonController.text.trim();
                   if (reason.isEmpty) {
-                    setState(() =>
-                        _dialogError = 'Please provide a reason for cancellation');
+                    setState(
+                      () => _dialogError =
+                          'Please provide a reason for cancellation',
+                    );
                     return;
                   }
 
@@ -1170,4 +1174,3 @@ class _CancelBookingDialogState extends State<_CancelBookingDialog> {
     );
   }
 }
-

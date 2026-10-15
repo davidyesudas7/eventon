@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'package:eventon/features/auth/presentation/providers/auth_providers.dart';
 import 'package:eventon/features/explore/presentation/providers/explore_providers.dart';
 import 'package:flutter/material.dart';
@@ -234,12 +235,13 @@ class HomeScreen extends ConsumerWidget {
   }
 
   Widget _buildOccasionCard(BuildContext context, Occasion occasion) {
+    log('the font family name is ${AppTextStyles.fontFamily}');
     return GestureDetector(
       onTap: () {
         context.push('/home/occasion/${occasion.slug}');
       },
       child: Container(
-        width: 145,
+        width: 150,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
           color: AppColors.cardPlaceholder,
@@ -260,7 +262,7 @@ class HomeScreen extends ConsumerWidget {
                   begin: Alignment.bottomCenter,
                   end: Alignment.topCenter,
                   colors: [
-                    AppColors.overlayDark,
+                    // AppColors.overlayDark,
                     AppColors.overlayMedium,
                     AppColors.transparent,
                   ],
@@ -270,14 +272,18 @@ class HomeScreen extends ConsumerWidget {
             Positioned(
               bottom: 12,
               left: 12,
+              right: 12,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
                     occasion.name,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                     style: AppTextStyles.labelLg.copyWith(
                       color: AppColors.onPrimary,
-                      fontWeight: FontWeight.w700,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                   Text(
@@ -404,14 +410,11 @@ class HomeScreen extends ConsumerWidget {
               Image.network(
                 coverUrl,
                 fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) => Container(
-                  color: AppColors.occasionCard,
-                ),
+                errorBuilder: (context, error, stackTrace) =>
+                    Container(color: AppColors.occasionCard),
               )
             else
-              Container(
-                color: AppColors.occasionCard,
-              ),
+              Container(color: AppColors.occasionCard),
             Container(
               decoration: const BoxDecoration(
                 gradient: LinearGradient(

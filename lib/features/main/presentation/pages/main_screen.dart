@@ -1,6 +1,7 @@
 import 'package:eventon/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:eventon/features/auth/presentation/providers/auth_providers.dart';
@@ -68,28 +69,28 @@ class MainScreen extends ConsumerWidget {
             );
           },
           destinations: [
-            const NavigationDestination(
-              icon: Icon(Icons.home_outlined),
+            NavigationDestination(
+              icon: FaIcon(FontAwesomeIcons.house),
               label: 'Home',
             ),
-            const NavigationDestination(
-              icon: Icon(Icons.search),
+            NavigationDestination(
+              icon: FaIcon(FontAwesomeIcons.magnifyingGlass),
               label: 'Explore',
             ),
             const NavigationDestination(
-              icon: Icon(Icons.calendar_month_outlined),
+              icon: FaIcon(FontAwesomeIcons.calendarDays),
               label: 'Bookings',
             ),
             NavigationDestination(
               icon: Badge(
                 isLabelVisible: unreadCount > 0,
                 label: Text(unreadCount > 99 ? '99+' : '$unreadCount'),
-                child: const Icon(Icons.chat_bubble_outline),
+                child: FaIcon(FontAwesomeIcons.comment),
               ),
               label: 'Chats',
             ),
             const NavigationDestination(
-              icon: Icon(Icons.person_outline),
+              icon: FaIcon(FontAwesomeIcons.user),
               label: 'Profile',
             ),
           ],

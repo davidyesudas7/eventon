@@ -17,7 +17,7 @@ class AppTheme {
       ),
       scaffoldBackgroundColor: AppColors.surfaceBase,
       fontFamily: AppTextStyles.fontFamily,
-      textTheme: const TextTheme(
+      textTheme: TextTheme(
         displayLarge: AppTextStyles.headlineXl,
         displayMedium: AppTextStyles.headlineLg,
         displaySmall: AppTextStyles.headlineMd,

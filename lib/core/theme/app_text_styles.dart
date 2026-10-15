@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'app_colors.dart';
 
 class AppTextStyles {
-  static const String fontFamily = 'DM Sans';
+  static String? get fontFamily => GoogleFonts.dmSans().fontFamily;
 
-  static const TextStyle headlineXl = TextStyle(
-    fontFamily: fontFamily,
+  static TextStyle headlineXl = GoogleFonts.dmSans(
     fontSize: 36,
     fontWeight: FontWeight.w700,
     height: 44 / 36,
@@ -13,8 +13,7 @@ class AppTextStyles {
     color: AppColors.textPrimary,
   );
 
-  static const TextStyle headlineLg = TextStyle(
-    fontFamily: fontFamily,
+  static TextStyle headlineLg = GoogleFonts.dmSans(
     fontSize: 26,
     fontWeight: FontWeight.w700,
     height: 32 / 26,
@@ -22,64 +21,56 @@ class AppTextStyles {
     color: AppColors.textPrimary,
   );
 
-  static const TextStyle headlineMd = TextStyle(
-    fontFamily: fontFamily,
+  static TextStyle headlineMd = GoogleFonts.dmSans(
     fontSize: 20,
     fontWeight: FontWeight.w700,
     height: 26 / 20,
     color: AppColors.textPrimary,
   );
 
-  static const TextStyle headlineSm = TextStyle(
-    fontFamily: fontFamily,
+  static TextStyle headlineSm = GoogleFonts.dmSans(
     fontSize: 16,
     fontWeight: FontWeight.w700,
     height: 22 / 16,
     color: AppColors.textPrimary,
   );
 
-  static const TextStyle bodyLg = TextStyle(
-    fontFamily: fontFamily,
+  static TextStyle bodyLg = GoogleFonts.dmSans(
     fontSize: 16,
     fontWeight: FontWeight.w400,
     height: 24 / 16,
     color: AppColors.textSecondary,
   );
 
-  static const TextStyle bodyMd = TextStyle(
-    fontFamily: fontFamily,
+  static TextStyle bodyMd = GoogleFonts.dmSans(
     fontSize: 14,
     fontWeight: FontWeight.w400,
     height: 20 / 14,
     color: AppColors.textSecondary,
   );
 
-  static const TextStyle bodySm = TextStyle(
-    fontFamily: fontFamily,
+  static TextStyle bodySm = GoogleFonts.dmSans(
     fontSize: 12,
     fontWeight: FontWeight.w400,
     height: 16 / 12,
     color: AppColors.textSecondary,
   );
 
-  static const TextStyle labelLg = TextStyle(
-    fontFamily: fontFamily,
-    fontSize: 14,
-    fontWeight: FontWeight.w600,
-    height: 18 / 14,
+  static TextStyle labelLg = GoogleFonts.dmSans(
+    fontSize: 15,
+    fontWeight: FontWeight.w700,
+    height: 22 / 15,
     color: AppColors.textPrimary,
   );
 
-  static const TextStyle labelMd = TextStyle(
-    fontFamily: fontFamily,
+  static TextStyle labelMd = GoogleFonts.dmSans(
     fontSize: 12,
     fontWeight: FontWeight.w600,
     height: 16 / 12,
     color: AppColors.textPrimary,
   );
 
-  static const TextStyle labelSm = TextStyle(
-    fontFamily: fontFamily,
+  static TextStyle labelSm = GoogleFonts.dmSans(
     fontSize: 10,
     fontWeight: FontWeight.w600,
     height: 14 / 10,
