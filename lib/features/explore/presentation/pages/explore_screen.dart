@@ -31,6 +31,8 @@ class ExploreScreen extends ConsumerStatefulWidget {
 
 class _ExploreScreenState extends ConsumerState<ExploreScreen> {
   final TextEditingController _searchController = TextEditingController();
+  final TextEditingController _minPriceController = TextEditingController();
+  final TextEditingController _maxPriceController = TextEditingController();
   bool _openingSearch = false;
   bool _isFetchingLocation = false;
 
@@ -38,6 +40,79 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
   String? _appliedCategoryId;
   final Map<String, dynamic> _selectedAttributes = {};
   Map<String, dynamic> _appliedAttributes = {};
+
+  double? _selectedMinRating;
+  double? _appliedMinRating;
+
+  double? _appliedMinPrice;
+  double? _appliedMaxPrice;
+
+  String _selectedSortBy = 'Recommended';
+  String _appliedSortBy = 'Recommended';
+
+  static const Map<String, String> _sortByApiValues = {
+    'Recommended': 'trust',
+    'Price: Low to High': 'priceAsc',
+    'Price: High to Low': 'priceDesc',
+    'Rating: High to Low': 'rating',
+    'Newest': 'newest',
+  };
+
+  bool get _hasActiveFilters {
+    return _appliedCategoryId != null ||
+        _appliedAttributes.isNotEmpty ||
+        _appliedMinRating != null ||
+        _appliedMinPrice != null ||
+        _appliedMaxPrice != null ||
+        _appliedSortBy != 'Recommended';
+  }
+
+  void _syncDraftFilters() {
+    _selectedCategoryId = _appliedCategoryId;
+    _selectedAttributes.clear();
+    _selectedAttributes.addAll(_appliedAttributes);
+    _selectedMinRating = _appliedMinRating;
+    _selectedSortBy = _appliedSortBy;
+    _minPriceController.text = _appliedMinPrice != null
+        ? (_appliedMinPrice! % 1 == 0
+              ? _appliedMinPrice!.toInt().toString()
+              : _appliedMinPrice!.toString())
+        : '';
+    _maxPriceController.text = _appliedMaxPrice != null
+        ? (_appliedMaxPrice! % 1 == 0
+              ? _appliedMaxPrice!.toInt().toString()
+              : _appliedMaxPrice!.toString())
+        : '';
+  }
+
+  void _resetFilters() {
+    setState(() {
+      _selectedCategoryId = null;
+      _appliedCategoryId = null;
+      _selectedAttributes.clear();
+      _appliedAttributes.clear();
+      _selectedMinRating = null;
+      _appliedMinRating = null;
+      _minPriceController.clear();
+      _maxPriceController.clear();
+      _appliedMinPrice = null;
+      _appliedMaxPrice = null;
+      _selectedSortBy = 'Recommended';
+      _appliedSortBy = 'Recommended';
+    });
+
+    final location = ref.read(exploreLocationProvider);
+    final Map<String, dynamic> cleanQueries = {};
+    if (_searchController.text.isNotEmpty) {
+      cleanQueries['q'] = _searchController.text;
+    }
+    if (location != null && location.radiusKm != null) {
+      cleanQueries['lat'] = location.latitude;
+      cleanQueries['lng'] = location.longitude;
+      cleanQueries['radiusKm'] = location.radiusKm;
+    }
+    ref.invalidate(searchProvider(jsonEncode(cleanQueries)));
+  }
 
   // Rotating Hint
   Timer? _hintTimer;
@@ -78,6 +153,8 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
   void dispose() {
     _hintTimer?.cancel();
     _searchController.dispose();
+    _minPriceController.dispose();
+    _maxPriceController.dispose();
     super.dispose();
   }
 
@@ -105,7 +182,25 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
     if (_appliedCategoryId != null) {
       queries['categoryId'] = _appliedCategoryId;
     }
-    queries.addAll(_appliedAttributes);
+    if (_appliedMinPrice != null && _appliedMinPrice! > 0) {
+      queries['minPrice'] = _appliedMinPrice;
+    }
+    if (_appliedMaxPrice != null && _appliedMaxPrice! > 0) {
+      queries['maxPrice'] = _appliedMaxPrice;
+    }
+    if (_appliedMinRating != null && _appliedMinRating! > 0) {
+      queries['minRating'] = _appliedMinRating;
+    }
+    if (_appliedSortBy != 'Recommended') {
+      final apiSort = _sortByApiValues[_appliedSortBy];
+      if (apiSort != null) {
+        queries['sortBy'] = apiSort;
+      }
+    }
+    if (_appliedAttributes.isNotEmpty) {
+      queries['attributes'] = jsonEncode(_appliedAttributes);
+      queries.addAll(_appliedAttributes);
+    }
 
     if (location != null && location.radiusKm != null) {
       queries['lat'] = location.latitude;
@@ -132,7 +227,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
     });
 
     return Scaffold(
-      backgroundColor: Colors.grey[50], // Light gray background
+      backgroundColor: AppColors.surfaceElevated,
       appBar: const EventOnAppBar(
         showBack: false,
         actions: [SizedBox.shrink()],
@@ -145,7 +240,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
             children: [
               // Search & Filters Section
               Container(
-                color: Colors.white,
+                color: AppColors.surfaceWhite,
                 padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
                 child: Column(
                   children: [
@@ -159,7 +254,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                               child: Container(
                                 height: 48,
                                 decoration: BoxDecoration(
-                                  color: Colors.white,
+                                  color: AppColors.surfaceWhite,
                                   borderRadius: BorderRadius.circular(12),
                                   border: Border.all(
                                     color: AppColors.borderStrong,
@@ -212,22 +307,48 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                         Builder(
                           builder: (context) => GestureDetector(
                             onTap: () {
+                              _syncDraftFilters();
                               Scaffold.of(context).openEndDrawer();
                             },
                             child: Container(
                               width: 48,
                               height: 48,
                               decoration: BoxDecoration(
-                                color: Colors.white,
+                                color: _hasActiveFilters
+                                    ? AppColors.surfaceMintPill
+                                    : AppColors.surfaceWhite,
                                 borderRadius: BorderRadius.circular(12),
                                 border: Border.all(
-                                  color: AppColors.borderStrong,
+                                  color: _hasActiveFilters
+                                      ? AppColors.primary
+                                      : AppColors.borderStrong,
                                 ),
                               ),
-                              child: const Icon(
-                                Icons.tune,
-                                color: AppColors.textSecondary,
-                                size: 20,
+                              child: Stack(
+                                clipBehavior: Clip.none,
+                                alignment: Alignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.tune,
+                                    color: _hasActiveFilters
+                                        ? AppColors.primary
+                                        : AppColors.textSecondary,
+                                    size: 20,
+                                  ),
+                                  if (_hasActiveFilters)
+                                    Positioned(
+                                      top: 8,
+                                      right: 8,
+                                      child: Container(
+                                        width: 8,
+                                        height: 8,
+                                        decoration: const BoxDecoration(
+                                          color: AppColors.primary,
+                                          shape: BoxShape.circle,
+                                        ),
+                                      ),
+                                    ),
+                                ],
                               ),
                             ),
                           ),
@@ -262,7 +383,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                     decoration: BoxDecoration(
                       border: Border.all(color: AppColors.borderStrong),
                       borderRadius: BorderRadius.circular(12),
-                      color: Colors.white,
+                      color: AppColors.surfaceWhite,
                     ),
                     child: Row(
                       children: [
@@ -306,7 +427,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                                     final position = await locationService
                                         .getCurrentPosition();
 
-                                    if (position != null) {
+                                    if (position != null && context.mounted) {
                                       final locationData = SavedLocation(
                                         placeId: 'current',
                                         name: 'Current Location',
@@ -319,26 +440,6 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                                             exploreLocationProvider.notifier,
                                           )
                                           .setLocation(locationData);
-                                    } else {
-                                      final isDeniedForever =
-                                          await locationService
-                                              .isPermissionDeniedForever();
-                                      if (isDeniedForever && context.mounted) {
-                                        ScaffoldMessenger.of(
-                                          context,
-                                        ).showSnackBar(
-                                          SnackBar(
-                                            content: const Text(
-                                              'Location permissions are permanently denied.',
-                                            ),
-                                            action: SnackBarAction(
-                                              label: 'Settings',
-                                              onPressed: () => locationService
-                                                  .openAppSettings(),
-                                            ),
-                                          ),
-                                        );
-                                      }
                                     }
                                   } catch (e) {
                                     if (context.mounted) {
@@ -362,7 +463,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                                 },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.primary,
-                            foregroundColor: Colors.white,
+                            foregroundColor: AppColors.surfaceWhite,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8),
                             ),
@@ -378,7 +479,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                                   height: 16,
                                   child: CircularProgressIndicator(
                                     strokeWidth: 2,
-                                    color: Colors.white,
+                                    color: AppColors.surfaceWhite,
                                   ),
                                 )
                               : const Text(
@@ -401,7 +502,9 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                     return RefreshIndicator(
                       onRefresh: () async {
                         ref.invalidate(searchProvider(jsonEncode(queries)));
-                        await ref.read(searchProvider(jsonEncode(queries)).future);
+                        await ref.read(
+                          searchProvider(jsonEncode(queries)).future,
+                        );
                       },
                       child: ListView.separated(
                         padding: const EdgeInsets.all(16).copyWith(bottom: 96),
@@ -433,7 +536,9 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                             hasQuoteButton: !isAdded,
                             hasAddedBadge: isAdded,
                             onQuoteTap: () {
-                              final authState = ref.read(authControllerProvider);
+                              final authState = ref.read(
+                                authControllerProvider,
+                              );
                               if (authState is! AuthStateAuthenticated) {
                                 context.push('/sign-in-mobile');
                                 return;
@@ -498,7 +603,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: const [
                       BoxShadow(
-                        color: Colors.black26,
+                        color: AppColors.overlayMedium,
                         blurRadius: 10,
                         offset: Offset(0, 4),
                       ),
@@ -510,7 +615,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                       Text(
                         '${ref.watch(quoteCartProvider).length} business${ref.watch(quoteCartProvider).length == 1 ? '' : 'es'} picked',
                         style: AppTextStyles.labelMd.copyWith(
-                          color: Colors.white70,
+                          color: AppColors.surfaceWhite70,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -519,14 +624,14 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                           Text(
                             'Request quotes',
                             style: AppTextStyles.labelLg.copyWith(
-                              color: Colors.white,
+                              color: AppColors.surfaceWhite,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                           const SizedBox(width: 6),
                           const Icon(
                             Icons.arrow_forward,
-                            color: Colors.white,
+                            color: AppColors.surfaceWhite,
                             size: 18,
                           ),
                         ],
@@ -562,7 +667,10 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                   Row(
                     children: [
                       TextButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          _resetFilters();
+                          Navigator.pop(context);
+                        },
                         style: TextButton.styleFrom(
                           padding: const EdgeInsets.symmetric(horizontal: 12),
                           minimumSize: Size.zero,
@@ -698,6 +806,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                     children: [
                       Expanded(
                         child: TextField(
+                          controller: _minPriceController,
                           decoration: InputDecoration(
                             hintText: 'Min',
                             contentPadding: const EdgeInsets.symmetric(
@@ -725,6 +834,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                       ),
                       Expanded(
                         child: TextField(
+                          controller: _maxPriceController,
                           decoration: InputDecoration(
                             hintText: 'Max',
                             contentPadding: const EdgeInsets.symmetric(
@@ -757,10 +867,56 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                     spacing: 10,
                     runSpacing: 10,
                     children: [
-                      _buildFilterChip('Any', isSelected: true),
-                      _buildFilterChip('★ 3+'),
-                      _buildFilterChip('★ 4+'),
-                      _buildFilterChip('★ 4.5+'),
+                      GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _selectedMinRating = null;
+                          });
+                        },
+                        child: _buildFilterChip(
+                          'Any',
+                          isSelected: _selectedMinRating == null,
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _selectedMinRating = _selectedMinRating == 3.0
+                                ? null
+                                : 3.0;
+                          });
+                        },
+                        child: _buildFilterChip(
+                          '★ 3+',
+                          isSelected: _selectedMinRating == 3.0,
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _selectedMinRating = _selectedMinRating == 4.0
+                                ? null
+                                : 4.0;
+                          });
+                        },
+                        child: _buildFilterChip(
+                          '★ 4+',
+                          isSelected: _selectedMinRating == 4.0,
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _selectedMinRating = _selectedMinRating == 4.5
+                                ? null
+                                : 4.5;
+                          });
+                        },
+                        child: _buildFilterChip(
+                          '★ 4.5+',
+                          isSelected: _selectedMinRating == 4.5,
+                        ),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 32),
@@ -782,7 +938,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                     ),
                     child: DropdownButtonHideUnderline(
                       child: DropdownButton<String>(
-                        value: 'Recommended',
+                        value: _selectedSortBy,
                         isExpanded: true,
                         icon: const Icon(
                           Icons.keyboard_arrow_down,
@@ -794,6 +950,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                                   'Price: Low to High',
                                   'Price: High to Low',
                                   'Rating: High to Low',
+                                  'Newest',
                                 ]
                                 .map(
                                   (e) => DropdownMenuItem(
@@ -802,7 +959,13 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                                   ),
                                 )
                                 .toList(),
-                        onChanged: (v) {},
+                        onChanged: (v) {
+                          if (v != null) {
+                            setState(() {
+                              _selectedSortBy = v;
+                            });
+                          }
+                        },
                       ),
                     ),
                   ),
@@ -821,9 +984,23 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                 height: 52,
                 child: ElevatedButton(
                   onPressed: () {
+                    final minP = double.tryParse(
+                      _minPriceController.text.trim(),
+                    );
+                    final maxP = double.tryParse(
+                      _maxPriceController.text.trim(),
+                    );
                     setState(() {
                       _appliedCategoryId = _selectedCategoryId;
                       _appliedAttributes = Map.from(_selectedAttributes);
+                      _appliedMinPrice = (minP != null && minP > 0)
+                          ? minP
+                          : null;
+                      _appliedMaxPrice = (maxP != null && maxP > 0)
+                          ? maxP
+                          : null;
+                      _appliedMinRating = _selectedMinRating;
+                      _appliedSortBy = _selectedSortBy;
                     });
                     Navigator.pop(context);
                   },
@@ -836,7 +1013,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                   child: const Text(
                     'Show results',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: AppColors.surfaceWhite,
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
                     ),

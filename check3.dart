@@ -5,5 +5,5 @@ void main() {
   final jsonString = '{' + content.split('---').last.substring(content.split('---').last.indexOf('{') + 1);
   final map = jsonDecode(jsonString) as Map<String, dynamic>;
   final paths = map['paths'] as Map<String, dynamic>;
-  print(jsonEncode(paths['/bookings']['get']['responses']));
+  print(jsonEncode(paths['/discovery/search']['get']['parameters']));
 }

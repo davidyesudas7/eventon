@@ -29,7 +29,7 @@ import '../../features/vendors/presentation/pages/vendor_profile_screen.dart';
 
 part 'app_router.g.dart';
 
-final _rootNavigatorKey = GlobalKey<NavigatorState>();
+final rootNavigatorKey = GlobalKey<NavigatorState>();
 final _shellNavigatorHomeKey = GlobalKey<NavigatorState>(debugLabel: 'home');
 final _shellNavigatorExploreKey = GlobalKey<NavigatorState>(
   debugLabel: 'explore',
@@ -52,7 +52,7 @@ GoRouter goRouter(Ref ref) {
 
   return GoRouter(
     initialLocation: '/home',
-    navigatorKey: _rootNavigatorKey,
+    navigatorKey: rootNavigatorKey,
     refreshListenable: authStateListener,
 
     redirect: (context, state) {
@@ -240,7 +240,7 @@ GoRouter goRouter(Ref ref) {
                 routes: [
                   GoRoute(
                     path: ':id',
-                    parentNavigatorKey: _rootNavigatorKey,
+                    parentNavigatorKey: rootNavigatorKey,
                     builder: (context, state) {
                       final id = state.pathParameters['id']!;
                       return BookingDetailsScreen(id: id);
@@ -259,7 +259,7 @@ GoRouter goRouter(Ref ref) {
                 routes: [
                   GoRoute(
                     path: ':id',
-                    parentNavigatorKey: _rootNavigatorKey,
+                    parentNavigatorKey: rootNavigatorKey,
                     builder: (context, state) {
                       final id = state.pathParameters['id']!;
                       return ChatDetailScreen(conversationId: id);

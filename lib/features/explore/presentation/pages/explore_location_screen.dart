@@ -225,8 +225,8 @@ class _ExploreLocationScreenState extends ConsumerState<ExploreLocationScreen> {
               try {
                 final locationService = ref.read(locationServiceProvider);
                 final position = await locationService.getCurrentPosition();
-                
-                if (position != null) {
+
+                if (position != null && context.mounted) {
                   final locationData = SavedLocation(
                     placeId: 'current',
                     name: 'Current Location',
@@ -235,23 +235,14 @@ class _ExploreLocationScreenState extends ConsumerState<ExploreLocationScreen> {
                     longitude: position.longitude,
                     radiusKm: _selectedRadiusKm,
                   );
-                  ref.read(locationHistoryRepositoryProvider).savePreferredRadius(_selectedRadiusKm);
+                  ref
+                      .read(locationHistoryRepositoryProvider)
+                      .savePreferredRadius(_selectedRadiusKm);
                   // Set to provider but DON'T save to history
-                  ref.read(exploreLocationProvider.notifier).setLocation(locationData);
+                  ref
+                      .read(exploreLocationProvider.notifier)
+                      .setLocation(locationData);
                   if (context.mounted) context.pop();
-                } else {
-                  final isDeniedForever = await locationService.isPermissionDeniedForever();
-                  if (isDeniedForever && context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: const Text('Location permissions are permanently denied.'),
-                        action: SnackBarAction(
-                          label: 'Settings',
-                          onPressed: () => locationService.openAppSettings(),
-                        ),
-                      ),
-                    );
-                  }
                 }
               } catch (e) {
                 if (context.mounted) {

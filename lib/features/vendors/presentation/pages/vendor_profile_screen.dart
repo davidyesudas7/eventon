@@ -14,10 +14,7 @@ import '../widgets/vendor_listing_card.dart';
 import '../widgets/vendor_review_item.dart';
 
 class VendorProfileScreen extends ConsumerStatefulWidget {
-  const VendorProfileScreen({
-    super.key,
-    required this.vendorId,
-  });
+  const VendorProfileScreen({super.key, required this.vendorId});
 
   final String vendorId;
 
@@ -70,14 +67,18 @@ class _VendorProfileScreenState extends ConsumerState<VendorProfileScreen> {
     if (isAdded) {
       ref.read(quoteCartProvider.notifier).removeQuote(listing.id);
     } else {
-      ref.read(quoteCartProvider.notifier).addQuote(
-        QuoteItem(
-          id: listing.id,
-          title: listing.title,
-          imageUrl: listing.coverUrl,
-          price: listing.priceFrom != null ? 'From ₹${listing.priceFrom}' : null,
-        ),
-      );
+      ref
+          .read(quoteCartProvider.notifier)
+          .addQuote(
+            QuoteItem(
+              id: listing.id,
+              title: listing.title,
+              imageUrl: listing.coverUrl,
+              price: listing.priceFrom != null
+                  ? 'From ₹${listing.priceFrom}'
+                  : null,
+            ),
+          );
     }
 
     ScaffoldMessenger.of(context).showSnackBar(
@@ -119,15 +120,12 @@ class _VendorProfileScreenState extends ConsumerState<VendorProfileScreen> {
   Widget build(BuildContext context) {
     final profileAsync = ref.watch(vendorProfileProvider(widget.vendorId));
     final listingsAsync = ref.watch(vendorListingsProvider(widget.vendorId));
-    final reviewsState =
-        ref.watch(vendorReviewsProvider(widget.vendorId));
+    final reviewsState = ref.watch(vendorReviewsProvider(widget.vendorId));
     final quoteCart = ref.watch(quoteCartProvider);
 
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: EventOnAppBar(
-        onBack: _handleBack,
-      ),
+      appBar: EventOnAppBar(onBack: _handleBack),
       body: profileAsync.when(
         loading: () => const Center(
           child: CircularProgressIndicator(color: AppColors.primary),
@@ -169,35 +167,6 @@ class _VendorProfileScreenState extends ConsumerState<VendorProfileScreen> {
               padding: const EdgeInsets.only(bottom: 40),
               children: [
                 // Secondary Header Bar with Back Button & Vendor Name
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
-                  ),
-                  child: Row(
-                    children: [
-                      IconButton(
-                        icon: const Icon(
-                          Icons.arrow_back,
-                          color: AppColors.textPrimary,
-                        ),
-                        onPressed: _handleBack,
-                      ),
-                      Expanded(
-                        child: Text(
-                          titleName,
-                          style: AppTextStyles.headlineMd.copyWith(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.textPrimary,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
 
                 // Vendor Profile Header
                 VendorHeaderCard(
@@ -228,11 +197,16 @@ class _VendorProfileScreenState extends ConsumerState<VendorProfileScreen> {
                   loading: () => const Padding(
                     padding: EdgeInsets.all(32),
                     child: Center(
-                      child: CircularProgressIndicator(color: AppColors.primary),
+                      child: CircularProgressIndicator(
+                        color: AppColors.primary,
+                      ),
                     ),
                   ),
                   error: (err, _) => Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 16,
+                    ),
                     child: Text(
                       'Failed to load listings',
                       style: AppTextStyles.bodyMd.copyWith(color: Colors.red),
@@ -258,7 +232,9 @@ class _VendorProfileScreenState extends ConsumerState<VendorProfileScreen> {
                       padding: const EdgeInsets.symmetric(horizontal: 20),
                       child: Column(
                         children: listings.map((listing) {
-                          final isAdded = quoteCart.any((q) => q.id == listing.id);
+                          final isAdded = quoteCart.any(
+                            (q) => q.id == listing.id,
+                          );
 
                           return Padding(
                             padding: const EdgeInsets.only(bottom: 20),
@@ -276,7 +252,8 @@ class _VendorProfileScreenState extends ConsumerState<VendorProfileScreen> {
                 ),
 
                 // Reviews Section (shown when reviews exist or are loading)
-                if (reviewsState.isLoading || reviewsState.reviews.isNotEmpty) ...[
+                if (reviewsState.isLoading ||
+                    reviewsState.reviews.isNotEmpty) ...[
                   const Divider(
                     color: AppColors.borderSubtle,
                     height: 1,
@@ -296,8 +273,9 @@ class _VendorProfileScreenState extends ConsumerState<VendorProfileScreen> {
                     const Padding(
                       padding: EdgeInsets.all(24),
                       child: Center(
-                        child:
-                            CircularProgressIndicator(color: AppColors.primary),
+                        child: CircularProgressIndicator(
+                          color: AppColors.primary,
+                        ),
                       ),
                     )
                   else
