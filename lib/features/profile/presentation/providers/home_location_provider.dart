@@ -1,122 +1,57 @@
-import 'dart:convert';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:http/http.dart' as http;
+import '../../../../core/network/api_providers.dart';
+import '../../data/datasources/territory_local_data_source.dart';
+import '../../data/datasources/territory_remote_data_source.dart';
 import '../../data/models/location_models.dart';
+import '../../data/repositories/territory_repository_impl.dart';
+import '../../domain/repositories/territory_repository.dart';
 
 part 'home_location_provider.g.dart';
 
+final territoryRepositoryProvider = Provider<TerritoryRepository>((ref) {
+  final dio = ref.watch(dioProvider);
+  return TerritoryRepositoryImpl(
+    remoteDataSource: TerritoryRemoteDataSourceImpl(dio),
+    localDataSource: TerritoryLocalDataSourceImpl(),
+  );
+});
+
 @riverpod
 class HomeLocationState extends _$HomeLocationState {
-  bool _mounted = true;
-
   @override
   Future<HomeLocation?> build() async {
-    _mounted = true;
-    ref.onDispose(() => _mounted = false);
-    
-    final prefs = await SharedPreferences.getInstance();
-    final jsonStr = prefs.getString('home_location');
-    if (jsonStr != null) {
-      try {
-        final data = jsonDecode(jsonStr);
-        final pincode = data['pincode'] as String?;
-        final lsgJson = data['lsgDetails'] as Map<String, dynamic>?;
-        
-        LsgDetails? lsgDetails;
-        if (lsgJson != null) {
-          lsgDetails = LsgDetails.fromJson(lsgJson);
-        }
-        
-        if (pincode != null && pincode.length == 6) {
-          // Fetch fresh details when loading
-          final response = await http.get(
-            Uri.parse('https://api.eventongo.in/territories/reference/pincodes/$pincode')
-          );
-          if (response.statusCode == 200) {
-            final pinDetails = PincodeDetails.fromJson(jsonDecode(response.body));
-            return HomeLocation(pincodeDetails: pinDetails, lsgDetails: lsgDetails);
-          }
-        }
-      } catch (_) {
-        return null;
-      }
-    }
-    return null;
+    final repository = ref.watch(territoryRepositoryProvider);
+    return repository.getSavedLocation();
   }
 
   Future<void> saveLocation(PincodeDetails pin, LsgDetails? lsg) async {
-    final location = HomeLocation(pincodeDetails: pin, lsgDetails: lsg);
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('home_location', jsonEncode({
-      'pincode': pin.pincode,
-      'lsgDetails': lsg?.toJson(),
-    }));
-    state = AsyncData(location);
+    final repository = ref.read(territoryRepositoryProvider);
+    await repository.saveLocation(pin, lsg);
+    state = AsyncData(HomeLocation(pincodeDetails: pin, lsgDetails: lsg));
   }
 
   Future<void> saveFromLogin(String? pincode, String? lsgId) async {
-    if (pincode == null || pincode.isEmpty) return;
-    
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('home_location', jsonEncode({
-      'pincode': pincode,
-      'lsgDetails': lsgId != null ? {
-        'id': lsgId,
-        'name': '',
-        'type': '',
-        'district': '',
-        'state': 'Kerala'
-      } : null,
-    }));
-    
-    if (_mounted) {
-      ref.invalidateSelf();
-    }
+    final repository = ref.read(territoryRepositoryProvider);
+    await repository.saveFromLogin(pincode, lsgId);
+    ref.invalidateSelf();
   }
 
   Future<void> clearLocation() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('home_location');
+    final repository = ref.read(territoryRepositoryProvider);
+    await repository.clearLocation();
     state = const AsyncData(null);
   }
 }
 
 @riverpod
-Future<PincodeDetails?> fetchPincode(Ref ref, String pincode) async {
-  if (pincode.length != 6) return null;
-
-  try {
-    final response = await http.get(
-      Uri.parse(
-        'https://api.eventongo.in/territories/reference/pincodes/$pincode',
-      ),
-    );
-    if (response.statusCode == 200) {
-      return PincodeDetails.fromJson(jsonDecode(response.body));
-    }
-  } catch (e) {
-    // Handle or log error
-  }
-  return null;
+Future<PincodeDetails?> fetchPincode(Ref ref, String pincode) {
+  final repository = ref.watch(territoryRepositoryProvider);
+  return repository.getPincodeDetails(pincode);
 }
 
 @riverpod
-Future<List<LsgDetails>> searchLsg(Ref ref, String query) async {
-  if (query.trim().length < 2) return [];
-
-  try {
-    final response = await http.get(
-      Uri.parse(
-        'https://api.eventongo.in/territories/reference/lsg-search?state=Kerala&q=${Uri.encodeComponent(query)}',
-      ),
-    );
-    if (response.statusCode == 200) {
-      final List data = jsonDecode(response.body);
-      return data.map((e) => LsgDetails.fromJson(e)).toList();
-    }
-  } catch (e) {
-    // Handle error
-  }
-  return [];
+Future<List<LsgDetails>> searchLsg(Ref ref, String query) {
+  final repository = ref.watch(territoryRepositoryProvider);
+  return repository.searchLsg(query);
 }

@@ -157,8 +157,6 @@ class _VendorProfileScreenState extends ConsumerState<VendorProfileScreen> {
           ),
         ),
         data: (profile) {
-          final titleName = profile.displayName;
-
           return RefreshIndicator(
             color: AppColors.primary,
             onRefresh: _onRefresh,

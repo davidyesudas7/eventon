@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/widgets/eventon_app_bar.dart';
-import '../../../categories/presentation/providers/categories_providers.dart';
-import '../../../categories/presentation/widgets/category_grid.dart';
+import '../providers/categories_providers.dart';
+import '../widgets/category_grid.dart';
 
 class AllServicesScreen extends ConsumerWidget {
   const AllServicesScreen({super.key});

@@ -24,7 +24,7 @@ import '../../features/profile/presentation/pages/profile_screen.dart';
 import '../../features/quotes/presentation/pages/request_quotes_screen.dart';
 import '../../features/quotes/presentation/pages/quotes_listing_screen.dart';
 import '../../features/quotes/presentation/pages/quotes_detail_screen.dart';
-import '../../features/services/presentation/pages/all_services_screen.dart';
+import '../../features/categories/presentation/pages/all_services_screen.dart';
 import '../../features/vendors/presentation/pages/vendor_profile_screen.dart';
 
 part 'app_router.g.dart';
