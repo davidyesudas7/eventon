@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../categories/domain/entities/occasion.dart';
@@ -61,7 +62,10 @@ class _OccasionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        context.push('/home/occasion/${occasion.slug}');
+        context.pushNamed(
+          AppRoutes.occasion,
+          pathParameters: {'slug': occasion.slug},
+        );
       },
       child: Container(
         width: 150,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/router/app_routes.dart';
 import 'package:intl/intl.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../data/models/message_model.dart';
@@ -48,7 +49,10 @@ class _CustomQuoteWidgetState extends ConsumerState<CustomQuoteWidget> {
       // Accepting opens a booking; take the customer straight to it
       final bookingId = updatedMessage.quote?['bookingId']?.toString();
       if (accept && bookingId != null && bookingId.isNotEmpty) {
-        context.push('/bookings/$bookingId');
+        context.pushNamed(
+          AppRoutes.bookingDetails,
+          pathParameters: {'id': bookingId},
+        );
       }
     } catch (e) {
       if (!mounted) return;
@@ -263,7 +267,10 @@ class _CustomQuoteWidgetState extends ConsumerState<CustomQuoteWidget> {
                     const SizedBox(width: 16),
                     InkWell(
                       onTap: () {
-                        context.push('/bookings/$bookingId');
+                        context.pushNamed(
+                          AppRoutes.bookingDetails,
+                          pathParameters: {'id': bookingId},
+                        );
                       },
                       child: const Row(
                         mainAxisSize: MainAxisSize.min,

@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import 'app_routes.dart';
+export 'app_routes.dart';
+
 import '../../features/auth/presentation/pages/complete_profile_screen.dart';
 import '../../features/auth/presentation/pages/otp_verify_screen.dart';
 import '../../features/auth/presentation/pages/sign_in_email_screen.dart';
@@ -51,7 +54,7 @@ GoRouter goRouter(Ref ref) {
   });
 
   return GoRouter(
-    initialLocation: '/home',
+    initialLocation: AppRoutes.homePath,
     navigatorKey: rootNavigatorKey,
     refreshListenable: authStateListener,
 
@@ -59,46 +62,55 @@ GoRouter goRouter(Ref ref) {
       final isAuthenticated = authStateListener.value is AuthStateAuthenticated;
       final location = state.uri.toString();
 
-      final protectedRoutes = ['/profile', '/bookings', '/chats', '/request-quotes'];
+      final protectedRoutes = [
+        AppRoutes.profilePath,
+        AppRoutes.bookingsPath,
+        AppRoutes.chatsPath,
+        AppRoutes.requestQuotesPath,
+      ];
 
       final isProtectedRoute = protectedRoutes.any(
         (route) => location == route || location.startsWith('$route/'),
       );
 
       final isAuthRoute =
-          location == '/sign-in-mobile' ||
-          location == '/sign-in-email' ||
-          location == '/sign-up-email' ||
-          location == '/otp-verify' ||
-          location == '/complete-profile';
+          location == AppRoutes.signInMobilePath ||
+          location == AppRoutes.signInEmailPath ||
+          location == AppRoutes.signUpEmailPath ||
+          location == AppRoutes.otpVerifyPath ||
+          location == AppRoutes.completeProfilePath;
 
       // Redirect guest users trying to access protected routes to full-screen mobile sign-in
       if (isProtectedRoute && !isAuthenticated) {
-        return '/sign-in-mobile';
+        return AppRoutes.signInMobilePath;
       }
 
       // Redirect authenticated users away from auth screens to home
       if (isAuthRoute && isAuthenticated) {
-        return '/home';
+        return AppRoutes.homePath;
       }
 
       return null;
     },
     routes: [
       GoRoute(
-        path: '/sign-in-mobile',
+        name: AppRoutes.signInMobile,
+        path: AppRoutes.signInMobilePath,
         builder: (context, state) => const SignInMobileScreen(),
       ),
       GoRoute(
-        path: '/sign-in-email',
+        name: AppRoutes.signInEmail,
+        path: AppRoutes.signInEmailPath,
         builder: (context, state) => const SignInEmailScreen(),
       ),
       GoRoute(
-        path: '/sign-up-email',
+        name: AppRoutes.signUpEmail,
+        path: AppRoutes.signUpEmailPath,
         builder: (context, state) => const SignUpEmailScreen(),
       ),
       GoRoute(
-        path: '/otp-verify',
+        name: AppRoutes.otpVerify,
+        path: AppRoutes.otpVerifyPath,
         builder: (context, state) {
           final extra = state.extra as Map<String, dynamic>? ?? {};
           return OtpVerifyScreen(
@@ -108,22 +120,26 @@ GoRouter goRouter(Ref ref) {
         },
       ),
       GoRoute(
-        path: '/complete-profile',
+        name: AppRoutes.completeProfile,
+        path: AppRoutes.completeProfilePath,
         builder: (context, state) {
           final idToken = state.extra as String? ?? '';
           return CompleteProfileScreen(idToken: idToken);
         },
       ),
       GoRoute(
-        path: '/request-quotes',
+        name: AppRoutes.requestQuotes,
+        path: AppRoutes.requestQuotesPath,
         builder: (context, state) => const RequestQuotesScreen(),
       ),
       GoRoute(
-        path: '/quote-requests',
+        name: AppRoutes.quoteRequests,
+        path: AppRoutes.quoteRequestsPath,
         builder: (context, state) => const QuotesListingScreen(),
         routes: [
           GoRoute(
-            path: ':id',
+            name: AppRoutes.quoteRequestDetails,
+            path: AppRoutes.quoteRequestDetailsSubPath,
             builder: (context, state) {
               final id = state.pathParameters['id']!;
               return QuotesDetailScreen(id: id);
@@ -132,7 +148,8 @@ GoRouter goRouter(Ref ref) {
         ],
       ),
       GoRoute(
-        path: '/vendors/:id',
+        name: AppRoutes.vendorProfile,
+        path: AppRoutes.vendorProfilePath,
         builder: (context, state) {
           final id = state.pathParameters['id']!;
           return VendorProfileScreen(vendorId: id);
@@ -154,15 +171,18 @@ GoRouter goRouter(Ref ref) {
             navigatorKey: _shellNavigatorHomeKey,
             routes: [
               GoRoute(
-                path: '/home',
+                name: AppRoutes.home,
+                path: AppRoutes.homePath,
                 builder: (context, state) => const HomeScreen(),
                 routes: [
                   GoRoute(
-                    path: 'all-services',
+                    name: AppRoutes.allServices,
+                    path: AppRoutes.allServicesPath,
                     builder: (context, state) => const AllServicesScreen(),
                   ),
                   GoRoute(
-                    path: 'occasion/:slug',
+                    name: AppRoutes.occasion,
+                    path: AppRoutes.occasionPath,
                     builder: (context, state) {
                       return OccasionScreen(
                         slug: state.pathParameters['slug']!,
@@ -170,7 +190,8 @@ GoRouter goRouter(Ref ref) {
                     },
                   ),
                   GoRoute(
-                    path: 'listing/:id',
+                    name: AppRoutes.homeListingDetails,
+                    path: AppRoutes.listingDetailsPath,
                     builder: (context, state) {
                       return ListingDetailsScreen(
                         listingId: state.pathParameters['id']!,
@@ -178,7 +199,8 @@ GoRouter goRouter(Ref ref) {
                     },
                   ),
                   GoRoute(
-                    path: 'vendor/:id',
+                    name: AppRoutes.homeVendorProfile,
+                    path: AppRoutes.vendorDetailsPath,
                     builder: (context, state) {
                       return VendorProfileScreen(
                         vendorId: state.pathParameters['id']!,
@@ -193,14 +215,16 @@ GoRouter goRouter(Ref ref) {
             navigatorKey: _shellNavigatorExploreKey,
             routes: [
               GoRoute(
-                path: '/explore',
+                name: AppRoutes.explore,
+                path: AppRoutes.explorePath,
                 builder: (context, state) {
                   final categoryId = state.extra as String?;
                   return ExploreScreen(initialCategoryId: categoryId);
                 },
                 routes: [
                   GoRoute(
-                    path: 'search',
+                    name: AppRoutes.exploreSearch,
+                    path: AppRoutes.exploreSearchPath,
                     builder: (context, state) => ExploreSearchScreen(
                       initialQuery: state.extra is String
                           ? state.extra as String
@@ -208,11 +232,13 @@ GoRouter goRouter(Ref ref) {
                     ),
                   ),
                   GoRoute(
-                    path: 'location',
+                    name: AppRoutes.exploreLocation,
+                    path: AppRoutes.exploreLocationPath,
                     builder: (context, state) => const ExploreLocationScreen(),
                   ),
                   GoRoute(
-                    path: 'listing/:id',
+                    name: AppRoutes.exploreListingDetails,
+                    path: AppRoutes.listingDetailsPath,
                     builder: (context, state) {
                       return ListingDetailsScreen(
                         listingId: state.pathParameters['id']!,
@@ -220,7 +246,8 @@ GoRouter goRouter(Ref ref) {
                     },
                   ),
                   GoRoute(
-                    path: 'vendor/:id',
+                    name: AppRoutes.exploreVendorProfile,
+                    path: AppRoutes.vendorDetailsPath,
                     builder: (context, state) {
                       return VendorProfileScreen(
                         vendorId: state.pathParameters['id']!,
@@ -235,11 +262,13 @@ GoRouter goRouter(Ref ref) {
             navigatorKey: _shellNavigatorBookingsKey,
             routes: [
               GoRoute(
-                path: '/bookings',
+                name: AppRoutes.bookings,
+                path: AppRoutes.bookingsPath,
                 builder: (context, state) => const BookingsScreen(),
                 routes: [
                   GoRoute(
-                    path: ':id',
+                    name: AppRoutes.bookingDetails,
+                    path: AppRoutes.bookingDetailsSubPath,
                     parentNavigatorKey: rootNavigatorKey,
                     builder: (context, state) {
                       final id = state.pathParameters['id']!;
@@ -254,11 +283,13 @@ GoRouter goRouter(Ref ref) {
             navigatorKey: _shellNavigatorChatsKey,
             routes: [
               GoRoute(
-                path: '/chats',
+                name: AppRoutes.chats,
+                path: AppRoutes.chatsPath,
                 builder: (context, state) => const ChatsScreen(),
                 routes: [
                   GoRoute(
-                    path: ':id',
+                    name: AppRoutes.chatDetails,
+                    path: AppRoutes.chatDetailsSubPath,
                     parentNavigatorKey: rootNavigatorKey,
                     builder: (context, state) {
                       final id = state.pathParameters['id']!;
@@ -273,7 +304,8 @@ GoRouter goRouter(Ref ref) {
             navigatorKey: _shellNavigatorProfileKey,
             routes: [
               GoRoute(
-                path: '/profile',
+                name: AppRoutes.profile,
+                path: AppRoutes.profilePath,
                 builder: (context, state) => const ProfileScreen(),
               ),
             ],

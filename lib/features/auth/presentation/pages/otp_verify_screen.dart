@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/error/failures.dart';
+import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/widgets/inline_error_banner.dart';
@@ -61,16 +62,19 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifyScreen> {
       setState(() => _isLoading = false);
 
       if (success) {
-        context.go('/home');
+        context.goNamed(AppRoutes.home);
       } else {
         final authState = ref.read(authControllerProvider);
         if (authState is AuthStateError) {
           if (authState.failure is ProfileRequiredFailure) {
             // New user phone account needs full name
             final failure = authState.failure as ProfileRequiredFailure;
-            context.go('/complete-profile', extra: failure.idToken ?? '');
+            context.goNamed(
+              AppRoutes.completeProfile,
+              extra: failure.idToken ?? '',
+            );
           } else if (authState.failure is UsePasswordFailure) {
-            context.go('/sign-in-email');
+            context.goNamed(AppRoutes.signInEmail);
           } else {
             setState(() => _errorMessage = authState.failure.message);
           }

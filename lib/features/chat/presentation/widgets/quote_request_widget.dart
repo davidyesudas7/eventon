@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 
@@ -70,7 +71,10 @@ class QuoteRequestWidget extends StatelessWidget {
           Center(
             child: GestureDetector(
               onTap: () {
-                context.push('/quote-requests/$quoteRequestId');
+                context.pushNamed(
+                  AppRoutes.quoteRequestDetails,
+                  pathParameters: {'id': quoteRequestId},
+                );
               },
               child: Row(
                 mainAxisSize: MainAxisSize.min,

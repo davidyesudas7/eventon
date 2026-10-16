@@ -2,6 +2,7 @@ import 'package:eventon/features/bookings/presentation/providers/booking_provide
 import 'package:eventon/features/quotes/presentation/providers/quote_cart_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/widgets/eventon_app_bar.dart';
@@ -62,7 +63,7 @@ class _ListingDetailsScreenState extends ConsumerState<ListingDetailsScreen> {
   bool _checkAuth() {
     final authState = ref.read(authControllerProvider);
     if (authState is! AuthStateAuthenticated) {
-      context.push('/sign-in-mobile');
+      context.pushNamed(AppRoutes.signInMobile);
       return false;
     }
     return true;
@@ -265,10 +266,16 @@ class _ListingDetailsScreenState extends ConsumerState<ListingDetailsScreen> {
                                 final location = GoRouterState.of(
                                   context,
                                 ).uri.toString();
-                                if (location.startsWith('/explore')) {
-                                  context.push('/explore/vendor/${l.vendorId}');
+                                if (location.startsWith(AppRoutes.explorePath)) {
+                                  context.pushNamed(
+                                    AppRoutes.exploreVendorProfile,
+                                    pathParameters: {'id': l.vendorId},
+                                  );
                                 } else {
-                                  context.push('/home/vendor/${l.vendorId}');
+                                  context.pushNamed(
+                                    AppRoutes.homeVendorProfile,
+                                    pathParameters: {'id': l.vendorId},
+                                  );
                                 }
                               },
                               borderRadius: BorderRadius.circular(4),
@@ -786,7 +793,11 @@ class _BookPackageSheetState extends ConsumerState<_BookPackageSheet> {
     );
     if (booking != null && mounted) {
       Navigator.pop(context); // Close sheet
-      context.go('/bookings/${booking.id}', extra: booking); // Go to details
+      context.goNamed(
+        AppRoutes.bookingDetails,
+        pathParameters: {'id': booking.id},
+        extra: booking,
+      ); // Go to details
     } else if (mounted) {
       setState(() {
         _errorMessage = notifier.lastError ?? 'Failed to create booking';
@@ -945,7 +956,10 @@ class _MessageBusinessSheetState extends ConsumerState<_MessageBusinessSheet> {
 
     if (conversation != null && mounted) {
       Navigator.pop(context); // Close sheet
-      context.push('/chats/${conversation.id}'); // Go to chat screen
+      context.pushNamed(
+        AppRoutes.chatDetails,
+        pathParameters: {'id': conversation.id},
+      ); // Go to chat screen
     } else if (mounted) {
       setState(() {
         _errorMessage = notifier.lastError ?? 'Failed to start conversation';

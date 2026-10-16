@@ -2,6 +2,7 @@ import 'package:eventon/core/widgets/eventon_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/router/app_routes.dart';
 import 'package:intl/intl.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
@@ -252,8 +253,11 @@ class _QuotesDetailScreenState extends ConsumerState<QuotesDetailScreen> {
                                   child: OutlinedButton.icon(
                                     onPressed: () {
                                       if (vendor.conversationId != null) {
-                                        context.push(
-                                          '/chats/${vendor.conversationId}',
+                                        context.pushNamed(
+                                          AppRoutes.chatDetails,
+                                          pathParameters: {
+                                            'id': vendor.conversationId!,
+                                          },
                                         );
                                       } else {
                                         ScaffoldMessenger.of(

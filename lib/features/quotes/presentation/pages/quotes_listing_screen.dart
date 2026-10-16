@@ -2,6 +2,7 @@ import 'package:eventon/core/widgets/eventon_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/router/app_routes.dart';
 import 'package:intl/intl.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
@@ -35,7 +36,7 @@ class QuotesListingScreen extends ConsumerWidget {
                 GestureDetector(
                   onTap: () {
                     // Navigate to explore to make a new request
-                    context.go('/explore');
+                    context.goNamed(AppRoutes.explore);
                   },
                   child: Text(
                     'New request',
@@ -79,7 +80,10 @@ class QuotesListingScreen extends ConsumerWidget {
 
                       return InkWell(
                         onTap: () {
-                          context.push('/quote-requests/${item.id}');
+                          context.pushNamed(
+                            AppRoutes.quoteRequestDetails,
+                            pathParameters: {'id': item.id},
+                          );
                         },
                         child: Padding(
                           padding: const EdgeInsets.all(24.0),

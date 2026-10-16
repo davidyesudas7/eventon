@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/widgets/app_filter_chip.dart';
@@ -54,7 +55,7 @@ class _HomePopularNearYouSectionState
               ),
             ),
             GestureDetector(
-              onTap: () => context.go('/explore'),
+              onTap: () => context.goNamed(AppRoutes.explore),
               child: Text(
                 'See all',
                 style: AppTextStyles.labelMd.copyWith(color: AppColors.primary),
@@ -151,7 +152,10 @@ class _HomePopularNearYouSectionState
                       hasAddedBadge: false,
                       rating: listing.ratingAvg,
                       ratingBadgeDark: true,
-                      onTap: () => context.push('/home/listing/${listing.id}'),
+                      onTap: () => context.pushNamed(
+                        AppRoutes.homeListingDetails,
+                        pathParameters: {'id': listing.id},
+                      ),
                     ),
                   );
                 }).toList(),

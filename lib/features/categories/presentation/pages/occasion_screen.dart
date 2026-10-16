@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../providers/categories_providers.dart';
@@ -45,7 +46,7 @@ class OccasionScreen extends ConsumerWidget {
                         onTap: () {
                           // pop to home, then switch tab and select category
                           context.pop();
-                          context.go('/explore', extra: category.id);
+                          context.goNamed(AppRoutes.explore, extra: category.id);
                         },
                       ),
                       const SizedBox(height: 14),

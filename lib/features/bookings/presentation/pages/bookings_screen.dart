@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/router/app_routes.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
@@ -113,7 +114,10 @@ class _BookingsScreenState extends ConsumerState<BookingsScreen> {
                     BookingCard(
                       booking: b,
                       onTap: () async {
-                        await context.push('/bookings/${b.id}');
+                        await context.pushNamed(
+                          AppRoutes.bookingDetails,
+                          pathParameters: {'id': b.id},
+                        );
                         if (mounted) {
                           ref.read(bookingsProvider.notifier).refresh();
                         }

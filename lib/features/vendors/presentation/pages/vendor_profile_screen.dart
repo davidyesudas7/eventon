@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/router/app_routes.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
@@ -54,7 +55,7 @@ class _VendorProfileScreenState extends ConsumerState<VendorProfileScreen> {
   bool _checkAuth() {
     final authState = ref.read(authControllerProvider);
     if (authState is! AuthStateAuthenticated) {
-      context.push('/sign-in-mobile');
+      context.pushNamed(AppRoutes.signInMobile);
       return false;
     }
     return true;
@@ -93,10 +94,16 @@ class _VendorProfileScreenState extends ConsumerState<VendorProfileScreen> {
 
   void _navigateToListing(String listingId) {
     final location = GoRouterState.of(context).uri.toString();
-    if (location.startsWith('/explore')) {
-      context.push('/explore/listing/$listingId');
+    if (location.startsWith(AppRoutes.explorePath)) {
+      context.pushNamed(
+        AppRoutes.exploreListingDetails,
+        pathParameters: {'id': listingId},
+      );
     } else {
-      context.push('/home/listing/$listingId');
+      context.pushNamed(
+        AppRoutes.homeListingDetails,
+        pathParameters: {'id': listingId},
+      );
     }
   }
 
@@ -104,7 +111,7 @@ class _VendorProfileScreenState extends ConsumerState<VendorProfileScreen> {
     if (context.canPop()) {
       context.pop();
     } else {
-      context.go('/home');
+      context.goNamed(AppRoutes.home);
     }
   }
 

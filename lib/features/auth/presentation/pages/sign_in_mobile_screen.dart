@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/error/failures.dart';
+import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/widgets/inline_error_banner.dart';
@@ -67,7 +68,7 @@ class _SignInMobileScreenState extends ConsumerState<SignInMobileScreen> {
                   .read(authControllerProvider.notifier)
                   .firebaseSignIn(idToken: idToken);
               if (mounted && success) {
-                context.go('/home');
+                context.goNamed(AppRoutes.home);
               }
             }
           } catch (_) {}
@@ -88,8 +89,8 @@ class _SignInMobileScreenState extends ConsumerState<SignInMobileScreen> {
         onCodeSent: (verificationId, resendToken) {
           if (!mounted) return;
           setState(() => _isLoading = false);
-          context.push(
-            '/otp-verify',
+          context.pushNamed(
+            AppRoutes.otpVerify,
             extra: {
               'verificationId': verificationId,
               'phoneNumber': fullPhoneNumber,
@@ -122,13 +123,16 @@ class _SignInMobileScreenState extends ConsumerState<SignInMobileScreen> {
       setState(() => _isLoading = false);
 
       if (success) {
-        context.go('/home');
+        context.goNamed(AppRoutes.home);
       } else {
         final authState = ref.read(authControllerProvider);
         if (authState is AuthStateError) {
           if (authState.failure is ProfileRequiredFailure) {
             final failure = authState.failure as ProfileRequiredFailure;
-            context.go('/complete-profile', extra: failure.idToken ?? '');
+            context.goNamed(
+              AppRoutes.completeProfile,
+              extra: failure.idToken ?? '',
+            );
           } else {
             setState(() => _errorMessage = authState.failure.message);
           }
@@ -147,7 +151,7 @@ class _SignInMobileScreenState extends ConsumerState<SignInMobileScreen> {
     if (context.canPop()) {
       context.pop();
     } else {
-      context.go('/home');
+      context.goNamed(AppRoutes.home);
     }
   }
 
@@ -360,9 +364,9 @@ class _SignInMobileScreenState extends ConsumerState<SignInMobileScreen> {
                   child: TextButton(
                     onPressed: () {
                       if (_isSignUp) {
-                        context.push('/sign-up-email');
+                        context.pushNamed(AppRoutes.signUpEmail);
                       } else {
-                        context.push('/sign-in-email');
+                        context.pushNamed(AppRoutes.signInEmail);
                       }
                     },
                     child: Text(

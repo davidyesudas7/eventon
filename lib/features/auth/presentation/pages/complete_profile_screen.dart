@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/widgets/inline_error_banner.dart';
@@ -61,7 +62,7 @@ class _CompleteProfileScreenState extends ConsumerState<CompleteProfileScreen> {
     setState(() => _isLoading = false);
 
     if (success) {
-      context.go('/home');
+      context.goNamed(AppRoutes.home);
     } else {
       final state = ref.read(authControllerProvider);
       if (state is AuthStateError) {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/widgets/inline_error_banner.dart';
@@ -73,7 +74,7 @@ class _SignInEmailScreenState extends ConsumerState<SignInEmailScreen> {
       if (context.canPop()) {
         context.pop();
       } else {
-        context.go('/home');
+        context.goNamed(AppRoutes.home);
       }
     } else {
       final authState = ref.read(authControllerProvider);
@@ -110,7 +111,7 @@ class _SignInEmailScreenState extends ConsumerState<SignInEmailScreen> {
     if (context.canPop()) {
       context.pop();
     } else {
-      context.go('/sign-in-mobile');
+      context.goNamed(AppRoutes.signInMobile);
     }
   }
 
@@ -309,7 +310,7 @@ class _SignInEmailScreenState extends ConsumerState<SignInEmailScreen> {
                           ),
                         ),
                         GestureDetector(
-                          onTap: () => context.go('/sign-in-mobile'),
+                          onTap: () => context.goNamed(AppRoutes.signInMobile),
                           child: Text(
                             'Create an account',
                             style: AppTextStyles.labelLg.copyWith(

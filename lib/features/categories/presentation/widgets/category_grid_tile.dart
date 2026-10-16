@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../domain/entities/category.dart';
@@ -14,7 +15,7 @@ class CategoryGridTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onTap ?? () => context.go('/explore', extra: category.id),
+      onTap: onTap ?? () => context.goNamed(AppRoutes.explore, extra: category.id),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [

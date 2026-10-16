@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/router/app_routes.dart';
 import 'package:intl/intl.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
@@ -112,7 +113,10 @@ class _RequestQuotesScreenState extends ConsumerState<RequestQuotesScreen> {
         },
         (quoteRequest) {
           ref.read(quoteCartProvider.notifier).clearQuotes();
-          context.go('/quote-requests/${quoteRequest.id}');
+          context.goNamed(
+            AppRoutes.quoteRequestDetails,
+            pathParameters: {'id': quoteRequest.id},
+          );
         },
       );
     } catch (e) {

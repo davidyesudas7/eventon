@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/router/app_routes.dart';
 import '../../../categories/presentation/providers/categories_providers.dart';
 import '../providers/explore_providers.dart';
 import '../providers/location_search_provider.dart';
@@ -54,7 +55,7 @@ class _ExploreSearchScreenState extends ConsumerState<ExploreSearchScreen> {
     if (context.canPop()) {
       context.pop(result);
     } else {
-      context.go('/explore');
+      context.goNamed(AppRoutes.explore);
     }
   }
 
@@ -158,7 +159,7 @@ class _ExploreSearchScreenState extends ConsumerState<ExploreSearchScreen> {
             child: InkWell(
               borderRadius: BorderRadius.circular(999),
               onTap: () {
-                context.push('/explore/location');
+                context.pushNamed(AppRoutes.exploreLocation);
               },
               child: Container(
                 padding: const EdgeInsets.symmetric(
@@ -246,7 +247,10 @@ class _ExploreSearchScreenState extends ConsumerState<ExploreSearchScreen> {
             for (final listing in searchAsync.value!.items)
               InkWell(
                 onTap: () async {
-                  await context.push('/explore/listing/${listing.id}');
+                  await context.pushNamed(
+                    AppRoutes.exploreListingDetails,
+                    pathParameters: {'id': listing.id},
+                  );
                   if (context.mounted) {
                     _close();
                   }

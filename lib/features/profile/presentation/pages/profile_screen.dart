@@ -2,6 +2,7 @@ import 'package:eventon/core/widgets/eventon_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../auth/presentation/providers/auth_providers.dart';
@@ -68,7 +69,7 @@ class ProfileScreen extends ConsumerWidget {
 
             // Action Buttons
             InkWell(
-              onTap: () => context.go('/bookings'),
+              onTap: () => context.goNamed(AppRoutes.bookings),
               borderRadius: BorderRadius.circular(16),
               child: Container(
                 width: double.infinity,
@@ -89,7 +90,7 @@ class ProfileScreen extends ConsumerWidget {
               onTap: () async {
                 await ref.read(authControllerProvider.notifier).logout();
                 if (context.mounted) {
-                  context.go('/home');
+                  context.goNamed(AppRoutes.home);
                 }
               },
               borderRadius: BorderRadius.circular(16),

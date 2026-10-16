@@ -2,6 +2,7 @@ import 'package:eventon/core/widgets/eventon_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../auth/presentation/providers/auth_providers.dart';
@@ -27,7 +28,7 @@ class ChatsScreen extends ConsumerWidget {
               if (context.canPop()) {
                 context.pop();
               } else {
-                context.go('/home');
+                context.goNamed(AppRoutes.home);
               }
             },
           ),
@@ -71,7 +72,7 @@ class ChatsScreen extends ConsumerWidget {
                 ),
                 const SizedBox(height: 24),
                 ElevatedButton(
-                  onPressed: () => context.push('/sign-in-mobile'),
+                  onPressed: () => context.pushNamed(AppRoutes.signInMobile),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     foregroundColor: AppColors.onPrimary,
@@ -114,7 +115,7 @@ class ChatsScreen extends ConsumerWidget {
                 ),
                 GestureDetector(
                   onTap: () {
-                    context.push('/quote-requests');
+                    context.pushNamed(AppRoutes.quoteRequests);
                   },
                   child: Text(
                     'Quote requests',
@@ -174,7 +175,10 @@ class ChatItemWidget extends ConsumerWidget {
 
     return InkWell(
       onTap: () {
-        context.push('/chats/${conversation.id}');
+        context.pushNamed(
+          AppRoutes.chatDetails,
+          pathParameters: {'id': conversation.id},
+        );
       },
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,

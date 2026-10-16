@@ -5,6 +5,7 @@ import 'package:eventon/features/quotes/presentation/providers/quote_cart_provid
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/widgets/eventon_app_bar.dart';
@@ -163,7 +164,10 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
     if (value.isEmpty || _openingSearch) return;
     _openingSearch = true;
     FocusScope.of(context).unfocus();
-    final result = await context.push<String>('/explore/search', extra: value);
+    final result = await context.pushNamed<String>(
+      AppRoutes.exploreSearch,
+      extra: value,
+    );
     _openingSearch = false;
     if (!mounted) return;
 
@@ -418,7 +422,8 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                     Row(
                       children: [
                         GestureDetector(
-                          onTap: () => context.push('/explore/location'),
+                          onTap: () =>
+                              context.pushNamed(AppRoutes.exploreLocation),
                           child: LocationChip(
                             label: location != null
                                 ? '${location.name}${location.radiusKm != null ? ' · ${location.radiusKm} km' : ''}'
@@ -599,7 +604,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                                 authControllerProvider,
                               );
                               if (authState is! AuthStateAuthenticated) {
-                                context.push('/sign-in-mobile');
+                                context.pushNamed(AppRoutes.signInMobile);
                                 return;
                               }
 
@@ -622,8 +627,10 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                                     );
                               }
                             },
-                            onTap: () =>
-                                context.push('/explore/listing/${listing.id}'),
+                            onTap: () => context.pushNamed(
+                              AppRoutes.exploreListingDetails,
+                              pathParameters: {'id': listing.id},
+                            ),
                           );
                         },
                       ),
@@ -647,10 +654,10 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                 onTap: () {
                   final authState = ref.read(authControllerProvider);
                   if (authState is! AuthStateAuthenticated) {
-                    context.push('/sign-in-mobile');
+                    context.pushNamed(AppRoutes.signInMobile);
                     return;
                   }
-                  context.push('/request-quotes');
+                  context.pushNamed(AppRoutes.requestQuotes);
                 },
                 child: Container(
                   padding: const EdgeInsets.symmetric(
