@@ -267,447 +267,469 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
       }
     });
 
-    return Scaffold(
-      backgroundColor: AppColors.surfaceElevated,
-      appBar: const EventOnAppBar(
-        showBack: false,
-        actions: [SizedBox.shrink()],
-      ),
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        context.goNamed(AppRoutes.home);
+      },
+      child: Scaffold(
+        backgroundColor: AppColors.surfaceElevated,
 
-      endDrawer: _buildFiltersDrawer(context),
-      body: Stack(
-        children: [
-          Column(
+        // appBar: const EventOnAppBar(
+        //   showBack: false,
+        //   actions: [SizedBox.shrink()],
+        // ),
+        endDrawer: _buildFiltersDrawer(context),
+        body: SafeArea(
+          bottom: false,
+          child: Stack(
             children: [
-              // Search & Filters Section
-              Container(
-                color: AppColors.surfaceWhite,
-                padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
-                child: Column(
-                  children: [
-                    Row(
+              Column(
+                children: [
+                  // Search & Filters Section
+                  Container(
+                    color: AppColors.surfaceWhite,
+                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+                    child: Column(
                       children: [
-                        Expanded(
-                          child: Hero(
-                            tag: 'explore_search_bar',
-                            child: Material(
-                              type: MaterialType.transparency,
-                              child: Container(
-                                height: 48,
-                                decoration: BoxDecoration(
-                                  color: AppColors.surfaceWhite,
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(
-                                    color: AppColors.borderStrong,
-                                  ),
-                                ),
-                                child: Stack(
-                                  alignment: Alignment.centerLeft,
-                                  children: [
-                                    if (_searchController.text.isEmpty)
-                                      Padding(
-                                        padding: const EdgeInsets.only(
-                                          left: 44.0,
-                                        ),
-                                        child: TypewriterHint(
-                                          prefix: 'Search \'',
-                                          texts: _hintCategories,
-                                          currentIndex: _currentHintIndex,
-                                          style: AppTextStyles.bodyMd.copyWith(
-                                            color: AppColors.textSecondary,
-                                          ),
-                                        ),
-                                      ),
-                                    TextField(
-                                      controller: _searchController,
-                                      style: AppTextStyles.bodyMd.copyWith(
-                                        color: AppColors.textPrimary,
-                                      ),
-                                      cursorColor: AppColors.primary,
-                                      onChanged: (val) {
-                                        setState(
-                                          () {},
-                                        ); // trigger rebuild to hide hint
-                                        _onSearchChanged(val);
-                                      },
-                                      decoration: InputDecoration(
-                                        border: InputBorder.none,
-                                        enabledBorder: InputBorder.none,
-                                        focusedBorder: InputBorder.none,
-                                        filled: false,
-                                        prefixIcon: const Icon(
-                                          Icons.search,
-                                          color: AppColors.textMuted,
-                                          size: 20,
-                                        ),
-                                        suffixIcon:
-                                            _searchController.text.isNotEmpty
-                                            ? IconButton(
-                                                icon: const Icon(
-                                                  Icons.close,
-                                                  color:
-                                                      AppColors.textSecondary,
-                                                  size: 18,
-                                                ),
-                                                onPressed: () {
-                                                  setState(() {
-                                                    _searchController.clear();
-                                                    _selectedCategoryId = null;
-                                                    _appliedCategoryId = null;
-                                                  });
-                                                },
-                                              )
-                                            : null,
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Hero(
+                                tag: 'explore_search_bar',
+                                child: Material(
+                                  type: MaterialType.transparency,
+                                  child: Container(
+                                    height: 48,
+                                    decoration: BoxDecoration(
+                                      color: AppColors.surfaceWhite,
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(
+                                        color: AppColors.borderStrong,
                                       ),
                                     ),
-                                  ],
+                                    child: Stack(
+                                      alignment: Alignment.centerLeft,
+                                      children: [
+                                        if (_searchController.text.isEmpty)
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                              left: 44.0,
+                                            ),
+                                            child: TypewriterHint(
+                                              prefix: 'Search \'',
+                                              texts: _hintCategories,
+                                              currentIndex: _currentHintIndex,
+                                              style: AppTextStyles.bodyMd
+                                                  .copyWith(
+                                                    color:
+                                                        AppColors.textSecondary,
+                                                  ),
+                                            ),
+                                          ),
+                                        TextField(
+                                          controller: _searchController,
+                                          style: AppTextStyles.bodyMd.copyWith(
+                                            color: AppColors.textPrimary,
+                                          ),
+                                          cursorColor: AppColors.primary,
+                                          onChanged: (val) {
+                                            setState(
+                                              () {},
+                                            ); // trigger rebuild to hide hint
+                                            _onSearchChanged(val);
+                                          },
+                                          decoration: InputDecoration(
+                                            border: InputBorder.none,
+                                            enabledBorder: InputBorder.none,
+                                            focusedBorder: InputBorder.none,
+                                            filled: false,
+                                            prefixIcon: const Icon(
+                                              Icons.search,
+                                              color: AppColors.textMuted,
+                                              size: 20,
+                                            ),
+                                            suffixIcon:
+                                                _searchController
+                                                    .text
+                                                    .isNotEmpty
+                                                ? IconButton(
+                                                    icon: const Icon(
+                                                      Icons.close,
+                                                      color: AppColors
+                                                          .textSecondary,
+                                                      size: 18,
+                                                    ),
+                                                    onPressed: () {
+                                                      setState(() {
+                                                        _searchController
+                                                            .clear();
+                                                        _selectedCategoryId =
+                                                            null;
+                                                        _appliedCategoryId =
+                                                            null;
+                                                      });
+                                                    },
+                                                  )
+                                                : null,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Builder(
-                          builder: (context) => GestureDetector(
-                            onTap: () {
-                              _syncDraftFilters();
-                              Scaffold.of(context).openEndDrawer();
-                            },
-                            child: Container(
-                              width: 48,
-                              height: 48,
-                              decoration: BoxDecoration(
-                                color: _hasActiveFilters
-                                    ? AppColors.surfaceMintPill
-                                    : AppColors.surfaceWhite,
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(
-                                  color: _hasActiveFilters
-                                      ? AppColors.primary
-                                      : AppColors.borderStrong,
+                            const SizedBox(width: 12),
+                            Builder(
+                              builder: (context) => GestureDetector(
+                                onTap: () {
+                                  _syncDraftFilters();
+                                  Scaffold.of(context).openEndDrawer();
+                                },
+                                child: Container(
+                                  width: 48,
+                                  height: 48,
+                                  decoration: BoxDecoration(
+                                    color: _hasActiveFilters
+                                        ? AppColors.surfaceMintPill
+                                        : AppColors.surfaceWhite,
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(
+                                      color: _hasActiveFilters
+                                          ? AppColors.primary
+                                          : AppColors.borderStrong,
+                                    ),
+                                  ),
+                                  child: Stack(
+                                    clipBehavior: Clip.none,
+                                    alignment: Alignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.tune,
+                                        color: _hasActiveFilters
+                                            ? AppColors.primary
+                                            : AppColors.textSecondary,
+                                        size: 20,
+                                      ),
+                                      if (_hasActiveFilters)
+                                        Positioned(
+                                          top: 8,
+                                          right: 8,
+                                          child: Container(
+                                            width: 8,
+                                            height: 8,
+                                            decoration: const BoxDecoration(
+                                              color: AppColors.primary,
+                                              shape: BoxShape.circle,
+                                            ),
+                                          ),
+                                        ),
+                                    ],
+                                  ),
                                 ),
                               ),
-                              child: Stack(
-                                clipBehavior: Clip.none,
-                                alignment: Alignment.center,
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        Row(
+                          children: [
+                            GestureDetector(
+                              onTap: () =>
+                                  context.pushNamed(AppRoutes.exploreLocation),
+                              child: LocationChip(
+                                label: location != null
+                                    ? '${location.name}${location.radiusKm != null ? ' · ${location.radiusKm} km' : ''}'
+                                    : 'Anywhere',
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  if (location == null)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
+                      ),
+                      child: Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: AppColors.borderStrong),
+                          borderRadius: BorderRadius.circular(12),
+                          color: AppColors.surfaceWhite,
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(
+                              Icons.location_on_outlined,
+                              color: AppColors.textPrimary,
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Icon(
-                                    Icons.tune,
-                                    color: _hasActiveFilters
-                                        ? AppColors.primary
-                                        : AppColors.textSecondary,
-                                    size: 20,
-                                  ),
-                                  if (_hasActiveFilters)
-                                    Positioned(
-                                      top: 8,
-                                      right: 8,
-                                      child: Container(
-                                        width: 8,
-                                        height: 8,
-                                        decoration: const BoxDecoration(
-                                          color: AppColors.primary,
-                                          shape: BoxShape.circle,
-                                        ),
-                                      ),
+                                  Text(
+                                    'See businesses near you',
+                                    style: AppTextStyles.labelMd.copyWith(
+                                      color: AppColors.textPrimary,
                                     ),
+                                  ),
+                                  Text(
+                                    'Or pick the place your event is at.',
+                                    style: AppTextStyles.labelSm.copyWith(
+                                      color: AppColors.textSecondary,
+                                    ),
+                                  ),
                                 ],
                               ),
                             ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    Row(
-                      children: [
-                        GestureDetector(
-                          onTap: () =>
-                              context.pushNamed(AppRoutes.exploreLocation),
-                          child: LocationChip(
-                            label: location != null
-                                ? '${location.name}${location.radiusKm != null ? ' · ${location.radiusKm} km' : ''}'
-                                : 'Anywhere',
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-
-              if (location == null)
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 8,
-                  ),
-                  child: Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: AppColors.borderStrong),
-                      borderRadius: BorderRadius.circular(12),
-                      color: AppColors.surfaceWhite,
-                    ),
-                    child: Row(
-                      children: [
-                        const Icon(
-                          Icons.location_on_outlined,
-                          color: AppColors.textPrimary,
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'See businesses near you',
-                                style: AppTextStyles.labelMd.copyWith(
-                                  color: AppColors.textPrimary,
-                                ),
-                              ),
-                              Text(
-                                'Or pick the place your event is at.',
-                                style: AppTextStyles.labelSm.copyWith(
-                                  color: AppColors.textSecondary,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        ElevatedButton(
-                          onPressed: _isFetchingLocation
-                              ? null
-                              : () async {
-                                  setState(() {
-                                    _isFetchingLocation = true;
-                                  });
-
-                                  try {
-                                    final locationService = ref.read(
-                                      locationServiceProvider,
-                                    );
-                                    final position = await locationService
-                                        .getCurrentPosition();
-
-                                    if (position != null && context.mounted) {
-                                      final locationData = SavedLocation(
-                                        placeId: 'current',
-                                        name: 'Current Location',
-                                        address: 'Current Location',
-                                        latitude: position.latitude,
-                                        longitude: position.longitude,
-                                      );
-                                      ref
-                                          .read(
-                                            exploreLocationProvider.notifier,
-                                          )
-                                          .setLocation(locationData);
-                                    }
-                                  } catch (e) {
-                                    if (context.mounted) {
-                                      ScaffoldMessenger.of(
-                                        context,
-                                      ).showSnackBar(
-                                        SnackBar(
-                                          content: Text(
-                                            'Failed to fetch location: $e',
-                                          ),
-                                        ),
-                                      );
-                                    }
-                                  } finally {
-                                    if (mounted) {
+                            const SizedBox(width: 8),
+                            ElevatedButton(
+                              onPressed: _isFetchingLocation
+                                  ? null
+                                  : () async {
                                       setState(() {
-                                        _isFetchingLocation = false;
+                                        _isFetchingLocation = true;
                                       });
-                                    }
+
+                                      try {
+                                        final locationService = ref.read(
+                                          locationServiceProvider,
+                                        );
+                                        final position = await locationService
+                                            .getCurrentPosition();
+
+                                        if (position != null &&
+                                            context.mounted) {
+                                          final locationData = SavedLocation(
+                                            placeId: 'current',
+                                            name: 'Current Location',
+                                            address: 'Current Location',
+                                            latitude: position.latitude,
+                                            longitude: position.longitude,
+                                          );
+                                          ref
+                                              .read(
+                                                exploreLocationProvider
+                                                    .notifier,
+                                              )
+                                              .setLocation(locationData);
+                                        }
+                                      } catch (e) {
+                                        if (context.mounted) {
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
+                                            SnackBar(
+                                              content: Text(
+                                                'Failed to fetch location: $e',
+                                              ),
+                                            ),
+                                          );
+                                        }
+                                      } finally {
+                                        if (mounted) {
+                                          setState(() {
+                                            _isFetchingLocation = false;
+                                          });
+                                        }
+                                      }
+                                    },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.primary,
+                                foregroundColor: AppColors.surfaceWhite,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 8,
+                                ),
+                                minimumSize: Size.zero,
+                              ),
+                              child: _isFetchingLocation
+                                  ? const SizedBox(
+                                      width: 16,
+                                      height: 16,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        color: AppColors.surfaceWhite,
+                                      ),
+                                    )
+                                  : const Text(
+                                      'Use my location',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+
+                  // Vendor Feed
+                  Expanded(
+                    child: searchAsync.when(
+                      data: (result) {
+                        if (result.items.isEmpty) {
+                          return const Center(child: Text('No listings found'));
+                        }
+                        return RefreshIndicator(
+                          onRefresh: () async {
+                            ref.invalidate(searchProvider(jsonEncode(queries)));
+                            await ref.read(
+                              searchProvider(jsonEncode(queries)).future,
+                            );
+                          },
+                          child: ListView.separated(
+                            padding: const EdgeInsets.all(
+                              16,
+                            ).copyWith(bottom: 96),
+                            itemCount: result.items.length,
+                            separatorBuilder: (context, index) =>
+                                const SizedBox(height: 16),
+                            itemBuilder: (context, index) {
+                              final listing = result.items[index];
+                              ref.watch(quoteCartProvider);
+                              final isAdded = ref
+                                  .read(quoteCartProvider.notifier)
+                                  .isAdded(listing.id);
+
+                              return ListingCard(
+                                id: listing.id,
+                                title: listing.title,
+                                category:
+                                    '', // Handled by description mostly in this variant
+                                description: listing.description,
+                                imageUrl: listing.coverUrl,
+                                price: listing.priceFrom != null
+                                    ? 'From ₹${listing.priceFrom}'
+                                    : null,
+                                distance: listing.distanceMeters != null
+                                    ? '${(listing.distanceMeters! / 1000).round()} km away'
+                                    : null,
+                                rating: listing.ratingAvg,
+                                ratingBadgeDark: false,
+                                hasQuoteButton: !isAdded,
+                                hasAddedBadge: isAdded,
+                                onQuoteTap: () {
+                                  final authState = ref.read(
+                                    authControllerProvider,
+                                  );
+                                  if (authState is! AuthStateAuthenticated) {
+                                    context.pushNamed(AppRoutes.signInMobile);
+                                    return;
+                                  }
+
+                                  if (isAdded) {
+                                    ref
+                                        .read(quoteCartProvider.notifier)
+                                        .removeQuote(listing.id);
+                                  } else {
+                                    ref
+                                        .read(quoteCartProvider.notifier)
+                                        .addQuote(
+                                          QuoteItem(
+                                            id: listing.id,
+                                            title: listing.title,
+                                            imageUrl: listing.coverUrl,
+                                            price: listing.priceFrom != null
+                                                ? 'From ₹${listing.priceFrom}'
+                                                : null,
+                                          ),
+                                        );
                                   }
                                 },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.primary,
-                            foregroundColor: AppColors.surfaceWhite,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 8,
-                            ),
-                            minimumSize: Size.zero,
-                          ),
-                          child: _isFetchingLocation
-                              ? const SizedBox(
-                                  width: 16,
-                                  height: 16,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    color: AppColors.surfaceWhite,
-                                  ),
-                                )
-                              : const Text(
-                                  'Use my location',
-                                  style: TextStyle(fontWeight: FontWeight.w600),
+                                onTap: () => context.pushNamed(
+                                  AppRoutes.exploreListingDetails,
+                                  pathParameters: {'id': listing.id},
                                 ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-
-              // Vendor Feed
-              Expanded(
-                child: searchAsync.when(
-                  data: (result) {
-                    if (result.items.isEmpty) {
-                      return const Center(child: Text('No listings found'));
-                    }
-                    return RefreshIndicator(
-                      onRefresh: () async {
-                        ref.invalidate(searchProvider(jsonEncode(queries)));
-                        await ref.read(
-                          searchProvider(jsonEncode(queries)).future,
+                              );
+                            },
+                          ),
                         );
                       },
-                      child: ListView.separated(
-                        padding: const EdgeInsets.all(16).copyWith(bottom: 96),
-                        itemCount: result.items.length,
-                        separatorBuilder: (context, index) =>
-                            const SizedBox(height: 16),
-                        itemBuilder: (context, index) {
-                          final listing = result.items[index];
-                          ref.watch(quoteCartProvider);
-                          final isAdded = ref
-                              .read(quoteCartProvider.notifier)
-                              .isAdded(listing.id);
-
-                          return ListingCard(
-                            id: listing.id,
-                            title: listing.title,
-                            category:
-                                '', // Handled by description mostly in this variant
-                            description: listing.description,
-                            imageUrl: listing.coverUrl,
-                            price: listing.priceFrom != null
-                                ? 'From ₹${listing.priceFrom}'
-                                : null,
-                            distance: listing.distanceMeters != null
-                                ? '${(listing.distanceMeters! / 1000).round()} km away'
-                                : null,
-                            rating: listing.ratingAvg,
-                            ratingBadgeDark: false,
-                            hasQuoteButton: !isAdded,
-                            hasAddedBadge: isAdded,
-                            onQuoteTap: () {
-                              final authState = ref.read(
-                                authControllerProvider,
-                              );
-                              if (authState is! AuthStateAuthenticated) {
-                                context.pushNamed(AppRoutes.signInMobile);
-                                return;
-                              }
-
-                              if (isAdded) {
-                                ref
-                                    .read(quoteCartProvider.notifier)
-                                    .removeQuote(listing.id);
-                              } else {
-                                ref
-                                    .read(quoteCartProvider.notifier)
-                                    .addQuote(
-                                      QuoteItem(
-                                        id: listing.id,
-                                        title: listing.title,
-                                        imageUrl: listing.coverUrl,
-                                        price: listing.priceFrom != null
-                                            ? 'From ₹${listing.priceFrom}'
-                                            : null,
-                                      ),
-                                    );
-                              }
-                            },
-                            onTap: () => context.pushNamed(
-                              AppRoutes.exploreListingDetails,
-                              pathParameters: {'id': listing.id},
-                            ),
-                          );
-                        },
-                      ),
-                    );
-                  },
-                  loading: () =>
-                      const Center(child: CircularProgressIndicator()),
-                  error: (e, s) => Center(child: Text('Error: $e')),
-                ),
+                      loading: () =>
+                          const Center(child: CircularProgressIndicator()),
+                      error: (e, s) => Center(child: Text('Error: $e')),
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
 
-          // Floating Action Bar
-          if (ref.watch(quoteCartProvider).isNotEmpty)
-            Positioned(
-              bottom: 24,
-              left: 16,
-              right: 16,
-              child: GestureDetector(
-                onTap: () {
-                  final authState = ref.read(authControllerProvider);
-                  if (authState is! AuthStateAuthenticated) {
-                    context.pushNamed(AppRoutes.signInMobile);
-                    return;
-                  }
-                  context.pushNamed(AppRoutes.requestQuotes);
-                },
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 14,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppColors.surfaceDark,
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: const [
-                      BoxShadow(
-                        color: AppColors.overlayMedium,
-                        blurRadius: 10,
-                        offset: Offset(0, 4),
+              // Floating Action Bar
+              if (ref.watch(quoteCartProvider).isNotEmpty)
+                Positioned(
+                  bottom: 24,
+                  left: 16,
+                  right: 16,
+                  child: GestureDetector(
+                    onTap: () {
+                      final authState = ref.read(authControllerProvider);
+                      if (authState is! AuthStateAuthenticated) {
+                        context.pushNamed(AppRoutes.signInMobile);
+                        return;
+                      }
+                      context.pushNamed(AppRoutes.requestQuotes);
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 14,
                       ),
-                    ],
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        '${ref.watch(quoteCartProvider).length} business${ref.watch(quoteCartProvider).length == 1 ? '' : 'es'} picked',
-                        style: AppTextStyles.labelMd.copyWith(
-                          color: AppColors.surfaceWhite70,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      Row(
-                        children: [
-                          Text(
-                            'Request quotes',
-                            style: AppTextStyles.labelLg.copyWith(
-                              color: AppColors.textPrimary,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(width: 6),
-                          const Icon(
-                            Icons.arrow_forward,
-                            color: AppColors.surfaceWhite70,
-                            size: 18,
+                      decoration: BoxDecoration(
+                        color: AppColors.surfaceDark,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: AppColors.overlayMedium,
+                            blurRadius: 10,
+                            offset: Offset(0, 4),
                           ),
                         ],
                       ),
-                    ],
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            '${ref.watch(quoteCartProvider).length} business${ref.watch(quoteCartProvider).length == 1 ? '' : 'es'} picked',
+                            style: AppTextStyles.labelMd.copyWith(
+                              color: AppColors.surfaceWhite70,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          Row(
+                            children: [
+                              Text(
+                                'Request quotes',
+                                style: AppTextStyles.labelLg.copyWith(
+                                  color: AppColors.textPrimary,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(width: 6),
+                              const Icon(
+                                Icons.arrow_forward,
+                                color: AppColors.surfaceWhite70,
+                                size: 18,
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
-              ),
-            ),
-        ],
+            ],
+          ),
+        ),
       ),
     );
   }

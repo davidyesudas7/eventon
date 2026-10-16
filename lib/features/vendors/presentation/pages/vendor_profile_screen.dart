@@ -131,8 +131,8 @@ class _VendorProfileScreenState extends ConsumerState<VendorProfileScreen> {
     final quoteCart = ref.watch(quoteCartProvider);
 
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: EventOnAppBar(onBack: _handleBack),
+      backgroundColor: AppColors.surfaceBase,
+      // appBar: EventOnAppBar(onBack: _handleBack),
       body: profileAsync.when(
         loading: () => const Center(
           child: CircularProgressIndicator(color: AppColors.primary),
@@ -167,150 +167,153 @@ class _VendorProfileScreenState extends ConsumerState<VendorProfileScreen> {
           return RefreshIndicator(
             color: AppColors.primary,
             onRefresh: _onRefresh,
-            child: ListView(
-              controller: _scrollController,
-              padding: const EdgeInsets.only(bottom: 40),
-              children: [
-                // Secondary Header Bar with Back Button & Vendor Name
+            child: SafeArea(
+              bottom: false,
+              child: ListView(
+                controller: _scrollController,
+                padding: const EdgeInsets.only(bottom: 40),
+                children: [
+                  // Secondary Header Bar with Back Button & Vendor Name
 
-                // Vendor Profile Header
-                VendorHeaderCard(
-                  profile: profile,
-                  ratingAvg: reviewsState.averageRating,
-                  totalReviews: reviewsState.total,
-                ),
-
-                const Divider(
-                  color: AppColors.borderSubtle,
-                  height: 1,
-                  thickness: 1,
-                ),
-
-                // Listings Section
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
-                  child: Text(
-                    'Listings',
-                    style: AppTextStyles.headlineSm.copyWith(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
-                    ),
+                  // Vendor Profile Header
+                  VendorHeaderCard(
+                    profile: profile,
+                    ratingAvg: reviewsState.averageRating,
+                    totalReviews: reviewsState.total,
                   ),
-                ),
 
-                listingsAsync.when(
-                  loading: () => const Padding(
-                    padding: EdgeInsets.all(32),
-                    child: Center(
-                      child: CircularProgressIndicator(
-                        color: AppColors.primary,
-                      ),
-                    ),
-                  ),
-                  error: (err, _) => Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 16,
-                    ),
-                    child: Text(
-                      'Failed to load listings',
-                      style: AppTextStyles.bodyMd.copyWith(color: Colors.red),
-                    ),
-                  ),
-                  data: (listings) {
-                    if (listings.isEmpty) {
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 24,
-                        ),
-                        child: Text(
-                          'No listings found for this vendor.',
-                          style: AppTextStyles.bodyMd.copyWith(
-                            color: AppColors.textSecondary,
-                          ),
-                        ),
-                      );
-                    }
-
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: Column(
-                        children: listings.map((listing) {
-                          final isAdded = quoteCart.any(
-                            (q) => q.id == listing.id,
-                          );
-
-                          return Padding(
-                            padding: const EdgeInsets.only(bottom: 20),
-                            child: VendorListingCard(
-                              listing: listing,
-                              isAddedToQuote: isAdded,
-                              onQuoteTap: () => _toggleQuote(listing),
-                              onTap: () => _navigateToListing(listing.id),
-                            ),
-                          );
-                        }).toList(),
-                      ),
-                    );
-                  },
-                ),
-
-                // Reviews Section (shown when reviews exist or are loading)
-                if (reviewsState.isLoading ||
-                    reviewsState.reviews.isNotEmpty) ...[
                   const Divider(
                     color: AppColors.borderSubtle,
                     height: 1,
                     thickness: 1,
                   ),
+
+                  // Listings Section
                   Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
+                    padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
                     child: Text(
-                      'Reviews',
+                      'Listings',
                       style: AppTextStyles.headlineSm.copyWith(
                         fontSize: 18,
                         fontWeight: FontWeight.w700,
                       ),
                     ),
                   ),
-                  if (reviewsState.isLoading)
-                    const Padding(
-                      padding: EdgeInsets.all(24),
+
+                  listingsAsync.when(
+                    loading: () => const Padding(
+                      padding: EdgeInsets.all(32),
                       child: Center(
                         child: CircularProgressIndicator(
                           color: AppColors.primary,
                         ),
                       ),
-                    )
-                  else
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          ...reviewsState.reviews.map(
-                            (review) => VendorReviewItem(review: review),
+                    ),
+                    error: (err, _) => Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 16,
+                      ),
+                      child: Text(
+                        'Failed to load listings',
+                        style: AppTextStyles.bodyMd.copyWith(color: Colors.red),
+                      ),
+                    ),
+                    data: (listings) {
+                      if (listings.isEmpty) {
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 24,
                           ),
-                          if (reviewsState.isLoadingMore)
-                            const Padding(
-                              padding: EdgeInsets.symmetric(vertical: 16),
-                              child: Center(
-                                child: SizedBox(
-                                  width: 24,
-                                  height: 24,
-                                  child: CircularProgressIndicator(
-                                    color: AppColors.primary,
-                                    strokeWidth: 2,
+                          child: Text(
+                            'No listings found for this vendor.',
+                            style: AppTextStyles.bodyMd.copyWith(
+                              color: AppColors.textSecondary,
+                            ),
+                          ),
+                        );
+                      }
+
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: Column(
+                          children: listings.map((listing) {
+                            final isAdded = quoteCart.any(
+                              (q) => q.id == listing.id,
+                            );
+
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 20),
+                              child: VendorListingCard(
+                                listing: listing,
+                                isAddedToQuote: isAdded,
+                                onQuoteTap: () => _toggleQuote(listing),
+                                onTap: () => _navigateToListing(listing.id),
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      );
+                    },
+                  ),
+
+                  // Reviews Section (shown when reviews exist or are loading)
+                  if (reviewsState.isLoading ||
+                      reviewsState.reviews.isNotEmpty) ...[
+                    const Divider(
+                      color: AppColors.borderSubtle,
+                      height: 1,
+                      thickness: 1,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
+                      child: Text(
+                        'Reviews',
+                        style: AppTextStyles.headlineSm.copyWith(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                    if (reviewsState.isLoading)
+                      const Padding(
+                        padding: EdgeInsets.all(24),
+                        child: Center(
+                          child: CircularProgressIndicator(
+                            color: AppColors.primary,
+                          ),
+                        ),
+                      )
+                    else
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            ...reviewsState.reviews.map(
+                              (review) => VendorReviewItem(review: review),
+                            ),
+                            if (reviewsState.isLoadingMore)
+                              const Padding(
+                                padding: EdgeInsets.symmetric(vertical: 16),
+                                child: Center(
+                                  child: SizedBox(
+                                    width: 24,
+                                    height: 24,
+                                    child: CircularProgressIndicator(
+                                      color: AppColors.primary,
+                                      strokeWidth: 2,
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
+                  ],
                 ],
-              ],
+              ),
             ),
           );
         },

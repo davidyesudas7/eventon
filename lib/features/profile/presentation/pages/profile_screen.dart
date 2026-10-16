@@ -24,94 +24,105 @@ class ProfileScreen extends ConsumerWidget {
           authState.user.email ?? authState.user.phone ?? 'No contact info';
     }
 
-    return Scaffold(
-      backgroundColor: AppColors.surfaceBase,
-      appBar: EventOnAppBar(showBack: false),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Profile',
-              style: AppTextStyles.headlineXl.copyWith(fontSize: 28),
-            ),
-            const SizedBox(height: 24),
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        context.goNamed(AppRoutes.home);
+      },
+      child: Scaffold(
+        backgroundColor: AppColors.surfaceBase,
+        // appBar: EventOnAppBar(showBack: false),
+        body: SafeArea(
+          bottom: false,
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Profile',
+                  style: AppTextStyles.headlineXl.copyWith(fontSize: 28),
+                ),
+                const SizedBox(height: 24),
 
-            // User Details Card
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                border: Border.all(color: AppColors.borderSubtle),
-                borderRadius: BorderRadius.circular(16),
-                color: AppColors.surfaceElevated,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(name, style: AppTextStyles.headlineSm),
-                  const SizedBox(height: 4),
-                  Text(
-                    contactInfo,
-                    style: AppTextStyles.bodyMd.copyWith(
-                      color: AppColors.textSecondary,
+                // User Details Card
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: AppColors.borderSubtle),
+                    borderRadius: BorderRadius.circular(16),
+                    color: AppColors.surfaceElevated,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(name, style: AppTextStyles.headlineSm),
+                      const SizedBox(height: 4),
+                      Text(
+                        contactInfo,
+                        style: AppTextStyles.bodyMd.copyWith(
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                // Home Location Section
+                const HomeLocationCard(),
+                const SizedBox(height: 12),
+
+                // Action Buttons
+                InkWell(
+                  onTap: () => context.goNamed(AppRoutes.bookings),
+                  borderRadius: BorderRadius.circular(16),
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 16,
+                    ),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: AppColors.borderSubtle),
+                      borderRadius: BorderRadius.circular(16),
+                      color: AppColors.surfaceElevated,
+                    ),
+                    child: Text('My bookings', style: AppTextStyles.labelLg),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                InkWell(
+                  onTap: () async {
+                    await ref.read(authControllerProvider.notifier).logout();
+                    if (context.mounted) {
+                      context.goNamed(AppRoutes.home);
+                    }
+                  },
+                  borderRadius: BorderRadius.circular(16),
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 16,
+                    ),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: AppColors.borderSubtle),
+                      borderRadius: BorderRadius.circular(16),
+                      color: AppColors.surfaceElevated,
+                    ),
+                    child: Text(
+                      'Log out',
+                      style: AppTextStyles.labelLg.copyWith(
+                        color: AppColors.error,
+                      ),
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-            const SizedBox(height: 16),
-
-            // Home Location Section
-            const HomeLocationCard(),
-            const SizedBox(height: 12),
-
-            // Action Buttons
-            InkWell(
-              onTap: () => context.goNamed(AppRoutes.bookings),
-              borderRadius: BorderRadius.circular(16),
-              child: Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 16,
-                ),
-                decoration: BoxDecoration(
-                  border: Border.all(color: AppColors.borderSubtle),
-                  borderRadius: BorderRadius.circular(16),
-                  color: AppColors.surfaceElevated,
-                ),
-                child: Text('My bookings', style: AppTextStyles.labelLg),
-              ),
-            ),
-            const SizedBox(height: 12),
-            InkWell(
-              onTap: () async {
-                await ref.read(authControllerProvider.notifier).logout();
-                if (context.mounted) {
-                  context.goNamed(AppRoutes.home);
-                }
-              },
-              borderRadius: BorderRadius.circular(16),
-              child: Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 16,
-                ),
-                decoration: BoxDecoration(
-                  border: Border.all(color: AppColors.borderSubtle),
-                  borderRadius: BorderRadius.circular(16),
-                  color: AppColors.surfaceElevated,
-                ),
-                child: Text(
-                  'Log out',
-                  style: AppTextStyles.labelLg.copyWith(color: AppColors.error),
-                ),
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );

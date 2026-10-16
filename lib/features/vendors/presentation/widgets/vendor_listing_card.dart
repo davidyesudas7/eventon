@@ -26,7 +26,7 @@ class VendorListingCard extends StatelessWidget {
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.surfaceElevated,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(color: AppColors.borderSubtle),
           boxShadow: [
@@ -42,7 +42,9 @@ class VendorListingCard extends StatelessWidget {
           children: [
             // Image with Quote Button overlay
             ClipRRect(
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(20),
+              ),
               child: SizedBox(
                 height: 185,
                 width: double.infinity,
@@ -51,13 +53,14 @@ class VendorListingCard extends StatelessWidget {
                   children: [
                     Container(
                       color: Colors.grey[200],
-                      child: listing.coverUrl != null &&
+                      child:
+                          listing.coverUrl != null &&
                               listing.coverUrl!.trim().isNotEmpty
                           ? Image.network(
                               listing.coverUrl!,
                               fit: BoxFit.cover,
                               errorBuilder: (context, error, stackTrace) =>
-                                  Container(color: Colors.grey[200]),
+                                  Container(color: AppColors.surfaceBase),
                             )
                           : null,
                     ),
@@ -74,7 +77,7 @@ class VendorListingCard extends StatelessWidget {
                           decoration: BoxDecoration(
                             color: isAddedToQuote
                                 ? AppColors.primary
-                                : Colors.white.withValues(alpha: 0.95),
+                                : AppColors.surfaceElevated,
                             borderRadius: BorderRadius.circular(20),
                             boxShadow: [
                               BoxShadow(
@@ -101,8 +104,8 @@ class VendorListingCard extends StatelessWidget {
                                   fontSize: 12.5,
                                   fontWeight: FontWeight.w600,
                                   color: isAddedToQuote
-                                    ? Colors.white
-                                    : AppColors.textPrimary,
+                                      ? Colors.white
+                                      : AppColors.textPrimary,
                                 ),
                               ),
                             ],

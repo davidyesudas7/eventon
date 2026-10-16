@@ -102,7 +102,7 @@ class _ListingDetailsScreenState extends ConsumerState<ListingDetailsScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.surfaceWhite,
-      appBar: const EventOnAppBar(),
+      // appBar: const EventOnAppBar(),
       body: asyncData.when(
         loading: () => const Center(
           child: CircularProgressIndicator(color: AppColors.primary),
@@ -266,7 +266,9 @@ class _ListingDetailsScreenState extends ConsumerState<ListingDetailsScreen> {
                                 final location = GoRouterState.of(
                                   context,
                                 ).uri.toString();
-                                if (location.startsWith(AppRoutes.explorePath)) {
+                                if (location.startsWith(
+                                  AppRoutes.explorePath,
+                                )) {
                                   context.pushNamed(
                                     AppRoutes.exploreVendorProfile,
                                     pathParameters: {'id': l.vendorId},
@@ -439,11 +441,23 @@ class _ListingDetailsScreenState extends ConsumerState<ListingDetailsScreen> {
                               // Convert snake_case/camelCase to Title Case if still raw
                               if (label == key) {
                                 label = label
-                                    .replaceAll(RegExp(r'([A-Z])'), ' \$1')
-                                    .replaceAll('_', ' ');
-                                label =
-                                    label.substring(0, 1).toUpperCase() +
-                                    label.substring(1).toLowerCase();
+                                    .replaceAllMapped(
+                                      RegExp(r'([A-Z])'),
+                                      (m) => ' ${m[1]}',
+                                    )
+                                    .replaceAll('_', ' ')
+                                    .replaceAll('-', ' ')
+                                    .trim();
+                                if (label.isNotEmpty) {
+                                  label = label
+                                      .split(RegExp(r'\s+'))
+                                      .map(
+                                        (word) => word.isNotEmpty
+                                            ? '${word[0].toUpperCase()}${word.substring(1).toLowerCase()}'
+                                            : '',
+                                      )
+                                      .join(' ');
+                                }
                               }
 
                               // Format value

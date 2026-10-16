@@ -13,6 +13,7 @@ import '../../data/models/conversation_model.dart';
 import '../../data/models/message_model.dart';
 import '../../data/repositories/chat_repository_impl.dart';
 import '../../domain/repositories/chat_repository.dart';
+import '../../../quotes/presentation/providers/quotes_providers.dart';
 
 part 'chat_providers.g.dart';
 
@@ -148,17 +149,33 @@ class ChatDetailNotifier extends _$ChatDetailNotifier {
       socketService.joinConversation(conversationId);
     }
 
-    // 2. Listen to socket message event with deduplication
+    // 2. Listen to socket message event with deduplication and in-place update
     final subscription = socketService.messageStream.listen((data) {
       try {
         final newMessage = MessageModel.fromJson(data);
         if (newMessage.conversationId == conversationId) {
           final currentState = state.value ?? [];
-          // Deduplication: prevent adding if message ID already exists
-          if (currentState.any((m) => m.id == newMessage.id)) {
-            return;
+          final existingIndex =
+              currentState.indexWhere((m) => m.id == newMessage.id);
+
+          if (existingIndex != -1) {
+            final updatedList = List<MessageModel>.from(currentState);
+            updatedList[existingIndex] = newMessage;
+            state = AsyncValue.data(updatedList);
+          } else {
+            state = AsyncValue.data([...currentState, newMessage]);
           }
-          state = AsyncValue.data([...currentState, newMessage]);
+
+          // If this is a quote_request, invalidate quote request provider so dynamic details stay fresh
+          if (newMessage.type == 'quote_request') {
+            final qrId = newMessage.quoteRequest?['quoteRequestId']?.toString() ??
+                newMessage.quoteRequest?['id']?.toString() ??
+                newMessage.quoteRequest?['_id']?.toString();
+            if (qrId != null && qrId.isNotEmpty) {
+              ref.invalidate(quoteRequestDetailProvider(qrId));
+            }
+          }
+
           // Mark as read immediately while viewing this chat
           ref.read(conversationsProvider.notifier).markAsRead(conversationId);
         }
@@ -324,7 +341,13 @@ class ChatSyncService {
             eventDate: old.eventDate,
             bookingId: old.bookingId,
             lastMessageAt: msg.createdAt,
-            lastMessagePreview: msg.text,
+            lastMessagePreview: (msg.text != null && msg.text!.isNotEmpty)
+                ? msg.text
+                : msg.type == 'quote_request'
+                    ? 'Quote request'
+                    : msg.type == 'quote'
+                        ? 'Custom quote'
+                        : old.lastMessagePreview,
             unreadCount: isChatActive ? 0 : (old.unreadCount + 1),
             participantName: old.participantName,
             participantImage: old.participantImage,

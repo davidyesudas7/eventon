@@ -72,15 +72,19 @@ class SocketService {
       }
     });
 
-    // 3. Message Listener: Listen for 'message' event
-    _socket?.on('message', (data) {
-      debugPrint('[SocketService] Received message: $data');
+    // 3. Message Listener: Listen for 'message', 'quote_request', and 'quoteRequest' events
+    void handleIncoming(dynamic data) {
+      debugPrint('[SocketService] Received socket payload: $data');
       if (data is Map<String, dynamic>) {
         _messageController.add(data);
       } else if (data is Map) {
         _messageController.add(Map<String, dynamic>.from(data));
       }
-    });
+    }
+
+    _socket?.on('message', handleIncoming);
+    _socket?.on('quote_request', handleIncoming);
+    _socket?.on('quoteRequest', handleIncoming);
 
     _socket?.onDisconnect((_) {
       _isConnecting = false;

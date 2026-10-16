@@ -48,87 +48,104 @@ class _BookingsScreenState extends ConsumerState<BookingsScreen> {
   Widget build(BuildContext context) {
     final asyncData = ref.watch(bookingsProvider);
 
-    return Scaffold(
-      backgroundColor: AppColors.surfaceWhite,
-      appBar: const EventOnAppBar(showBack: false),
-      body: asyncData.when(
-        loading: () => const Center(
-          child: CircularProgressIndicator(color: AppColors.primary),
-        ),
-        error: (err, stack) => Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.error_outline, size: 48, color: AppColors.error),
-              const SizedBox(height: 16),
-              Text('Failed to load bookings', style: AppTextStyles.headlineSm),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: () => ref.read(bookingsProvider.notifier).refresh(),
-                child: const Text('Retry'),
-              ),
-            ],
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        context.goNamed(AppRoutes.home);
+      },
+      child: Scaffold(
+        backgroundColor: AppColors.surfaceWhite,
+        // appBar: const EventOnAppBar(showBack: false),
+        body: asyncData.when(
+          loading: () => const Center(
+            child: CircularProgressIndicator(color: AppColors.primary),
           ),
-        ),
-        data: (allBookings) {
-          final bookings = allBookings.where(_filter.matches).toList();
-          return RefreshIndicator(
-            onRefresh: () async {
-              await ref.read(bookingsProvider.notifier).refresh();
-            },
-            child: ListView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              padding: const EdgeInsets.fromLTRB(16, 24, 16, 24),
+          error: (err, stack) => Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text('My bookings', style: AppTextStyles.headlineMd),
-                const SizedBox(height: 16),
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: [
-                      for (final f in _BookingFilter.values) ...[
-                        AppFilterChip(
-                          label: f.label,
-                          isSelected: f == _filter,
-                          variant: FilterChipVariant.mint,
-                          onTap: () => setState(() => _filter = f),
-                        ),
-                        const SizedBox(width: 8),
-                      ],
-                    ],
-                  ),
+                const Icon(
+                  Icons.error_outline,
+                  size: 48,
+                  color: AppColors.error,
                 ),
-                const SizedBox(height: 20),
-                if (bookings.isEmpty)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 48),
-                    child: Center(
-                      child: Text(
-                        'No ${_filter == _BookingFilter.all ? '' : '${_filter.label.toLowerCase()} '}bookings',
-                        style: AppTextStyles.bodyMd,
-                      ),
-                    ),
-                  )
-                else
-                  for (final b in bookings) ...[
-                    BookingCard(
-                      booking: b,
-                      onTap: () async {
-                        await context.pushNamed(
-                          AppRoutes.bookingDetails,
-                          pathParameters: {'id': b.id},
-                        );
-                        if (mounted) {
-                          ref.read(bookingsProvider.notifier).refresh();
-                        }
-                      },
-                    ),
-                    const SizedBox(height: 12),
-                  ],
+                const SizedBox(height: 16),
+                Text(
+                  'Failed to load bookings',
+                  style: AppTextStyles.headlineSm,
+                ),
+                const SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: () =>
+                      ref.read(bookingsProvider.notifier).refresh(),
+                  child: const Text('Retry'),
+                ),
               ],
             ),
-          );
-        },
+          ),
+          data: (allBookings) {
+            final bookings = allBookings.where(_filter.matches).toList();
+            return RefreshIndicator(
+              onRefresh: () async {
+                await ref.read(bookingsProvider.notifier).refresh();
+              },
+              child: SafeArea(
+                bottom: false,
+                child: ListView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  padding: const EdgeInsets.fromLTRB(16, 24, 16, 24),
+                  children: [
+                    Text('My bookings', style: AppTextStyles.headlineMd),
+                    const SizedBox(height: 16),
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: [
+                          for (final f in _BookingFilter.values) ...[
+                            AppFilterChip(
+                              label: f.label,
+                              isSelected: f == _filter,
+                              variant: FilterChipVariant.mint,
+                              onTap: () => setState(() => _filter = f),
+                            ),
+                            const SizedBox(width: 8),
+                          ],
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    if (bookings.isEmpty)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 48),
+                        child: Center(
+                          child: Text(
+                            'No ${_filter == _BookingFilter.all ? '' : '${_filter.label.toLowerCase()} '}bookings',
+                            style: AppTextStyles.bodyMd,
+                          ),
+                        ),
+                      )
+                    else
+                      for (final b in bookings) ...[
+                        BookingCard(
+                          booking: b,
+                          onTap: () async {
+                            await context.pushNamed(
+                              AppRoutes.bookingDetails,
+                              pathParameters: {'id': b.id},
+                            );
+                            if (mounted) {
+                              ref.read(bookingsProvider.notifier).refresh();
+                            }
+                          },
+                        ),
+                        const SizedBox(height: 12),
+                      ],
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
       ),
     );
   }

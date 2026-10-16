@@ -19,7 +19,7 @@ class OccasionScreen extends ConsumerWidget {
     final occasionAsync = ref.watch(occasionDetailProvider(slug));
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.surfaceBase,
       body: occasionAsync.when(
         data: (occasion) => CustomScrollView(
           slivers: [
@@ -46,7 +46,10 @@ class OccasionScreen extends ConsumerWidget {
                         onTap: () {
                           // pop to home, then switch tab and select category
                           context.pop();
-                          context.goNamed(AppRoutes.explore, extra: category.id);
+                          context.goNamed(
+                            AppRoutes.explore,
+                            extra: category.id,
+                          );
                         },
                       ),
                       const SizedBox(height: 14),
@@ -165,7 +168,7 @@ class _ServiceCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: Colors.white,
+      color: AppColors.occasionCard,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
         side: const BorderSide(color: AppColors.borderSubtle),

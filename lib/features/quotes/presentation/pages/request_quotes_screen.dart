@@ -1,3 +1,4 @@
+import 'package:eventon/core/widgets/eventon_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -134,24 +135,7 @@ class _RequestQuotesScreenState extends ConsumerState<RequestQuotesScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.surfaceWhite,
-      appBar: AppBar(
-        backgroundColor: AppColors.surfaceWhite,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
-          onPressed: () => context.pop(),
-        ),
-        title: const Text(
-          'EventOn',
-          style: TextStyle(
-            color: AppColors.primary,
-            fontWeight: FontWeight.bold,
-            fontSize: 20,
-          ),
-        ),
-        centerTitle: false,
-        titleSpacing: 0,
-      ),
+      appBar: EventOnAppBar(),
       body: quoteItems.isEmpty
           ? _buildEmptyState()
           : _buildFilledState(quoteItems),

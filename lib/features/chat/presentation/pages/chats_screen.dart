@@ -95,68 +95,78 @@ class ChatsScreen extends ConsumerWidget {
 
     final conversationsState = ref.watch(conversationsProvider);
 
-    return Scaffold(
-      backgroundColor: AppColors.surfaceWhite,
-      appBar: EventOnAppBar(showBack: false),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 24, 16, 16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Text(
-                  'Messages',
-                  style: AppTextStyles.headlineMd.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                GestureDetector(
-                  onTap: () {
-                    context.pushNamed(AppRoutes.quoteRequests);
-                  },
-                  child: Text(
-                    'Quote requests',
-                    style: AppTextStyles.bodyMd.copyWith(
-                      color: AppColors.textSecondary,
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        context.goNamed(AppRoutes.home);
+      },
+      child: Scaffold(
+        backgroundColor: AppColors.surfaceWhite,
+        // appBar: EventOnAppBar(showBack: false),
+        body: SafeArea(
+          bottom: false,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 24, 16, 16),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      'Messages',
+                      style: AppTextStyles.headlineMd.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Expanded(
-            child: conversationsState.when(
-              data: (conversations) {
-                if (conversations.isEmpty) {
-                  return const Center(child: Text('No messages yet'));
-                }
-                return RefreshIndicator(
-                  onRefresh: () async {
-                    ref.invalidate(conversationsProvider);
-                    await ref.read(conversationsProvider.future);
-                  },
-                  child: ListView.separated(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    itemCount: conversations.length,
-                    separatorBuilder: (context, index) => const Divider(
-                      height: 32,
-                      color: AppColors.borderSubtle,
+                    GestureDetector(
+                      onTap: () {
+                        context.pushNamed(AppRoutes.quoteRequests);
+                      },
+                      child: Text(
+                        'Quote requests',
+                        style: AppTextStyles.bodyMd.copyWith(
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
                     ),
-                    itemBuilder: (context, index) {
-                      final conversation = conversations[index];
-                      return ChatItemWidget(conversation: conversation);
-                    },
-                  ),
-                );
-              },
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error: (error, stack) => Center(child: Text('Error: $error')),
-            ),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: conversationsState.when(
+                  data: (conversations) {
+                    if (conversations.isEmpty) {
+                      return const Center(child: Text('No messages yet'));
+                    }
+                    return RefreshIndicator(
+                      onRefresh: () async {
+                        ref.invalidate(conversationsProvider);
+                        await ref.read(conversationsProvider.future);
+                      },
+                      child: ListView.separated(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        itemCount: conversations.length,
+                        separatorBuilder: (context, index) => const Divider(
+                          height: 32,
+                          color: AppColors.borderSubtle,
+                        ),
+                        itemBuilder: (context, index) {
+                          final conversation = conversations[index];
+                          return ChatItemWidget(conversation: conversation);
+                        },
+                      ),
+                    );
+                  },
+                  loading: () =>
+                      const Center(child: CircularProgressIndicator()),
+                  error: (error, stack) => Center(child: Text('Error: $error')),
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

@@ -129,22 +129,32 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
                           message.senderId == authState.user.id;
 
                       if (message.type == 'system') {
-                        return Center(
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 8),
-                            child: Text(
-                              message.text ?? '',
-                              style: AppTextStyles.labelMd.copyWith(
-                                color: AppColors.textSecondary,
-                              ),
+                        return Container(
+                          alignment: Alignment.center,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 18,
+                            vertical: 8,
+                          ),
+                          child: Text(
+                            message.text ?? '',
+                            textAlign: TextAlign.center,
+                            style: AppTextStyles.labelMd.copyWith(
+                              color: AppColors.textSecondary,
                             ),
                           ),
                         );
                       }
 
                       if (message.type == 'quote_request') {
-                        final reqId = message.quoteRequest?['quoteRequestId'];
-                        return QuoteRequestWidget(quoteRequestId: reqId);
+                        final reqId =
+                            message.quoteRequest?['quoteRequestId']
+                                ?.toString() ??
+                            message.quoteRequest?['id']?.toString() ??
+                            message.quoteRequest?['_id']?.toString();
+                        return QuoteRequestWidget(
+                          message: message,
+                          quoteRequestId: reqId,
+                        );
                       }
 
                       if (message.type == 'quote') {
