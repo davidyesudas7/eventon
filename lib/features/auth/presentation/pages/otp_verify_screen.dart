@@ -106,7 +106,9 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifyScreen> {
         ),
       ),
       body: SafeArea(
-        child: Padding(
+        child: SingleChildScrollView(
+          physics: const ClampingScrollPhysics(),
+          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 28),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,

@@ -145,11 +145,23 @@ class _SignInEmailScreenState extends ConsumerState<SignInEmailScreen> {
         ),
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return SingleChildScrollView(
+              physics: const ClampingScrollPhysics(),
+              keyboardDismissBehavior:
+                  ScrollViewKeyboardDismissBehavior.onDrag,
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                child: IntrinsicHeight(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 24,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
               Text(
                 'Sign in with email',
                 style: AppTextStyles.headlineXl.copyWith(fontSize: 30),
@@ -280,7 +292,9 @@ class _SignInEmailScreenState extends ConsumerState<SignInEmailScreen> {
                         ),
                 ),
               ),
-              const SizedBox(height: 64),
+              const SizedBox(height: 16),
+              const Spacer(),
+              const SizedBox(height: 16),
 
               Center(
                 child: Column(
@@ -322,6 +336,11 @@ class _SignInEmailScreenState extends ConsumerState<SignInEmailScreen> {
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+},
+),
+),
+);
+}
 }

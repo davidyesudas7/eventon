@@ -162,11 +162,23 @@ class _SignInMobileScreenState extends ConsumerState<SignInMobileScreen> {
       child: Scaffold(
         backgroundColor: AppColors.surfaceWhite,
         body: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return SingleChildScrollView(
+                physics: const ClampingScrollPhysics(),
+                keyboardDismissBehavior:
+                    ScrollViewKeyboardDismissBehavior.onDrag,
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                  child: IntrinsicHeight(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 20,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
                 // Header with logo and optional close button
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -363,7 +375,9 @@ class _SignInMobileScreenState extends ConsumerState<SignInMobileScreen> {
                   ),
                 ),
 
+                const SizedBox(height: 16),
                 const Spacer(),
+                const SizedBox(height: 16),
 
                 Center(
                   child: Column(
@@ -413,5 +427,10 @@ class _SignInMobileScreenState extends ConsumerState<SignInMobileScreen> {
         ),
       ),
     );
-  }
+  },
+),
+),
+),
+);
+}
 }
